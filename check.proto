@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package check;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "github.com/emicklei/protocheck/test;test";
+
+message Check {
+  string id   = 1;
+  string fail = 2; // fail?
+  string cel  = 3;
+}
+
+extend google.protobuf.MessageOptions {
+  optional Check message = 20030916;
+}
+
+extend google.protobuf.FieldOptions {
+  optional Check field = 20030916;
+}
+

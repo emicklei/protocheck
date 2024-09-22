@@ -1,0 +1,1 @@
+https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen
