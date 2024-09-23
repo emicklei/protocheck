@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package check;
+
+import "check.proto";
+import "person.proto";
+
+option go_package = "github.com/emicklei/protocheck/test;test";
+
+message Holiday {
+  
+  // per field check
+           string destination = 1 [(check.field) = { cel:"size(this.destination) > 1" }];
+  repeated Person group       = 2 [(check.field) = { cel:"size(this.group) > 0"       }];
+}
+

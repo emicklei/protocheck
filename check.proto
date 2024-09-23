@@ -4,7 +4,7 @@ package check;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package = "github.com/emicklei/protocheck/test;test";
+option go_package = "github.com/emicklei/protocheck;protocheck";
 
 message Check {
   string id   = 1;

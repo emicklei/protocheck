@@ -22,28 +22,20 @@ func (v ValidationError) Error() string {
 	return v.Message
 }
 
-type Check struct {
-	Id         string
-	Message    string
-	Expression string
-}
-
 type Checker struct {
-	id      string
-	message string
+	check   *Check
 	program cel.Program
 }
 
-func NewChecker(id string, message string, program cel.Program) Checker {
+func NewChecker(id string, message string, cel string, program cel.Program) Checker {
 	return Checker{
-		id:      id,
-		message: message,
+		check: &Check{
+			Id:   id,
+			Fail: message,
+			Cel:  cel,
+		},
 		program: program,
 	}
-}
-
-func (c Checker) String() string {
-	return fmt.Sprintf("id: %s, message: %s", c.id, c.message)
 }
 
 type MessageValidator struct {
@@ -68,10 +60,10 @@ func (m MessageValidator) Validate(this any) error {
 			valid, ok := out.Value().(bool)
 			if !ok {
 				result = multierror.Append(result,
-					fmt.Errorf("expected check expression [%s] to return a boolean, got [%T]", each, out.Value()))
+					fmt.Errorf("expected check expression [%s] to return a boolean, got [%T]", each.check.Cel, out.Value()))
 			} else {
 				if !valid {
-					result = multierror.Append(result, errors.New(each.message))
+					result = multierror.Append(result, errors.New(each.check.Fail))
 				}
 			}
 		}
