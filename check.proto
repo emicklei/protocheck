@@ -7,9 +7,9 @@ import "google/protobuf/descriptor.proto";
 option go_package = "github.com/emicklei/protocheck;protocheck";
 
 message Check {
-  string id   = 1;
-  string fail = 2; // fail?
-  string cel  = 3;
+  string id   = 1; // optional identifier for lookup purposes
+  string fail = 2; // optional message to report when the check fails
+  string cel  = 3; // CEL expression
 }
 
 extend google.protobuf.MessageOptions {

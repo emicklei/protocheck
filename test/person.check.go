@@ -1,6 +1,8 @@
 package test
 
 import (
+	sync "sync"
+
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
@@ -8,12 +10,13 @@ import (
 )
 
 var (
-	PersonValidator protocheck.MessageValidator
+	personValidator     protocheck.MessageValidator
+	personValidatorOnce sync.Once
 )
 
-func init() {
+func file_person_check_proto_init() {
 	// ensure proto_init (idempotent) is called first.
-	file_sample_proto_init()
+	file_person_proto_init()
 
 	{ // check.Person
 		env, err := cel.NewEnv(
@@ -37,10 +40,13 @@ func init() {
 			}
 			chs = append(chs, protocheck.NewChecker("", "length must be greater than 3", `size(this.name) > 3`, prg))
 		}
-		PersonValidator = protocheck.NewMessageValidator(chs)
+		personValidator = protocheck.NewMessageValidator(chs)
 	}
 }
 
+// Validate checks the validity of the Person message.
+// Returns an error if the validation fails.
 func (x *Person) Validate() error {
-	return PersonValidator.Validate(x)
+	personValidatorOnce.Do(file_person_check_proto_init)
+	return personValidator.Validate(x)
 }

@@ -1,0 +1,60 @@
+package {{.PkgName}}
+
+import (
+	sync "sync"
+
+	"github.com/emicklei/protocheck"
+	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/checker/decls"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+)
+
+var (
+    {{- range .Messages}}
+    {{.LowercaseMessageName}}Validator     protocheck.MessageValidator
+    {{.LowercaseMessageName}}ValidatorOnce sync.Once
+    {{- end }}
+)
+
+ {{- range .Messages}}
+func file_{{.LowercaseMessageName}}_check_proto_init() {
+	// ensure proto_init (idempotent) is called first.
+	file_{{.LowercaseMessageName}}_proto_init()
+
+    {{- $lowerName := .LowercaseMessageName}}
+    {{- $messageName := .MessageName}}
+    {{- range .Checkers }}
+	{ // {{$.PkgName}}.{{$messageName}}
+		env, err := cel.NewEnv(
+			cel.Types(&{{$messageName}}{}),
+			cel.Types(&timestamppb.Timestamp{}),
+			cel.Declarations(
+				decls.NewVar("now", decls.NewObjectType("google.protobuf.Timestamp")),
+				decls.NewVar("this", decls.NewObjectType("check.{{$messageName}}"))))
+		if err != nil {
+			panic(err)
+		}
+		chs := []protocheck.Checker{}
+		{ // {{.FieldName}}
+			ast, iss := env.Compile(`{{.Expr}}`)
+			if err = iss.Err(); err != nil {
+				panic(err)
+			}
+			prg, err := env.Program(ast)
+			if err != nil {
+				panic(err)
+			}
+			chs = append(chs, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, prg))
+		}
+		{{$lowerName}}Validator = protocheck.NewMessageValidator(chs)
+	}
+    {{- end }}
+}
+
+// Validate checks the validity of the {{.MessageName}} message.
+// Returns an error if the validation fails.
+func (x *{{.MessageName}}) Validate() error {
+	{{.LowercaseMessageName}}ValidatorOnce.Do(file_{{.LowercaseMessageName}}_check_proto_init)
+	return {{.LowercaseMessageName}}Validator.Validate(x)
+}
+{{- end }}

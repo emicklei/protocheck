@@ -33,9 +33,9 @@ func TestCheckPersonDescription(t *testing.T) {
 	check(err)
 	ast, iss := env.Compile(`size(this.description) > 0`)
 	check(iss.Err())
-	prg, err := env.Program(ast)
+	prg, _ := env.Program(ast)
 	joe := &Person{Name: "Joe"}
-	out, _, err := prg.Eval(map[string]interface{}{
+	out, _, _ := prg.Eval(map[string]interface{}{
 		"this": joe,
 	})
 	fmt.Println(out.Value())

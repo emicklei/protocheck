@@ -18,3 +18,8 @@ message Person {
            google.protobuf.Timestamp birth_date  = 3 [(check.field) = { id  :"check_birth_date"            cel:"this.birth_date < now"      }];
 }
 
+// second message in same file
+message Pet {
+  string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog' " }];
+}
+

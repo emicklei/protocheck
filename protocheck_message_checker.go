@@ -22,6 +22,7 @@ func (v ValidationError) Error() string {
 	return v.Message
 }
 
+// Checker performs one check using a CEL program.
 type Checker struct {
 	check   *Check
 	program cel.Program

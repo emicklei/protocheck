@@ -13,4 +13,3 @@ message Holiday {
            string destination = 1 [(check.field) = { cel:"size(this.destination) > 1" }];
   repeated Person group       = 2 [(check.field) = { cel:"size(this.group) > 0"       }];
 }
-
