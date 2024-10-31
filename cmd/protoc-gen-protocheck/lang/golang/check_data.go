@@ -1,9 +1,9 @@
-package main
+package golang
 
 import (
 	_ "embed"
-	"html/template"
 	"strings"
+	"text/template"
 )
 
 //go:embed check_template.txt
@@ -14,6 +14,7 @@ type FileData struct {
 	Messages []MessageData
 }
 type MessageData struct {
+	InitFuncName         string
 	LowercaseMessageName string
 	MessageName          string
 	Checkers             []CheckerData

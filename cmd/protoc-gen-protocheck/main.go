@@ -3,13 +3,16 @@ package main
 import (
 	"flag"
 	"log/slog"
-	"strings"
 
+	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/golang"
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
+var lang *string
+
 func main() {
 	var flags flag.FlagSet
+	lang = flags.String("lang", "go", "one of the supported programming languages")
 	opts := &protogen.Options{
 		ParamFunc: flags.Set,
 	}
@@ -27,19 +30,15 @@ func run(p *protogen.Plugin) error {
 			continue
 		}
 		slog.Info("destination",
-			"import path", each.GoImportPath,
 			"pkg", each.GoPackageName,
-			"file", each.Desc.Path(),
-			"param", p.Request.GetParameter())
+			"file", each.Desc.Path())
 
-		fd := buildFileData(each)
-		content, err := generate(fd)
-		if err != nil {
-			return err
+		switch *lang {
+		case "go":
+			golang.Process(p, each)
+		default:
+			slog.Warn("unsupported language", "lang", *lang)
 		}
-		outName := strings.Replace(each.Desc.Path(), ".proto", ".check.go", -1)
-		f := p.NewGeneratedFile(outName, each.GoImportPath)
-		f.P(content)
 	}
 	return nil
 }
@@ -53,31 +52,4 @@ func importsCheck(f *protogen.File) bool {
 		}
 	}
 	return false
-}
-
-func buildFileData(f *protogen.File) FileData {
-	fd := FileData{
-		PkgName: string(f.GoPackageName),
-	}
-	for _, each := range f.Messages {
-		fd.Messages = append(fd.Messages, buildMessageData(each))
-	}
-	return fd
-}
-
-func buildMessageData(m *protogen.Message) MessageData {
-	md := MessageData{
-		LowercaseMessageName: strings.ToLower(string(m.Desc.Name())),
-		MessageName:          string(m.Desc.Name()),
-	}
-	for _, each := range m.Fields {
-		md.Checkers = append(md.Checkers, buildCheckerData(each))
-	}
-	return md
-}
-
-func buildCheckerData(f *protogen.Field) CheckerData {
-	return CheckerData{
-		FieldName: f.GoName,
-	}
 }

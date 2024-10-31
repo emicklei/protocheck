@@ -1,1 +1,1 @@
-https://pkg.go.dev/google.golang.org/protobuf/compiler/protogen
+put copy of checker in generated folder so no protocheck runtime dependency.

@@ -33,7 +33,7 @@ func file_person_check_proto_init() {
 		}
 		chs := []protocheck.Checker{}
 		{ // Name
-			ast, iss := env.Compile(``)
+			ast, iss := env.Compile(`size(this.name) > 1`)
 			if err = iss.Err(); err != nil {
 				panic(err)
 			}
@@ -41,7 +41,7 @@ func file_person_check_proto_init() {
 			if err != nil {
 				panic(err)
 			}
-			chs = append(chs, protocheck.NewChecker("", "", ``, prg))
+			chs = append(chs, protocheck.NewChecker("", "", `size(this.name) > 1`, prg))
 		}
 		personValidator = protocheck.NewMessageValidator(chs)
 	}
@@ -57,7 +57,7 @@ func file_person_check_proto_init() {
 		}
 		chs := []protocheck.Checker{}
 		{ // Description
-			ast, iss := env.Compile(``)
+			ast, iss := env.Compile(`size(this.description) > 0`)
 			if err = iss.Err(); err != nil {
 				panic(err)
 			}
@@ -65,7 +65,7 @@ func file_person_check_proto_init() {
 			if err != nil {
 				panic(err)
 			}
-			chs = append(chs, protocheck.NewChecker("", "", ``, prg))
+			chs = append(chs, protocheck.NewChecker("", "description cannot be empty", `size(this.description) > 0`, prg))
 		}
 		personValidator = protocheck.NewMessageValidator(chs)
 	}
@@ -81,7 +81,7 @@ func file_person_check_proto_init() {
 		}
 		chs := []protocheck.Checker{}
 		{ // BirthDate
-			ast, iss := env.Compile(``)
+			ast, iss := env.Compile(`this.birth_date < now`)
 			if err = iss.Err(); err != nil {
 				panic(err)
 			}
@@ -89,7 +89,7 @@ func file_person_check_proto_init() {
 			if err != nil {
 				panic(err)
 			}
-			chs = append(chs, protocheck.NewChecker("", "", ``, prg))
+			chs = append(chs, protocheck.NewChecker("check_birth_date", "", `this.birth_date < now`, prg))
 		}
 		personValidator = protocheck.NewMessageValidator(chs)
 	}
@@ -103,7 +103,7 @@ func (x *Person) Validate(opts ...cel.EnvOption) error {
 }
 func file_pet_check_proto_init() {
 	// ensure proto_init (idempotent) is called first.
-	file_pet_proto_init()
+	file_person_proto_init()
 	{ // test.Pet
 		env, err := cel.NewEnv(
 			cel.Types(new(Pet)),
@@ -116,7 +116,7 @@ func file_pet_check_proto_init() {
 		}
 		chs := []protocheck.Checker{}
 		{ // Kind
-			ast, iss := env.Compile(``)
+			ast, iss := env.Compile(`this.kind == 'cat' || this.kind == 'dog' `)
 			if err = iss.Err(); err != nil {
 				panic(err)
 			}
@@ -124,7 +124,7 @@ func file_pet_check_proto_init() {
 			if err != nil {
 				panic(err)
 			}
-			chs = append(chs, protocheck.NewChecker("", "", ``, prg))
+			chs = append(chs, protocheck.NewChecker("", "", `this.kind == 'cat' || this.kind == 'dog' `, prg))
 		}
 		petValidator = protocheck.NewMessageValidator(chs)
 	}

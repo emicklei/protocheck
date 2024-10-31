@@ -21,7 +21,7 @@ var (
  {{- range .Messages}}
 func file_{{.LowercaseMessageName}}_check_proto_init() {
 	// ensure proto_init (idempotent) is called first.
-	file_{{.LowercaseMessageName}}_proto_init()
+	{{.InitFuncName}}()
 
     {{- $lowerName := .LowercaseMessageName}}
     {{- $messageName := .MessageName}}

@@ -1,4 +1,4 @@
-package main
+package golang
 
 import (
 	"testing"
@@ -8,6 +8,7 @@ func TestTemplate(t *testing.T) {
 	fd := FileData{
 		PkgName: "test",
 		Messages: []MessageData{{
+			Filename:             "person",
 			LowercaseMessageName: "person",
 			MessageName:          "Person",
 			Checkers: []CheckerData{

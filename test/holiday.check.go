@@ -31,7 +31,7 @@ func file_holiday_check_proto_init() {
 		}
 		chs := []protocheck.Checker{}
 		{ // Destination
-			ast, iss := env.Compile(``)
+			ast, iss := env.Compile(`size(this.destination) > 1`)
 			if err = iss.Err(); err != nil {
 				panic(err)
 			}
@@ -39,7 +39,7 @@ func file_holiday_check_proto_init() {
 			if err != nil {
 				panic(err)
 			}
-			chs = append(chs, protocheck.NewChecker("", "", ``, prg))
+			chs = append(chs, protocheck.NewChecker("", "", `size(this.destination) > 1`, prg))
 		}
 		holidayValidator = protocheck.NewMessageValidator(chs)
 	}
@@ -55,7 +55,7 @@ func file_holiday_check_proto_init() {
 		}
 		chs := []protocheck.Checker{}
 		{ // Group
-			ast, iss := env.Compile(``)
+			ast, iss := env.Compile(`size(this.group) > 0`)
 			if err = iss.Err(); err != nil {
 				panic(err)
 			}
@@ -63,7 +63,7 @@ func file_holiday_check_proto_init() {
 			if err != nil {
 				panic(err)
 			}
-			chs = append(chs, protocheck.NewChecker("", "", ``, prg))
+			chs = append(chs, protocheck.NewChecker("", "", `size(this.group) > 0`, prg))
 		}
 		holidayValidator = protocheck.NewMessageValidator(chs)
 	}
