@@ -1,13 +1,10 @@
 package main
 
 import (
-	"os"
 	"testing"
-	"text/template"
 )
 
 func TestTemplate(t *testing.T) {
-	tmpl := template.Must(template.New("check").Parse(checkDataTemplate))
 	fd := FileData{
 		PkgName: "test",
 		Messages: []MessageData{{
@@ -16,7 +13,7 @@ func TestTemplate(t *testing.T) {
 			Checkers: []CheckerData{
 				{
 					FieldName: "name",
-					ID:        "name",
+					ID:        "name-id",
 					Expr:      `size(this.name) > 3`,
 					Fail:      "length must be greater than 3",
 				},
@@ -27,14 +24,14 @@ func TestTemplate(t *testing.T) {
 			Checkers: []CheckerData{
 				{
 					FieldName: "name",
-					ID:        "name",
+					ID:        "name-id",
 					Expr:      `size(this.name) > 3`,
 					Fail:      "length must be greater than 3",
 				},
 			},
 		}},
 	}
-	if err := tmpl.Execute(os.Stdout, fd); err != nil {
+	if _, err := generate(fd); err != nil {
 		t.Fatal(err)
 	}
 }

@@ -1,6 +1,10 @@
 package main
 
-import _ "embed"
+import (
+	_ "embed"
+	"html/template"
+	"strings"
+)
 
 //go:embed check_template.txt
 var checkDataTemplate string
@@ -19,4 +23,13 @@ type CheckerData struct {
 	ID        string
 	Expr      string
 	Fail      string
+}
+
+func generate(fd FileData) (string, error) {
+	tmpl := template.Must(template.New("check").Parse(checkDataTemplate))
+	buf := new(strings.Builder)
+	if err := tmpl.Execute(buf, fd); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

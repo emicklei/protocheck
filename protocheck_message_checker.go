@@ -47,7 +47,7 @@ func NewMessageValidator(chs []Checker) MessageValidator {
 	return MessageValidator{checkers: chs}
 }
 
-func (m MessageValidator) Validate(this any) error {
+func (m MessageValidator) Validate(this any, opts ...cel.EnvOption) error {
 	var result error
 	env := map[string]interface{}{
 		"this": this,
