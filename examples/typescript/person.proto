@@ -1,25 +1,25 @@
 syntax = "proto3";
 
-package check;
+package golang;
 
 import "check.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/emicklei/protocheck/test;test";
+option go_package = "github.com/emicklei/protocheck-example/golang;golang";
 
 message Person {
   
-  // overal message state check
-  option (check.message) = { fail:"name and description cannot be empty" id:"person_invariant" cel:"size(this.name + this.description) > 0" };
+  // message state check
+  option (check.message) = { fail:"name and description cannot be empty" id:"person_invariant"  cel:"size(this.name + this.description) > 0" };
+  option (check.message) = { fail:"name and description cannot be empty" id:"person_invariant2" cel:"size(this.name + this.description) > 0" };
   
-  // per field check
-           string                    name        = 1 [(check.field) = { cel :"size(this.name) > 1"         }  ];
-  optional string                    description = 2 [(check.field) = { fail:"description cannot be empty" cel:"size(this.description) > 0" }];
-           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { id  :"check_birth_date"            cel:"this.birth_date < now"      }];
+  // with per field checks
+           string                    name        = 1 [(check.field) = { cel :"size(this.name) > 1"         id :"check_name"                           }];
+  optional string                    description = 2 [(check.field) = { fail:"description cannot be empty" cel:"size(this.description) > 0"           }];
+           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { id  :"check_birth_date"            cel:"this.birth_date.getFullYear() > 2000" }];
 }
 
 // second message in same file
 message Pet {
   string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog' " }];
 }
-

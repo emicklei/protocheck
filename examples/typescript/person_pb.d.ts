@@ -1,4 +1,4 @@
-// package: check
+// package: golang
 // file: person.proto
 
 import * as jspb from "google-protobuf";

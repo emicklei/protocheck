@@ -13,7 +13,7 @@ message Check {
 }
 
 extend google.protobuf.MessageOptions {
-  optional Check message = 20030916;
+  repeated Check message = 20030916;
 }
 
 extend google.protobuf.FieldOptions {
