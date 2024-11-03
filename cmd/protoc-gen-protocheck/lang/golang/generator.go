@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"log/slog"
 	"strings"
 
 	"github.com/emicklei/protocheck"
@@ -42,6 +43,14 @@ func buildMessageData(m *protogen.Message) MessageData {
 	md := MessageData{
 		LowercaseMessageName: strings.ToLower(string(m.Desc.Name())),
 		MessageName:          string(m.Desc.Name()),
+	}
+	opts := m.Desc.Options()
+	if opts != nil {
+		mops := opts.(*descriptorpb.MessageOptions)
+		if proto.HasExtension(mops, protocheck.E_Message) {
+			ext, ok := proto.GetExtension(mops, protocheck.E_Message).([]*protocheck.Check)
+			slog.Info("msgs", "ext", ext, "ok", ok)
+		}
 	}
 	for _, each := range m.Fields {
 		cd, ok := buildCheckerData(each)

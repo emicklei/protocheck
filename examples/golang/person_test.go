@@ -13,7 +13,8 @@ func check(err error) {
 }
 func TestCheckPerson(t *testing.T) {
 	joe := &Person{
-		Name:      "Joe",
-		BirthDate: &timestamppb.Timestamp{Seconds: timestamppb.Now().Seconds + 1}}
-	t.Log(joe.Validate())
+		Name:      "",
+		BirthDate: &timestamppb.Timestamp{Seconds: 1}}
+	err := joe.Validate()
+	t.Log(err)
 }

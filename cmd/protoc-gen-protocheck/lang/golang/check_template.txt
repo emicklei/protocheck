@@ -8,7 +8,6 @@ import (
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -25,38 +24,30 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 
     {{- $lowerName := .LowercaseMessageName}}
     {{- $messageName := .MessageName}}
-    {{- range .Checkers }}
-	{ // {{$.PkgName}}.{{$messageName}}
-		env, err := cel.NewEnv(
-			cel.Types(new({{$messageName}})),
-			cel.Types(new(timestamppb.Timestamp)),
-			cel.Declarations(
-				decls.NewVar("now", decls.NewObjectType("google.protobuf.Timestamp")),
-				decls.NewVar("this", decls.NewObjectType("{{$.PkgName}}.{{$messageName}}"))))
-		if err != nil {
+	env, err := cel.NewEnv(
+		cel.Types(new({{$messageName}})),
+		cel.Declarations(
+			decls.NewVar("this", decls.NewObjectType("{{$.PkgName}}.{{$messageName}}"))))
+	if err != nil {
+		panic(err)
+	}	
+	chs := []protocheck.Checker{}
+	{{- range .Checkers }}	
+	{ // {{.FieldName}}
+		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
 			panic(err)
-		}
-		chs := []protocheck.Checker{}
-		{ // {{.FieldName}}
-			ast, iss := env.Compile(`{{.Expr}}`)
-			if err = iss.Err(); err != nil {
-				panic(err)
-			}
-			prg, err := env.Program(ast)
-			if err != nil {
-				panic(err)
-			}
+		} else {
 			chs = append(chs, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, prg))
 		}
-		{{$lowerName}}Validator = protocheck.NewMessageValidator(chs)
-	}
+	}	
     {{- end }}
+	{{$lowerName}}Validator = protocheck.NewMessageValidator(chs)
 }
 
 // Validate checks the validity of the {{.MessageName}} message.
 // Returns an error if the validation fails.
-func (x *{{.MessageName}}) Validate(opts ...cel.EnvOption) error {
+func (x *{{.MessageName}}) Validate() protocheck.ValidationError {
 	{{.LowercaseMessageName}}ValidatorOnce.Do(file_{{.LowercaseMessageName}}_check_proto_init)
-	return {{.LowercaseMessageName}}Validator.Validate(x,opts...)
+	return {{.LowercaseMessageName}}Validator.Validate(x)
 }
 {{- end }}

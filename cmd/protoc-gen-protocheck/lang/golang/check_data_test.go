@@ -8,7 +8,7 @@ func TestTemplate(t *testing.T) {
 	fd := FileData{
 		PkgName: "test",
 		Messages: []MessageData{{
-			Filename:             "person",
+			InitFuncName:         "person_init",
 			LowercaseMessageName: "person",
 			MessageName:          "Person",
 			Checkers: []CheckerData{
@@ -32,7 +32,9 @@ func TestTemplate(t *testing.T) {
 			},
 		}},
 	}
-	if _, err := generate(fd); err != nil {
+	if src, err := generate(fd); err != nil {
 		t.Fatal(err)
+	} else {
+		t.Log(src)
 	}
 }

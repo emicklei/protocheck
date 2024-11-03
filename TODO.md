@@ -1,1 +1,0 @@
-put copy of checker in generated folder so no protocheck runtime dependency.
