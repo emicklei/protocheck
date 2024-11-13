@@ -14,7 +14,7 @@ message Person {
   option (check.message) = { fail:"name and description cannot be empty" id:"person_invariant2" cel:"size(this.name + this.description) > 0" };
   
   // with per field checks
-           string                    name        = 1 [(check.field) = { cel :"size(this.name) > 1"         id :"check_name"                           }];
+           string                    name        = 1 [(check.field) = { id  :"check_name"                  cel:"size(this.name) > 1"                  }];
   optional string                    description = 2 [(check.field) = { fail:"description cannot be empty" cel:"size(this.description) > 0"           }];
            google.protobuf.Timestamp birth_date  = 3 [(check.field) = { id  :"check_birth_date"            cel:"this.birth_date.getFullYear() > 2000" }];
 }
@@ -23,3 +23,4 @@ message Person {
 message Pet {
   string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog' " }];
 }
+

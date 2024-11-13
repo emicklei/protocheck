@@ -14,13 +14,17 @@ type CheckError struct {
 	Err  error
 }
 
-// ValidationError is a collection or error (kind of a multierror)
+// ValidationError is a collection of CheckError.
 type ValidationError []CheckError
 
 // Error implements error
 func (v ValidationError) Error() string {
 	b := new(strings.Builder)
-	fmt.Fprintf(b, "%d error occurred:\n", len(v))
+	plural := ""
+	if len(v) > 1 {
+		plural = "s"
+	}
+	fmt.Fprintf(b, "%d error%s occurred:\n", len(v), plural)
 	for _, each := range v {
 		fail := each.Fail
 		if fail == "" {
