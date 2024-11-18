@@ -9,14 +9,14 @@ option go_package = "github.com/emicklei/protocheck-example/golang;golang";
 
 message Person {
   
-  // message state check
-  option (check.message) = { fail:"name and description cannot be empty" id:"person_invariant"  cel:"size(this.name + this.description) > 0" };
-  option (check.message) = { fail:"name and description cannot be empty" id:"person_invariant2" cel:"size(this.name + this.description) > 0" };
+  // multiple message state checks
+  option (check.message) = { cel:"size(this.name + this.description) > 0" fail:"name and description cannot be empty" id:"person_invariant"  };
+  option (check.message) = { cel:"size(this.name + this.description) > 0" fail:"name and description cannot be empty" id:"person_invariant2" };
   
-  // with per field checks
-           string                    name        = 1 [(check.field) = { id  :"check_name"                  cel:"size(this.name) > 1"                  }];
-  optional string                    description = 2 [(check.field) = { fail:"description cannot be empty" cel:"size(this.description) > 0"           }];
-           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { id  :"check_birth_date"            cel:"this.birth_date.getFullYear() > 2000" }];
+  // with per field state checks
+           string                    name        = 1 [(check.field) = { cel:"size(this.name) > 1"                  fail:"name cannot be empty"        }];
+  optional string                    description = 2 [(check.field) = { cel:"size(this.description) > 0"           fail:"description cannot be empty" }];
+           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { cel:"this.birth_date.getFullYear() > 2000" id  :"check_birth_date"            }];
 }
 
 // second message in same file
