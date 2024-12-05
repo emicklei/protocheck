@@ -32,7 +32,7 @@ func file_person_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env, `size(this.name) > 1`); err != nil {
 			panic(err)
 		} else {
-			chs = append(chs, protocheck.NewChecker("check_name", "", `size(this.name) > 1`, prg))
+			chs = append(chs, protocheck.NewChecker("", "name cannot be empty", `size(this.name) > 1`, prg))
 		}
 	}
 	{ // Description

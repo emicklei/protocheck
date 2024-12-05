@@ -77,7 +77,14 @@ func buildCheckerData(f *protogen.Field) (CheckerData, bool) {
 	return CheckerData{
 		FieldName: f.GoName,
 		ID:        ext.Id,
-		Fail:      ext.Fail,
+		Fail:      ifEmpty(ext.Fail, ext.Cel),
 		Expr:      ext.Cel,
 	}, true
+}
+
+func ifEmpty(content, alt string) string {
+	if content == "" {
+		return alt
+	}
+	return content
 }

@@ -9,7 +9,7 @@ option go_package = "github.com/emicklei/protocheck;protocheck";
 message Check {
   string id   = 1; // optional identifier for lookup purposes
   string fail = 2; // optional message to report when the check fails
-  string cel  = 3; // CEL expression
+  string cel  = 3; // Google/CEL expression (https://github.com/google/cel-spec)
 }
 
 extend google.protobuf.MessageOptions {

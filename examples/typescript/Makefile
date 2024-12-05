@@ -8,7 +8,7 @@ runjs:
 	node hello.js
 
 gen:
-	protoc \
+	proto -I=../protos \
 		--ts_opt=esModuleInterop=true \
 		--ts_out="." \
 		person.proto check.proto
