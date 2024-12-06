@@ -52,16 +52,45 @@ func buildMessageData(m *protogen.Message) MessageData {
 			slog.Info("msgs", "ext", ext, "ok", ok)
 		}
 	}
+	// TODO nested messages
+	cds, ok := buildMessageCheckerData(m)
+	if ok {
+		md.MessageCheckers = append(md.MessageCheckers, cds...)
+	}
 	for _, each := range m.Fields {
-		cd, ok := buildCheckerData(each)
+		cd, ok := buildFieldCheckerData(each)
 		if ok {
-			md.Checkers = append(md.Checkers, cd)
+			md.FieldCheckers = append(md.FieldCheckers, cd)
 		}
 	}
 	return md
 }
+func buildMessageCheckerData(m *protogen.Message) ([]CheckerData, bool) {
+	opts := m.Desc.Options()
+	if opts == nil {
+		return []CheckerData{}, false
+	}
+	mops := opts.(*descriptorpb.MessageOptions)
+	if !proto.HasExtension(mops, protocheck.E_Message) {
+		return []CheckerData{}, false
+	}
+	exts, ok := proto.GetExtension(mops, protocheck.E_Message).([]*protocheck.Check)
+	if !ok {
+		return []CheckerData{}, false
+	}
+	cds := []CheckerData{}
+	for _, each := range exts {
+		cds = append(cds, CheckerData{
+			Comment: ifEmpty(each.Id, each.Cel),
+			ID:      each.Id,
+			Fail:    ifEmpty(each.Fail, each.Cel),
+			Expr:    each.Cel,
+		})
+	}
+	return cds, true
+}
 
-func buildCheckerData(f *protogen.Field) (CheckerData, bool) {
+func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
 	opts := f.Desc.Options()
 	if opts == nil {
 		return CheckerData{}, false
@@ -75,6 +104,7 @@ func buildCheckerData(f *protogen.Field) (CheckerData, bool) {
 		return CheckerData{}, false
 	}
 	return CheckerData{
+		Comment:   f.GoName,
 		FieldName: f.GoName,
 		ID:        ext.Id,
 		Fail:      ifEmpty(ext.Fail, ext.Cel),

@@ -11,22 +11,21 @@ func TestTemplate(t *testing.T) {
 			InitFuncName:         "person_init",
 			LowercaseMessageName: "person",
 			MessageName:          "Person",
-			Checkers: []CheckerData{
+			MessageCheckers: []CheckerData{
 				{
-					FieldName: "name",
-					ID:        "name-id",
-					Expr:      `size(this.name) > 3`,
-					Fail:      "length must be greater than 3",
+					ID:   "name-id",
+					Expr: `size(this.name) > 3`,
+					Fail: "length must be greater than 3",
 				},
 			},
 		}, {
 			LowercaseMessageName: "thing",
 			MessageName:          "Thing",
-			Checkers: []CheckerData{
+			FieldCheckers: []CheckerData{
 				{
 					FieldName: "name",
 					ID:        "name-id",
-					Expr:      `size(this.name) > 3`,
+					Expr:      `size(this) > 3`,
 					Fail:      "length must be greater than 3",
 				},
 			},

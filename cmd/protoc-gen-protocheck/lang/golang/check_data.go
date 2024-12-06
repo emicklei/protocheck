@@ -17,10 +17,12 @@ type MessageData struct {
 	InitFuncName         string
 	LowercaseMessageName string
 	MessageName          string
-	Checkers             []CheckerData
+	MessageCheckers      []CheckerData
+	FieldCheckers        []CheckerData
 }
 type CheckerData struct {
-	FieldName string
+	Comment   string
+	FieldName string // empty for message level
 	ID        string
 	Expr      string
 	Fail      string

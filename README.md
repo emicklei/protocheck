@@ -47,5 +47,5 @@ err := p.Validate()
 
 The `protocheck` packages is inspired by this and both packages are using the powerful CEL expression language and implementation.
 
-- `this` always refers to the message
 - slightly more compact syntax
+- only dependenct on google/cel

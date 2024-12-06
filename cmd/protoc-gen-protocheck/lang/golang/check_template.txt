@@ -30,18 +30,28 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 			decls.NewVar("this", decls.NewObjectType("{{$.PkgName}}.{{$messageName}}"))))
 	if err != nil {
 		panic(err)
-	}	
-	chs := []protocheck.Checker{}
-	{{- range .Checkers }}	
-	{ // {{.FieldName}}
+	}
+	messageCheckers := []protocheck.Checker{}	
+	{{- range .MessageCheckers }}	
+	{ // {{.Commment}}
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
 			panic(err)
 		} else {
-			chs = append(chs, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, prg))
+			messageCheckers = append(messageCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", prg))
+		}
+	}	
+    {{- end }}	
+	fieldCheckers := []protocheck.Checker{}
+	{{- range .FieldCheckers }}	
+	{ // {{.Commment}}
+		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", prg))
 		}
 	}	
     {{- end }}
-	{{$lowerName}}Validator = protocheck.NewMessageValidator(chs)
+	{{$lowerName}}Validator = protocheck.NewMessageValidator(messageCheckers,fieldCheckers)
 }
 
 // Validate checks the validity of the {{.MessageName}} message.
