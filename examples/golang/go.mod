@@ -6,6 +6,7 @@ go 1.23
 
 require (
 	github.com/emicklei/protocheck v0.0.0-00010101000000-000000000000
+	github.com/golang/protobuf v1.5.0
 	github.com/google/cel-go v0.22.0
 	google.golang.org/protobuf v1.35.2
 )

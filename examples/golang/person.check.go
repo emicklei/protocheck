@@ -28,40 +28,33 @@ func file_person_check_proto_init() {
 		panic(err)
 	}
 	messageCheckers := []protocheck.Checker{}
-	{
+	{ // person_invariant
 		if prg, err := protocheck.MakeProgram(env, `size(this.name + this.description) > 0`); err != nil {
 			panic(err)
 		} else {
-			messageCheckers = append(messageCheckers, protocheck.NewChecker("person_invariant", "name and description cannot be empty", `size(this.name + this.description) > 0`, "", prg))
-		}
-	}
-	{
-		if prg, err := protocheck.MakeProgram(env, `size(this.name + this.description) > 0`); err != nil {
-			panic(err)
-		} else {
-			messageCheckers = append(messageCheckers, protocheck.NewChecker("person_invariant2", "name and description cannot be empty", `size(this.name + this.description) > 0`, "", prg))
+			messageCheckers = append(messageCheckers, protocheck.NewChecker("person_invariant", "name and description cannot be empty", `size(this.name + this.description) > 0`, "", false, prg))
 		}
 	}
 	fieldCheckers := []protocheck.Checker{}
 	{ // Name
-		if prg, err := protocheck.MakeProgram(env, `size(this) > 1`); err != nil {
+		if prg, err := protocheck.MakeProgram(env, `size(this.name) > 1`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "name cannot be empty", `size(this) > 1`, "Name", prg))
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "name cannot be empty", `size(this.name) > 1`, "Name", false, prg))
 		}
 	}
 	{ // Description
-		if prg, err := protocheck.MakeProgram(env, `size(this) > 0`); err != nil {
+		if prg, err := protocheck.MakeProgram(env, `size(this.description) > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "description cannot be empty", `size(this) > 0`, "Description", prg))
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "description cannot be empty", `size(this.description) > 0`, "Description", true, prg))
 		}
 	}
 	{ // BirthDate
-		if prg, err := protocheck.MakeProgram(env, `this.getFullYear() > 2000`); err != nil {
+		if prg, err := protocheck.MakeProgram(env, `this.birth_date.getFullYear() > 2000`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("check_birth_date", "this.getFullYear() > 2000", `this.getFullYear() > 2000`, "BirthDate", prg))
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("check_birth_date", "this.birth_date.getFullYear() > 2000", `this.birth_date.getFullYear() > 2000`, "BirthDate", false, prg))
 		}
 	}
 	personValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
@@ -89,7 +82,7 @@ func file_pet_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env, `this.kind == 'cat' || this.kind == 'dog' `); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "this.kind == 'cat' || this.kind == 'dog' ", `this.kind == 'cat' || this.kind == 'dog' `, "Kind", prg))
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "this.kind == 'cat' || this.kind == 'dog' ", `this.kind == 'cat' || this.kind == 'dog' `, "Kind", false, prg))
 		}
 	}
 	petValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)

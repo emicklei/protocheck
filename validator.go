@@ -22,14 +22,13 @@ func (m MessageValidator) Validate(this any) ValidationError {
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
 	}
-	rv := reflect.ValueOf(this)
+	rv := reflect.ValueOf(this).Elem()
 	for _, each := range m.fieldCheckers {
 		rf := rv.FieldByName(each.fieldName)
-		if rf.IsZero() {
-			env["this"] = nil
-		} else {
-			env["this"] = rf.Interface()
+		if rf.IsZero() && each.isOptional {
+			continue
 		}
+		env["this"] = rf.Interface()
 		result = append(result, evalChecker(each, env)...)
 	}
 	return result

@@ -35,7 +35,9 @@ func run(p *protogen.Plugin) error {
 
 		switch *lang {
 		case "go":
-			golang.Process(p, each)
+			if err := golang.Process(p, each); err != nil {
+				return err
+			}
 		default:
 			slog.Warn("unsupported language", "lang", *lang)
 		}

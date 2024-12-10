@@ -33,21 +33,21 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 	}
 	messageCheckers := []protocheck.Checker{}	
 	{{- range .MessageCheckers }}	
-	{ // {{.Commment}}
+	{ // {{.Comment}}
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
 			panic(err)
 		} else {
-			messageCheckers = append(messageCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", prg))
+			messageCheckers = append(messageCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", false, prg))
 		}
 	}	
     {{- end }}	
 	fieldCheckers := []protocheck.Checker{}
 	{{- range .FieldCheckers }}	
-	{ // {{.Commment}}
+	{ // {{.Comment}}
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", prg))
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", {{.IsOptional}}, prg))
 		}
 	}	
     {{- end }}

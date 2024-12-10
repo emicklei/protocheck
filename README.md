@@ -14,16 +14,13 @@ package hr;
 
 message Person {
   
-  // overal message state check
-  option (check.message) = { 
-    id:  "person_invariant"
-    fail:"name and description cannot be empty"  
-    cel: "size(this.name + this.description) > 0" };
+  // multiple message state checks
+  option (check.message) = { cel:"size(this.name + this.description) > 0" fail:"name and description cannot be empty" id:"person_invariant"  };
   
-  // per field check
-           string                    name        = 1 [(check.field) = { cel :"size(this.name) > 1"         }  ];
-  optional string                    description = 2 [(check.field) = { fail:"description cannot be empty" cel:"size(this.description) > 0" }];
-           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { id  :"check_birth_date"            cel:"this.birth_date.getFullYear() > 2000" }];
+  // with per field state checks
+           string                    name        = 1 [(check.field) = { cel:"size(this) > 1"            fail:"name cannot be empty"        }];
+  optional string                    description = 2 [(check.field) = { cel:"size(this) > 0"            fail:"description cannot be empty" }];
+           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { cel:"this.getFullYear() > 1000" id:"check_birth_date"              }];
 }
 ```
 
@@ -34,18 +31,14 @@ message Person {
 ```go
 p := &Person{
     Name:      "",
-    Description: "",
     BirthDate: &timestamppb.Timestamp{Seconds:1}
 }
 err := p.Validate()
 ```
 
-## comparing to the envoyproxy/protoc-gen-validate package
+The `protocheck` package is inspired by `bufbuild/protovalidate` which also uses the powerful CEL expression language.
+However, it differs by:
 
-
-## comparing to the bufbuild/protovalidate package
-
-The `protocheck` packages is inspired by this and both packages are using the powerful CEL expression language and implementation.
-
-- slightly more compact syntax
-- only dependenct on google/cel
+  - `this` always refers to the (root) message
+  - no dependency on the buf package
+  - syntax is more compact

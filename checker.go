@@ -33,7 +33,7 @@ func (v ValidationError) Error() string {
 		if each.Err == nil {
 			fmt.Fprintf(b, "\t* %s\n", fail)
 		} else {
-			fmt.Fprintf(b, "\t* %s:%s\n", fail, each.Err.Error())
+			fmt.Fprintf(b, "\t* %s err=%s\n", fail, each.Err.Error())
 		}
 	}
 	return b.String()
@@ -41,20 +41,22 @@ func (v ValidationError) Error() string {
 
 // Checker performs one check using a CEL program.
 type Checker struct {
-	check     *Check
-	program   cel.Program
-	fieldName string // for field level checks
+	check      *Check
+	program    cel.Program
+	fieldName  string // for field level checks
+	isOptional bool
 }
 
 // NewChecker creates a Checker
-func NewChecker(id string, fail string, cel string, fieldName string, program cel.Program) Checker {
+func NewChecker(id string, fail string, cel string, fieldName string, isOptional bool, program cel.Program) Checker {
 	return Checker{
 		check: &Check{
 			Id:   id,
 			Fail: fail,
 			Cel:  cel,
 		},
-		fieldName: fieldName,
-		program:   program,
+		fieldName:  fieldName,
+		isOptional: isOptional,
+		program:    program,
 	}
 }
