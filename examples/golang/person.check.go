@@ -11,12 +11,42 @@ import (
 )
 
 var (
+	healthValidator     protocheck.MessageValidator
+	healthValidatorOnce sync.Once
 	personValidator     protocheck.MessageValidator
 	personValidatorOnce sync.Once
 	petValidator        protocheck.MessageValidator
 	petValidatorOnce    sync.Once
 )
 
+func file_health_check_proto_init() {
+	// ensure proto_init (idempotent) is called first.
+	file_person_proto_init()
+	env, err := cel.NewEnv(
+		cel.Types(new(Person_Health)),
+		cel.Declarations(
+			decls.NewVar("this", decls.NewObjectType("golang.Person_Health"))))
+	if err != nil {
+		panic(err)
+	}
+	messageCheckers := []protocheck.Checker{}
+	fieldCheckers := []protocheck.Checker{}
+	{ // Weight
+		if prg, err := protocheck.MakeProgram(env, `this.weight > 0`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "weight in kg must be positive", `this.weight > 0`, "Weight", false, prg))
+		}
+	}
+	healthValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
+}
+
+// Validate checks the validity of the Person_Health message.
+// Returns an error if the validation fails.
+func (x *Person_Health) Validate() protocheck.ValidationError {
+	healthValidatorOnce.Do(file_health_check_proto_init)
+	return healthValidator.Validate(x)
+}
 func file_person_check_proto_init() {
 	// ensure proto_init (idempotent) is called first.
 	file_person_proto_init()

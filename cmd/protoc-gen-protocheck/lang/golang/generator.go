@@ -28,23 +28,29 @@ func buildFileData(f *protogen.File) FileData {
 	fd := FileData{
 		PkgName: string(f.GoPackageName),
 	}
+	init := "file_" +
+		strings.ReplaceAll(string(f.Desc.Path()), ".", "_") +
+		"_init"
 	for _, each := range f.Messages {
-		md := buildMessageData(each)
-		// file_person_proto_init()
-		md.InitFuncName = "file_" +
-			strings.ReplaceAll(string(f.Desc.Path()), ".", "_") +
-			"_init"
-		fd.Messages = append(fd.Messages, md)
+		fd.Messages = addMessageDataTo(each, init, fd.Messages)
 	}
 	return fd
+}
+
+func addMessageDataTo(msg *protogen.Message, init string, list []MessageData) []MessageData {
+	for _, each := range msg.Messages {
+		list = addMessageDataTo(each, init, list)
+	}
+	md := buildMessageData(msg)
+	md.InitFuncName = init
+	return append(list, md)
 }
 
 func buildMessageData(m *protogen.Message) MessageData {
 	md := MessageData{
 		LowercaseMessageName: strings.ToLower(string(m.Desc.Name())),
-		MessageName:          string(m.Desc.Name()),
+		MessageName:          string(m.GoIdent.GoName),
 	}
-	// TODO nested messages
 	cds, ok := buildMessageCheckerData(m)
 	if ok {
 		md.MessageCheckers = append(md.MessageCheckers, cds...)

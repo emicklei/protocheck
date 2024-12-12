@@ -23,4 +23,6 @@ func TestCheckPerson(t *testing.T) {
 	for _, each := range err {
 		t.Logf("%#v", each)
 	}
+
+	t.Log(new(Person_Health).Validate())
 }
