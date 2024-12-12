@@ -28,7 +28,6 @@ func (m MessageValidator) Validate(this any) ValidationError {
 		if rf.IsZero() && each.isOptional {
 			continue
 		}
-		env["this"] = rf.Interface()
 		result = append(result, evalChecker(each, env)...)
 	}
 	return result

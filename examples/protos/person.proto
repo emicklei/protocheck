@@ -9,17 +9,23 @@ option go_package = "github.com/emicklei/protocheck-example/golang;golang";
 
 message Person {
   
-  // multiple message state checks
-  option (check.message) = { cel:"size(this.name + this.description) > 0" fail:"name and description cannot be empty" id:"person_invariant"  };
+  // message cross-field checks
+  option (check.message) = { cel:"size(this.name + this.surname) > 0" fail:"name and surname cannot be empty" id:"person_invariant" };
   
   // with per field state checks
-           string                    name        = 1 [(check.field) = { cel:"size(this.name) > 1"                   fail:"name cannot be empty"        }];
-  optional string                    description = 2 [(check.field) = { cel:"size(this.description) > 0"            fail:"description cannot be empty" }];
-           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { cel:"this.birth_date.getFullYear() > 2000"  id  :"check_birth_date"            }];
+           string                    name        = 1 [(check.field) = { cel:"size(this.name) > 1"                  fail:"name must be longer than 1"           }];
+  optional string                    middle_name = 2 [(check.field) = { cel:"size(this.middle_name) > 0"           fail:"middle name (if set) cannot be empty" }];
+           string                    surname     = 3 [(check.field) = { cel:"size(this.surname) > 1"               fail:"surname must be longer than 1"        }];
+           google.protobuf.Timestamp birth_date  = 4 [(check.field) = { cel:"this.birth_date.getFullYear() > 2000" id  :"check_birth_date"                     }];
+  // nested message
+  message Health {
+    int32 weight = 1 [(check.field) = { cel:"this.weight > 0" fail:"weight in kg must be positive" }];
+  }
+
 }
 
 // second message in same file
 message Pet {
-  string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog' " }];
+  string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog'" fail:"only dog and cat are allowed" }];
 }
 

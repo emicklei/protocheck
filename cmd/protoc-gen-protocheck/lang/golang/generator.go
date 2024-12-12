@@ -1,6 +1,7 @@
 package golang
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/emicklei/protocheck"
@@ -99,7 +100,7 @@ func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
 		FieldName:  f.GoName,
 		IsOptional: f.Desc.HasOptionalKeyword(),
 		ID:         ext.Id,
-		Fail:       ifEmpty(ext.Fail, ext.Cel),
+		Fail:       ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
 		Expr:       ext.Cel,
 	}, true
 }

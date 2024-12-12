@@ -12,9 +12,15 @@ func check(err error) {
 	}
 }
 func TestCheckPerson(t *testing.T) {
+	empty := ""
 	joe := &Person{
-		Name:      "",
-		BirthDate: &timestamppb.Timestamp{Seconds: 1}}
+		Name:       empty,
+		MiddleName: &empty,
+		BirthDate:  &timestamppb.Timestamp{Seconds: 1}}
 	err := joe.Validate()
 	t.Log(err)
+
+	for _, each := range err {
+		t.Logf("%#v", each)
+	}
 }
