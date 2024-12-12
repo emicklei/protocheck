@@ -14,13 +14,14 @@ package hr;
 
 message Person {
   
-  // multiple message state checks
-  option (check.message) = { cel:"size(this.name + this.description) > 0" fail:"name and description cannot be empty" id:"person_invariant"  };
+  // message cross-field checks
+  option (check.message) = { cel:"size(this.name + this.surname) > 0" fail:"name and surname cannot be empty" id:"person_invariant" };
   
   // with per field state checks
-           string                    name        = 1 [(check.field) = { cel:"size(this) > 1"            fail:"name cannot be empty"        }];
-  optional string                    description = 2 [(check.field) = { cel:"size(this) > 0"            fail:"description cannot be empty" }];
-           google.protobuf.Timestamp birth_date  = 3 [(check.field) = { cel:"this.getFullYear() > 1000" id:"check_birth_date"              }];
+           string                    name        = 1 [(check.field) = { cel:"size(this.name) > 1"                  fail:"name must be longer than 1"           }];
+  optional string                    middle_name = 2 [(check.field) = { cel:"size(this.middle_name) > 0"           fail:"middle name (if set) cannot be empty" }];
+           string                    surname     = 3 [(check.field) = { cel:"size(this.surname) > 1"               fail:"surname must be longer than 1"        }];
+           google.protobuf.Timestamp birth_date  = 4 [(check.field) = { cel:"this.birth_date.getFullYear() > 2000" id  :"check_birth_date"    
 }
 ```
 
@@ -40,5 +41,5 @@ The `protocheck` package is inspired by `bufbuild/protovalidate` which also uses
 However, it differs by:
 
   - `this` always refers to the (root) message
-  - no dependency on the buf package
+  - minimal dependencies (cel and protobuf)
   - syntax is more compact
