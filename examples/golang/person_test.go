@@ -6,23 +6,17 @@ import (
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
 func TestCheckPerson(t *testing.T) {
 	empty := ""
 	joe := &Person{
 		Name:       empty,
 		MiddleName: &empty,
-		BirthDate:  &timestamppb.Timestamp{Seconds: 1}}
+		BirthDate:  &timestamppb.Timestamp{Seconds: 1},
+		Health:     &Person_Health{Weight: 0}}
 	err := joe.Validate()
 	t.Log(err)
 
 	for _, each := range err {
 		t.Logf("%#v", each)
 	}
-
-	t.Log(new(Person_Health).Validate())
 }

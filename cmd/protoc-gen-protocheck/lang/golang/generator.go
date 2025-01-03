@@ -32,14 +32,14 @@ func buildFileData(f *protogen.File) FileData {
 		strings.ReplaceAll(string(f.Desc.Path()), ".", "_") +
 		"_init"
 	for _, each := range f.Messages {
-		fd.Messages = addMessageDataTo(each, init, fd.Messages)
+		fd.Messages = addMessageDataTo(f, each, init, fd.Messages)
 	}
 	return fd
 }
 
-func addMessageDataTo(msg *protogen.Message, init string, list []MessageData) []MessageData {
+func addMessageDataTo(f *protogen.File, msg *protogen.Message, init string, list []MessageData) []MessageData {
 	for _, each := range msg.Messages {
-		list = addMessageDataTo(each, init, list)
+		list = addMessageDataTo(f, each, init, list)
 	}
 	md := buildMessageData(msg)
 	md.InitFuncName = init
@@ -50,6 +50,7 @@ func buildMessageData(m *protogen.Message) MessageData {
 	md := MessageData{
 		LowercaseMessageName: strings.ToLower(string(m.Desc.Name())),
 		MessageName:          string(m.GoIdent.GoName),
+		ObjectTypeName:       string(m.Desc.FullName()),
 	}
 	cds, ok := buildMessageCheckerData(m)
 	if ok {

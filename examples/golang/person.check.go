@@ -8,6 +8,7 @@ import (
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -25,7 +26,7 @@ func file_health_check_proto_init() {
 	env, err := cel.NewEnv(
 		cel.Types(new(Person_Health)),
 		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("golang.Person_Health"))))
+			decls.NewVar("this", decls.NewObjectType("golang.Person.Health"))))
 	if err != nil {
 		panic(err)
 	}
@@ -101,7 +102,12 @@ func file_person_check_proto_init() {
 // Returns an error if the validation fails.
 func (x *Person) Validate() protocheck.ValidationError {
 	personValidatorOnce.Do(file_person_check_proto_init)
-	return personValidator.Validate(x)
+	ve := personValidator.Validate(x)
+	var nested proto.Message = x.GetHealth()
+		if v, ok := nested.(protocheck.Validator); ok {
+			ve = append(ve, v.Validate()...)
+		}
+	return ve
 }
 func file_pet_check_proto_init() {
 	// ensure proto_init (idempotent) is called first.

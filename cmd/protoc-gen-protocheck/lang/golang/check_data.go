@@ -17,6 +17,7 @@ type MessageData struct {
 	InitFuncName         string
 	LowercaseMessageName string
 	MessageName          string
+	ObjectTypeName       string
 	MessageCheckers      []CheckerData
 	FieldCheckers        []CheckerData
 }

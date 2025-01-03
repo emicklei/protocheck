@@ -21,7 +21,7 @@ message Person {
   message Health {
     int32 weight = 1 [(check.field) = { cel:"this.weight > 0" fail:"weight in kg must be positive" }];
   }
-
+  Health health = 5;
 }
 
 // second message in same file

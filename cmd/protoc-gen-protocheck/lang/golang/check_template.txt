@@ -23,11 +23,10 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 	{{.InitFuncName}}()
 
     {{- $lowerName := .LowercaseMessageName}}
-    {{- $messageName := .MessageName}}
 	env, err := cel.NewEnv(
-		cel.Types(new({{$messageName}})),
+		cel.Types(new({{.MessageName}})),
 		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("{{$.PkgName}}.{{$messageName}}"))))
+			decls.NewVar("this", decls.NewObjectType("{{.ObjectTypeName}}"))))
 	if err != nil {
 		panic(err)
 	}

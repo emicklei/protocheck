@@ -12,6 +12,10 @@ type MessageValidator struct {
 	messageCheckers []Checker
 }
 
+type Validator interface {
+	Validate() ValidationError
+}
+
 func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValidator {
 	return MessageValidator{fieldCheckers: fieldCheckers, messageCheckers: messageCheckers}
 }
