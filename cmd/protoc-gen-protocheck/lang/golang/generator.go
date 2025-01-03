@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/emicklei/protocheck"
+	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/common"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
@@ -39,7 +41,9 @@ func buildFileData(f *protogen.File) FileData {
 
 func addMessageDataTo(f *protogen.File, msg *protogen.Message, init string, list []MessageData) []MessageData {
 	for _, each := range msg.Messages {
-		list = addMessageDataTo(f, each, init, list)
+		if !each.Desc.IsMapEntry() {
+			list = addMessageDataTo(f, each, init, list)
+		}
 	}
 	md := buildMessageData(msg)
 	md.InitFuncName = init
@@ -79,6 +83,13 @@ func buildMessageCheckerData(m *protogen.Message) ([]CheckerData, bool) {
 	}
 	cds := []CheckerData{}
 	for _, each := range exts {
+		// this is needed to escape backslashes in the generated code
+		each.Cel = strings.ReplaceAll(each.Cel, "\\", "\\\\")
+
+		// validate the syntax at generation time
+		if iss := parseCEL(each.Cel); iss != nil {
+			panic(fmt.Sprintf("invalid CEL expression [%s] for message [%s], error [%v]", each.Cel, m.Desc.FullName(), iss))
+		}
 		cds = append(cds, CheckerData{
 			Comment: ifEmpty(each.Id, each.Cel),
 			ID:      each.Id,
@@ -87,6 +98,12 @@ func buildMessageCheckerData(m *protogen.Message) ([]CheckerData, bool) {
 		})
 	}
 	return cds, true
+}
+
+func parseCEL(expr string) *cel.Issues {
+	env, _ := cel.NewEnv()
+	_, err := env.ParseSource(common.NewTextSource(expr))
+	return err
 }
 
 func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
@@ -101,6 +118,13 @@ func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
 	ext, ok := proto.GetExtension(fops, protocheck.E_Field).(*protocheck.Check)
 	if !ok {
 		return CheckerData{}, false
+	}
+	// this is needed to escape backslashes in the generated code
+	ext.Cel = strings.ReplaceAll(ext.Cel, "\\", "\\\\")
+
+	// validate the syntax at generation time
+	if iss := parseCEL(ext.Cel); iss != nil {
+		panic(fmt.Sprintf("invalid CEL expression [%s] for field [%s], error [%v]", ext.Cel, f.Desc.FullName(), iss))
 	}
 	return CheckerData{
 		Comment:    f.GoName,

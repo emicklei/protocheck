@@ -8,7 +8,6 @@ import (
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
-	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -46,7 +45,8 @@ func file_health_check_proto_init() {
 // Returns an error if the validation fails.
 func (x *Person_Health) Validate() protocheck.ValidationError {
 	healthValidatorOnce.Do(file_health_check_proto_init)
-	return healthValidator.Validate(x)
+	ve := healthValidator.Validate(x)
+	return ve
 }
 func file_person_check_proto_init() {
 	// ensure proto_init (idempotent) is called first.
@@ -95,6 +95,41 @@ func file_person_check_proto_init() {
 			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("check_birth_date", "[this.birth_date.getFullYear() > 2000] is false", `this.birth_date.getFullYear() > 2000`, "BirthDate", false, prg))
 		}
 	}
+	{ // Email
+		if prg, err := protocheck.MakeProgram(env, `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "email is not valid", `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')`, "Email", false, prg))
+		}
+	}
+	{ // Phone
+		if prg, err := protocheck.MakeProgram(env, `this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "phone is not valid", `this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')`, "Phone", false, prg))
+		}
+	}
+	{ // Nicknames
+		if prg, err := protocheck.MakeProgram(env, `size(this.nicknames) > 0`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "at least one nickname is required", `size(this.nicknames) > 0`, "Nicknames", false, prg))
+		}
+	}
+	{ // Attributes
+		if prg, err := protocheck.MakeProgram(env, `size(this.attributes) > 0`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "at least one attribute is required", `size(this.attributes) > 0`, "Attributes", false, prg))
+		}
+	}
+	{ // Favorites
+		if prg, err := protocheck.MakeProgram(env, `size(this.favorites) > 0`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "at least one favorite is required", `size(this.favorites) > 0`, "Favorites", false, prg))
+		}
+	}
 	personValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
 }
 
@@ -103,10 +138,6 @@ func file_person_check_proto_init() {
 func (x *Person) Validate() protocheck.ValidationError {
 	personValidatorOnce.Do(file_person_check_proto_init)
 	ve := personValidator.Validate(x)
-	var nested proto.Message = x.GetHealth()
-		if v, ok := nested.(protocheck.Validator); ok {
-			ve = append(ve, v.Validate()...)
-		}
 	return ve
 }
 func file_pet_check_proto_init() {
@@ -128,6 +159,13 @@ func file_pet_check_proto_init() {
 			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "only dog and cat are allowed", `this.kind == 'cat' || this.kind == 'dog'`, "Kind", false, prg))
 		}
 	}
+	{ // Name
+		if prg, err := protocheck.MakeProgram(env, `size(this.name) > 0`); err != nil {
+			panic(err)
+		} else {
+			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "name cannot be empty", `size(this.name) > 0`, "Name", false, prg))
+		}
+	}
 	petValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
 }
 
@@ -135,5 +173,6 @@ func file_pet_check_proto_init() {
 // Returns an error if the validation fails.
 func (x *Pet) Validate() protocheck.ValidationError {
 	petValidatorOnce.Do(file_pet_check_proto_init)
-	return petValidator.Validate(x)
+	ve := petValidator.Validate(x)
+	return ve
 }

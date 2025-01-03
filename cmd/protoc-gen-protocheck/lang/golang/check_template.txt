@@ -57,6 +57,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 // Returns an error if the validation fails.
 func (x *{{.MessageName}}) Validate() protocheck.ValidationError {
 	{{.LowercaseMessageName}}ValidatorOnce.Do(file_{{.LowercaseMessageName}}_check_proto_init)
-	return {{.LowercaseMessageName}}Validator.Validate(x)
+	ve := {{.LowercaseMessageName}}Validator.Validate(x)
+	return ve
 }
 {{- end }}

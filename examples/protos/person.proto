@@ -22,10 +22,34 @@ message Person {
     int32 weight = 1 [(check.field) = { cel:"this.weight > 0" fail:"weight in kg must be positive" }];
   }
   Health health = 5;
+
+  // oneof with field checks
+  // test with https://playcel.undistro.io/
+  oneof identification {
+    string email = 6 [(check.field) = { 
+      cel:"this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')" 
+      fail:"email is not valid" }];
+    string phone = 7 [(check.field) = {
+      cel:"this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')" 
+      fail:"phone is not valid" }];
+  }
+
+  // repeated with field check
+  repeated string nicknames = 8 [(check.field) = { cel:"size(this.nicknames) > 0" fail:"at least one nickname is required" }];
+
+  // repeated proto message with  check
+  repeated Pet pets = 9;
+
+  // map with field check
+  map<string, string> attributes = 10 [(check.field) = { cel:"size(this.attributes) > 0" fail:"at least one attribute is required" }];
+
+  // map with proto message value with check
+  map<string, Pet> favorites = 11 [(check.field) = { cel:"size(this.favorites) > 0" fail:"at least one favorite is required" }];
 }
 
 // second message in same file
 message Pet {
   string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog'" fail:"only dog and cat are allowed" }];
+  string name = 2 [(check.field) = { cel:"size(this.name) > 0" fail:"name cannot be empty" }];
 }
 

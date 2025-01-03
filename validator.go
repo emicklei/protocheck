@@ -26,10 +26,15 @@ func (m MessageValidator) Validate(this any) ValidationError {
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
 	}
-	rv := reflect.ValueOf(this).Elem()
+	rv := reflect.ValueOf(this)
 	for _, each := range m.fieldCheckers {
-		rf := rv.FieldByName(each.fieldName)
-		if rf.IsZero() && each.isOptional {
+		methodName := "Get" + each.fieldName
+		method := rv.MethodByName(methodName)
+		if !method.IsValid() {
+			panic(fmt.Errorf("method [%s] not found in %T", methodName, this))
+		}
+		getValue := method.Call([]reflect.Value{})
+		if len(getValue) == 0 && each.isOptional {
 			continue
 		}
 		result = append(result, evalChecker(each, env)...)
