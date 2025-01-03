@@ -5,12 +5,12 @@ Lightweight solution to ProtocolBuffers message validation.
 
 ## features
 
-- checks use expressions with Google/CEL
-- both message and field hecks
-- checks nested messages
-- checks oneof fields
+- expressions with Google/CEL
+- both message and field checks
+- nested messages
+- repeated, oneof and map fields
 - syntax validation of CEL expressions at generation time
-- proto3 and editions supported
+- supports proto3 and editions
 
 ## status
 
@@ -18,7 +18,15 @@ Lightweight solution to ProtocolBuffers message validation.
 
 ## install
 
+```bash
   go install github.com/emicklei/protocheck/cmd/protocheck-proto-gen@latest
+```
+
+### generate
+
+```bash
+	protoc --go_out=. --go_opt=paths=source_relative --protocheck_out=.
+```
 
 ## example
 
@@ -53,15 +61,9 @@ message Person {
       id  :"check_birth_date" }];
 ```
 
-Seee [CEL language definition](https://github.com/google/cel-spec/blob/master/doc/langdef.md) for creating CEL expressions.
+See [CEL language definition](https://github.com/google/cel-spec/blob/master/doc/langdef.md) for creating CEL expressions.
 
 `getFullYear` is one of the supported [CEL macros](https://github.com/google/cel-spec/blob/master/doc/langdef.md#macros).
-
-### generating
-
-```bash
-	protoc --go_out=. --go_opt=paths=source_relative --protocheck_out=.
-```
 
 ### usage
 
@@ -72,6 +74,8 @@ p := &Person{
 }
 err := p.Validate() // a protocheck.ValidationError
 ```
+
+### considerations
 
 The `protocheck` package is inspired by `bufbuild/protovalidate` which also uses the powerful CEL expression language. However, it differs by:
 
