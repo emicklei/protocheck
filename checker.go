@@ -41,10 +41,11 @@ func (v ValidationError) Error() string {
 
 // Checker performs one check using a CEL program.
 type Checker struct {
-	check      *Check
-	program    cel.Program
-	fieldName  string // for field level checks
-	isOptional bool
+	check       *Check
+	program     cel.Program
+	fieldName   string // for field level checks
+	isOptional  bool
+	enabledFunc func(any) bool // if set then call it to see if check is enabled
 }
 
 // NewChecker creates a Checker
@@ -59,4 +60,8 @@ func NewChecker(id string, fail string, cel string, fieldName string, isOptional
 		isOptional: isOptional,
 		program:    program,
 	}
+}
+func (c Checker) WithEnabledFunc(enabledFunc func(any) bool) Checker {
+	c.enabledFunc = enabledFunc
+	return c
 }

@@ -35,7 +35,8 @@ func file_health_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env, `this.weight > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "weight in kg must be positive", `this.weight > 0`, "Weight", false, prg))
+			ch := protocheck.NewChecker("", "weight in kg must be positive", `this.weight > 0`, "Weight", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	healthValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
@@ -63,7 +64,8 @@ func file_person_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env, `size(this.name + this.surname) > 0`); err != nil {
 			panic(err)
 		} else {
-			messageCheckers = append(messageCheckers, protocheck.NewChecker("person_invariant", "name and surname cannot be empty", `size(this.name + this.surname) > 0`, "", false, prg))
+			ch := protocheck.NewChecker("person_invariant", "name and surname cannot be empty", `size(this.name + this.surname) > 0`, "", false, prg)
+			messageCheckers = append(messageCheckers, ch)
 		}
 	}
 	fieldCheckers := []protocheck.Checker{}
@@ -71,63 +73,88 @@ func file_person_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env, `size(this.name) > 1`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "name must be longer than 1", `size(this.name) > 1`, "Name", false, prg))
+			ch := protocheck.NewChecker("", "name must be longer than 1", `size(this.name) > 1`, "Name", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // MiddleName
 		if prg, err := protocheck.MakeProgram(env, `size(this.middle_name) > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "middle name (if set) cannot be empty", `size(this.middle_name) > 0`, "MiddleName", true, prg))
+			ch := protocheck.NewChecker("", "middle name (if set) cannot be empty", `size(this.middle_name) > 0`, "MiddleName", true, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Surname
 		if prg, err := protocheck.MakeProgram(env, `size(this.surname) > 1`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "surname must be longer than 1", `size(this.surname) > 1`, "Surname", false, prg))
+			ch := protocheck.NewChecker("", "surname must be longer than 1", `size(this.surname) > 1`, "Surname", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // BirthDate
 		if prg, err := protocheck.MakeProgram(env, `this.birth_date.getFullYear() > 2000`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("check_birth_date", "[this.birth_date.getFullYear() > 2000] is false", `this.birth_date.getFullYear() > 2000`, "BirthDate", false, prg))
+			ch := protocheck.NewChecker("check_birth_date", "[this.birth_date.getFullYear() > 2000] is false", `this.birth_date.getFullYear() > 2000`, "BirthDate", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Email
 		if prg, err := protocheck.MakeProgram(env, `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "email is not valid", `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')`, "Email", false, prg))
+			ch := protocheck.NewChecker("", "email is not valid", `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')`, "Email", false, prg)
+			ch = ch.WithEnabledFunc(func(x any) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				_, ok := typedX.Identification.(*Person_Email)
+				return ok
+			})
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Phone
 		if prg, err := protocheck.MakeProgram(env, `this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "phone is not valid", `this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')`, "Phone", false, prg))
+			ch := protocheck.NewChecker("", "phone is not valid", `this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')`, "Phone", false, prg)
+			ch = ch.WithEnabledFunc(func(x any) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				_, ok := typedX.Identification.(*Person_Phone)
+				return ok
+			})
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Nicknames
 		if prg, err := protocheck.MakeProgram(env, `size(this.nicknames) > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "at least one nickname is required", `size(this.nicknames) > 0`, "Nicknames", false, prg))
+			ch := protocheck.NewChecker("", "at least one nickname is required", `size(this.nicknames) > 0`, "Nicknames", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Attributes
 		if prg, err := protocheck.MakeProgram(env, `size(this.attributes) > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "at least one attribute is required", `size(this.attributes) > 0`, "Attributes", false, prg))
+			ch := protocheck.NewChecker("", "at least one attribute is required", `size(this.attributes) > 0`, "Attributes", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Favorites
 		if prg, err := protocheck.MakeProgram(env, `size(this.favorites) > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "at least one favorite is required", `size(this.favorites) > 0`, "Favorites", false, prg))
+			ch := protocheck.NewChecker("", "at least one favorite is required", `size(this.favorites) > 0`, "Favorites", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	personValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
@@ -156,14 +183,16 @@ func file_pet_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env, `this.kind == 'cat' || this.kind == 'dog'`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "only dog and cat are allowed", `this.kind == 'cat' || this.kind == 'dog'`, "Kind", false, prg))
+			ch := protocheck.NewChecker("", "only dog and cat are allowed", `this.kind == 'cat' || this.kind == 'dog'`, "Kind", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	{ // Name
 		if prg, err := protocheck.MakeProgram(env, `size(this.name) > 0`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("", "name cannot be empty", `size(this.name) > 0`, "Name", false, prg))
+			ch := protocheck.NewChecker("", "name cannot be empty", `size(this.name) > 0`, "Name", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
 	petValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)

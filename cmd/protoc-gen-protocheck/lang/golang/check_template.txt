@@ -36,17 +36,30 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
 			panic(err)
 		} else {
-			messageCheckers = append(messageCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", false, prg))
+			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", false, prg)
+			messageCheckers = append(messageCheckers, ch)
 		}
 	}	
     {{- end }}	
 	fieldCheckers := []protocheck.Checker{}
+	{{- $msgName := .MessageName}}
 	{{- range .FieldCheckers }}	
 	{ // {{.Comment}}
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
 			panic(err)
 		} else {
-			fieldCheckers = append(fieldCheckers, protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", {{.IsOptional}}, prg))
+			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", {{.IsOptional}}, prg)
+			{{- if ne .OneOfType "" }}
+			ch = ch.WithEnabledFunc(func(x any) bool { 
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*{{$msgName}})
+				_, ok := typedX.{{.OneOfFieldName}}.(*{{.OneOfType}})
+				return ok 
+			})
+			{{- end }}
+			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}	
     {{- end }}

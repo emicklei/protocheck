@@ -6,3 +6,6 @@ https://github.com/ChromeGG/cel-js
 			ve = append(ve, v.Validate()...)
 		}
 	return ve
+
+
+- remove panic in generated code

@@ -126,13 +126,32 @@ func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
 	if iss := parseCEL(ext.Cel); iss != nil {
 		panic(fmt.Sprintf("invalid CEL expression [%s] for field [%s], error [%v]", ext.Cel, f.Desc.FullName(), iss))
 	}
+	oneOfType := ""  // not a field of oneof
+	oneOfField := "" // not for a field of oneof
+	// optionals are oneof like
+	if !f.Desc.HasOptionalKeyword() && f.Oneof != nil {
+		// find the matching field
+		var found *protogen.Field
+		for _, each := range f.Oneof.Fields {
+			if each.Desc.Name() == f.Desc.Name() {
+				found = each
+			}
+		}
+		if found == nil {
+			panic("should have found the matching one of field")
+		}
+		oneOfType = string(found.GoIdent.GoName)
+		oneOfField = f.Oneof.GoName
+	}
 	return CheckerData{
-		Comment:    f.GoName,
-		FieldName:  f.GoName,
-		IsOptional: f.Desc.HasOptionalKeyword(),
-		ID:         ext.Id,
-		Fail:       ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
-		Expr:       ext.Cel,
+		Comment:        f.GoName,
+		FieldName:      f.GoName,
+		IsOptional:     f.Desc.HasOptionalKeyword(),
+		OneOfType:      oneOfType,
+		OneOfFieldName: oneOfField,
+		ID:             ext.Id,
+		Fail:           ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
+		Expr:           ext.Cel,
 	}, true
 }
 

@@ -16,18 +16,29 @@ type Validator interface {
 	Validate() ValidationError
 }
 
+// NewMessageValidator creates a MessageValidator using two collections of checkers
 func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValidator {
 	return MessageValidator{fieldCheckers: fieldCheckers, messageCheckers: messageCheckers}
 }
 
+// Validate runs all message and field checkers with the message.
 func (m MessageValidator) Validate(this any) ValidationError {
 	var result ValidationError
 	env := map[string]interface{}{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
 	}
+	// are we done?
+	if len(m.fieldCheckers) == 0 {
+		return result
+	}
 	rv := reflect.ValueOf(this)
 	for _, each := range m.fieldCheckers {
+		// check is enabled
+		if each.enabledFunc != nil && !each.enabledFunc(this) {
+			continue
+		}
+		// check is set
 		methodName := "Get" + each.fieldName
 		method := rv.MethodByName(methodName)
 		if !method.IsValid() {
