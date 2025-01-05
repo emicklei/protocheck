@@ -25,7 +25,7 @@ Lightweight solution to ProtocolBuffers message validation.
 ### generate
 
 ```bash
-	protoc --go_out=. --go_opt=paths=source_relative --protocheck_out=.
+  protoc --go_out=. --go_opt=paths=source_relative --protocheck_out=.
 ```
 
 ## example
@@ -41,7 +41,7 @@ message Person {
   option (check.message) = { 
     cel:"size(this.name + this.surname) > 0" 
     fail:"name and surname cannot be empty" 
-    id:"person_invariant" };
+    id:"person_invariant" }; // id is optional
   
   // with per field state checks
   string name = 1 [(check.field) = { 
@@ -58,7 +58,7 @@ message Person {
 
   google.protobuf.Timestamp birth_date  = 4 [(check.field) = { 
       cel:"this.birth_date.getFullYear() > 2000" 
-      id  :"check_birth_date" }];
+      id:"check_birth_date" }];
 ```
 
 See [CEL language definition](https://github.com/google/cel-spec/blob/master/doc/langdef.md) for creating CEL expressions.
