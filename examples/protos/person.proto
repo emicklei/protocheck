@@ -28,7 +28,8 @@ message Person {
   oneof identification {
     string email = 6 [(check.field) = { 
       cel:"this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')" 
-      fail:"email is not valid" }];
+      fail:"email is not valid"
+      id:"email" }];
     string phone = 7 [(check.field) = {
       cel:"this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')" 
       fail:"phone is not valid" }];
@@ -38,7 +39,7 @@ message Person {
   repeated string nicknames = 8 [(check.field) = { cel:"size(this.nicknames) > 0" fail:"at least one nickname is required" }];
 
   // repeated proto message with  check
-  repeated Pet pets = 9;
+  repeated Pet pets = 9 [(check.field) = { cel:"size(this.pets) > 0" fail:"at least one Pet is required" }];
 
   // map with field check
   map<string, string> attributes = 10 [(check.field) = { cel:"size(this.attributes) > 0" fail:"at least one attribute is required" }];
@@ -49,7 +50,7 @@ message Person {
 
 // second message in same file
 message Pet {
-  string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog'" fail:"only dog and cat are allowed" }];
+  string kind = 1 [(check.field) = { cel:"this.kind == 'cat' || this.kind == 'dog'" fail:"only dog or cat is allowed" id:"pet1" }];
   string name = 2 [(check.field) = { cel:"size(this.name) > 0" fail:"name cannot be empty" }];
 }
 

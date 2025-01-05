@@ -56,16 +56,27 @@ func buildMessageData(m *protogen.Message) MessageData {
 		MessageName:          string(m.GoIdent.GoName),
 		ObjectTypeName:       string(m.Desc.FullName()),
 	}
+	containers := []string{}
 	cds, ok := buildMessageCheckerData(m)
 	if ok {
 		md.MessageCheckers = append(md.MessageCheckers, cds...)
 	}
 	for _, each := range m.Fields {
+		// normal or oneof field
 		cd, ok := buildFieldCheckerData(each)
 		if ok {
 			md.FieldCheckers = append(md.FieldCheckers, cd)
 		}
+		// repeated Message
+		if each.Desc.IsList() && each.Desc.Message() != nil {
+			containers = append(containers, string(each.GoName))
+		}
+		// map[?]Message
+		if each.Desc.IsMap() && each.Desc.MapValue().Message() != nil {
+			containers = append(containers, string(each.GoName))
+		}
 	}
+	md.ContainerFieldNames = containers
 	return md
 }
 func buildMessageCheckerData(m *protogen.Message) ([]CheckerData, bool) {

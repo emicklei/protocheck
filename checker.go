@@ -9,9 +9,20 @@ import (
 
 // CheckError captures a failed check.
 type CheckError struct {
+	Path string
 	Id   string
 	Fail string
 	Err  error
+}
+
+func (c CheckError) WithParentField(parent string, key any) CheckError {
+	path := fmt.Sprintf("%s[%v] ", parent, key)
+	if c.Path == "" {
+		c.Path = "." + path
+	} else {
+		c.Path = strings.TrimRight(path, " ") + "." + c.Path
+	}
+	return c
 }
 
 // ValidationError is a collection of CheckError.
@@ -31,9 +42,9 @@ func (v ValidationError) Error() string {
 			fail = "id=" + each.Id
 		}
 		if each.Err == nil {
-			fmt.Fprintf(b, "\t* %s\n", fail)
+			fmt.Fprintf(b, "\t* %s%s\n", each.Path, fail)
 		} else {
-			fmt.Fprintf(b, "\t* %s err=%s\n", fail, each.Err.Error())
+			fmt.Fprintf(b, "\t* %s%s err=%s\n", each.Path, fail, each.Err.Error())
 		}
 	}
 	return b.String()

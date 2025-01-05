@@ -15,29 +15,32 @@ func createValidPerson() *Person {
 		BirthDate:  &timestamppb.Timestamp{Seconds: 200 * 365 * 60 * 60 * 60},
 		Health:     &Person_Health{Weight: 0}}
 	p.Identification = &Person_Email{Email: "a.b@here.com"}
+	p.Pets = append(p.Pets, &Pet{Kind: "dog", Name: notempty})
 	p.Attributes = map[string]string{notempty: notempty}
 	p.Favorites = map[string]*Pet{notempty: {Kind: "cat", Name: notempty}}
 	p.Nicknames = []string{notempty}
 	return p
 }
 
-func TestCheckPerson(t *testing.T) {
-	empty := ""
-	joe := &Person{
-		Name:       empty,
-		MiddleName: &empty,
-		BirthDate:  &timestamppb.Timestamp{Seconds: 1},
-		Health:     &Person_Health{Weight: 0}}
-	err := joe.Validate()
-	t.Log(err)
-	for _, each := range err {
-		t.Logf("%#v", each)
+func TestCheckPersonMapWithInvalidPet(t *testing.T) {
+	p := createValidPerson()
+	p.Favorites["test"].Kind = "spider"
+	err := p.Validate()
+	if len(err) != 1 {
+		t.Fatal(err)
+	}
+	if got, want := err[0].Id, "pet1"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
-func TestCheckPersonMapWithPet(t *testing.T) {
+func TestCheckPersonInvalidEmail(t *testing.T) {
 	p := createValidPerson()
+	p.Identification = &Person_Email{Email: "invalid"}
 	err := p.Validate()
-	if len(err) != 0 {
+	if len(err) != 1 {
 		t.Fatal(err)
+	}
+	if got, want := err[0].Id, "email"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }

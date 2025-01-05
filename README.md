@@ -79,6 +79,6 @@ err := p.Validate() // a protocheck.ValidationError
 
 The `protocheck` package is inspired by `bufbuild/protovalidate` which also uses the powerful CEL expression language. However, it differs by:
 
-  - `this` always refers to the (root) message
+  - `this` always refers to the message
   - minimal dependencies (cel and protobuf)
   - syntax is more compact

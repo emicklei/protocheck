@@ -20,6 +20,7 @@ type MessageData struct {
 	ObjectTypeName       string
 	MessageCheckers      []CheckerData
 	FieldCheckers        []CheckerData
+	ContainerFieldNames  []string
 }
 type CheckerData struct {
 	Comment        string

@@ -4,7 +4,9 @@ package {{.PkgName}}
 
 import (
 	"sync"
-
+	"fmt"
+	"log/slog"
+	
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
@@ -18,7 +20,7 @@ var (
 )
 
  {{- range .Messages}}
-func file_{{.LowercaseMessageName}}_check_proto_init() {
+func file_{{.LowercaseMessageName}}_check_proto_init() error {
 	// ensure proto_init (idempotent) is called first.
 	{{.InitFuncName}}()
 
@@ -28,13 +30,13 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 		cel.Declarations(
 			decls.NewVar("this", decls.NewObjectType("{{.ObjectTypeName}}"))))
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("cel.NewEnv failed: %w", err)
 	}
 	messageCheckers := []protocheck.Checker{}	
 	{{- range .MessageCheckers }}	
 	{ // {{.Comment}}
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
-			panic(err)
+			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", false, prg)
 			messageCheckers = append(messageCheckers, ch)
@@ -46,7 +48,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 	{{- range .FieldCheckers }}	
 	{ // {{.Comment}}
 		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
-			panic(err)
+			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", {{.IsOptional}}, prg)
 			{{- if ne .OneOfType "" }}
@@ -64,13 +66,28 @@ func file_{{.LowercaseMessageName}}_check_proto_init() {
 	}	
     {{- end }}
 	{{$lowerName}}Validator = protocheck.NewMessageValidator(messageCheckers,fieldCheckers)
+	return nil
 }
 
 // Validate checks the validity of the {{.MessageName}} message.
 // Returns an error if the validation fails.
 func (x *{{.MessageName}}) Validate() protocheck.ValidationError {
-	{{.LowercaseMessageName}}ValidatorOnce.Do(file_{{.LowercaseMessageName}}_check_proto_init)
+	if x == nil {
+		return protocheck.ValidationError{}
+	}
+	{{.LowercaseMessageName}}ValidatorOnce.Do(func() {
+		if err := file_{{.LowercaseMessageName}}_check_proto_init(); err != nil {
+			slog.Error("checkers initialization failed","err",err)
+		}
+	})
 	ve := {{.LowercaseMessageName}}Validator.Validate(x)
+	{{- range .ContainerFieldNames}}
+	for key, m := range x.Get{{.}}() { // {{.}}
+		for _ , nve := range m.Validate() {
+			ve = append(ve, nve.WithParentField("{{.}}", key))
+		}
+	}
+	{{- end}}
 	return ve
 }
 {{- end }}
