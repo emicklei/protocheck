@@ -47,10 +47,11 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 	{{- $msgName := .MessageName}}
 	{{- range .FieldCheckers }}	
 	{ // {{.Comment}}
-		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
+		expr := `{{.Expr}}`
+		if prg, err := protocheck.MakeProgram(env,expr); err != nil {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
-			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`,"{{.FieldName}}", {{.IsOptional}}, prg)
+			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}",expr,"{{.FieldName}}", {{.IsOptional}}, prg)
 			{{- if ne .OneOfType "" }}
 			ch = ch.WithEnabledFunc(func(x any) bool { 
 				if x == nil {
@@ -82,8 +83,8 @@ func (x *{{.MessageName}}) Validate() protocheck.ValidationError {
 	})
 	ve := {{.LowercaseMessageName}}Validator.Validate(x)
 	{{- range .ContainerFieldNames}}
-	for key, m := range x.Get{{.}}() { // {{.}}
-		for _ , nve := range m.Validate() {
+	for key, msg := range x.Get{{.}}() { // {{.}}
+		for _ , nve := range msg.Validate() {
 			ve = append(ve, nve.WithParentField("{{.}}", key))
 		}
 	}
