@@ -46,6 +46,10 @@ message Person {
 
   // map with proto message value with check
   map<string, Pet> favorites = 11 [(check.field) = { cel:"size(this.favorites) > 0" fail:"at least one favorite is required" }];
+
+  google.protobuf.Timestamp no_check_date = 12;  
+  map<string, Pet> no_check_favorites = 13;
+  repeated Pet no_check_pets  = 14;
 }
 
 // second message in same file

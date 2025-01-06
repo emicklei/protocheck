@@ -82,6 +82,11 @@ func (x *{{.MessageName}}) Validate() protocheck.ValidationError {
 		}
 	})
 	ve := {{.LowercaseMessageName}}Validator.Validate(x)
+	{{- range .MessageFieldNames}}
+	for _ , nve := range x.Get{{.}}().Validate() {
+		ve = append(ve, nve.WithPath(".{{.}}"))
+	}
+	{{- end}}	
 	{{- range .ContainerFieldNames}}
 	for key, msg := range x.Get{{.}}() { // {{.}}
 		for _ , nve := range msg.Validate() {

@@ -13,15 +13,15 @@ import (
 )
 
 var (
-	healthValidator     protocheck.MessageValidator
-	healthValidatorOnce sync.Once
-	personValidator     protocheck.MessageValidator
-	personValidatorOnce sync.Once
-	petValidator        protocheck.MessageValidator
-	petValidatorOnce    sync.Once
+	person_healthValidator     protocheck.MessageValidator
+	person_healthValidatorOnce sync.Once
+	personValidator            protocheck.MessageValidator
+	personValidatorOnce        sync.Once
+	petValidator               protocheck.MessageValidator
+	petValidatorOnce           sync.Once
 )
 
-func file_health_check_proto_init() error {
+func file_person_health_check_proto_init() error {
 	// ensure proto_init (idempotent) is called first.
 	file_person_proto_init()
 	env, err := cel.NewEnv(
@@ -42,7 +42,7 @@ func file_health_check_proto_init() error {
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
-	healthValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
+	person_healthValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
 	return nil
 }
 
@@ -52,12 +52,12 @@ func (x *Person_Health) Validate() protocheck.ValidationError {
 	if x == nil {
 		return protocheck.ValidationError{}
 	}
-	healthValidatorOnce.Do(func() {
-		if err := file_health_check_proto_init(); err != nil {
+	person_healthValidatorOnce.Do(func() {
+		if err := file_person_health_check_proto_init(); err != nil {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := healthValidator.Validate(x)
+	ve := person_healthValidator.Validate(x)
 	return ve
 }
 func file_person_check_proto_init() error {
@@ -202,6 +202,9 @@ func (x *Person) Validate() protocheck.ValidationError {
 		}
 	})
 	ve := personValidator.Validate(x)
+	for _, nve := range x.GetHealth().Validate() {
+		ve = append(ve, nve.WithPath(".Health"))
+	}
 	for key, msg := range x.GetPets() { // Pets
 		for _, nve := range msg.Validate() {
 			ve = append(ve, nve.WithParentField("Pets", key))
@@ -210,6 +213,16 @@ func (x *Person) Validate() protocheck.ValidationError {
 	for key, msg := range x.GetFavorites() { // Favorites
 		for _, nve := range msg.Validate() {
 			ve = append(ve, nve.WithParentField("Favorites", key))
+		}
+	}
+	for key, msg := range x.GetNoCheckFavorites() { // NoCheckFavorites
+		for _, nve := range msg.Validate() {
+			ve = append(ve, nve.WithParentField("NoCheckFavorites", key))
+		}
+	}
+	for key, msg := range x.GetNoCheckPets() { // NoCheckPets
+		for _, nve := range msg.Validate() {
+			ve = append(ve, nve.WithParentField("NoCheckPets", key))
 		}
 	}
 	return ve

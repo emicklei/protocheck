@@ -9,6 +9,7 @@ import (
 	"github.com/google/cel-go/common"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -52,11 +53,12 @@ func addMessageDataTo(f *protogen.File, msg *protogen.Message, init string, list
 
 func buildMessageData(m *protogen.Message) MessageData {
 	md := MessageData{
-		LowercaseMessageName: strings.ToLower(string(m.Desc.Name())),
+		LowercaseMessageName: strings.ToLower(string(m.GoIdent.GoName)),
 		MessageName:          string(m.GoIdent.GoName),
 		ObjectTypeName:       string(m.Desc.FullName()),
 	}
 	containers := []string{}
+	fieldsWithMessage := []string{}
 	cds, ok := buildMessageCheckerData(m)
 	if ok {
 		md.MessageCheckers = append(md.MessageCheckers, cds...)
@@ -67,18 +69,77 @@ func buildMessageData(m *protogen.Message) MessageData {
 		if ok {
 			md.FieldCheckers = append(md.FieldCheckers, cd)
 		}
+		// direct Message type, non repeated
+		if messageHasChecks(each.Desc.Message()) && !each.Desc.IsList() && !each.Desc.IsMap() {
+			fieldsWithMessage = append(fieldsWithMessage, string(each.GoName))
+		}
 		// repeated Message
-		if each.Desc.IsList() && each.Desc.Message() != nil {
+		if each.Desc.IsList() && messageHasChecks(each.Desc.Message()) {
 			containers = append(containers, string(each.GoName))
 		}
 		// map[?]Message
-		if each.Desc.IsMap() && each.Desc.MapValue().Message() != nil {
+		if each.Desc.IsMap() && messageHasChecks(each.Desc.MapValue().Message()) {
 			containers = append(containers, string(each.GoName))
 		}
 	}
 	md.ContainerFieldNames = containers
+	md.MessageFieldNames = fieldsWithMessage
 	return md
 }
+
+func messageHasChecks(md protoreflect.MessageDescriptor) bool {
+	if md == nil {
+		return false
+	}
+	if messageHasMessageChecks(md) {
+		return true
+	}
+	for i := 0; i < md.Fields().Len(); i++ {
+		f := md.Fields().Get(i)
+		if fieldHasChecks(f) {
+			return true
+		}
+	}
+	return false
+}
+
+func messageHasMessageChecks(md protoreflect.MessageDescriptor) bool {
+	if md == nil {
+		return false
+	}
+	opts := md.Options()
+	if opts == nil {
+		return false
+	}
+	mops, ok := opts.(*descriptorpb.MessageOptions)
+	if !ok {
+		return false
+	}
+	if !proto.HasExtension(mops, protocheck.E_Message) {
+		return false
+	}
+	exts, ok := proto.GetExtension(mops, protocheck.E_Message).([]*protocheck.Check)
+	return ok && len(exts) > 0
+}
+
+func fieldHasChecks(fd protoreflect.FieldDescriptor) bool {
+	if fd == nil {
+		return false
+	}
+	opts := fd.Options()
+	if opts == nil {
+		return false
+	}
+	fops, ok := opts.(*descriptorpb.FieldOptions)
+	if !ok {
+		return false
+	}
+	if !proto.HasExtension(fops, protocheck.E_Field) {
+		return false
+	}
+	return proto.GetExtension(fops, protocheck.E_Field) != nil
+}
+
 func buildMessageCheckerData(m *protogen.Message) ([]CheckerData, bool) {
 	opts := m.Desc.Options()
 	if opts == nil {
