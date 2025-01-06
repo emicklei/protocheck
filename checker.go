@@ -9,12 +9,13 @@ import (
 
 // CheckError captures a failed check.
 type CheckError struct {
-	Path string
-	Id   string
-	Fail string
-	Err  error
+	Path string // path to the field that failed, if empty then the field is part of the root message
+	Id   string // optional id of the check that failed
+	Fail string // optional message to display
+	Err  error  // set if the check failed due to an error
 }
 
+// WithParentField returns a new CheckError with the parent field prepended to the path.
 func (c CheckError) WithParentField(parent string, key any) CheckError {
 	path := fmt.Sprintf("%s[%v] ", parent, key)
 	if c.Path == "" {

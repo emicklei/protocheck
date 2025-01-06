@@ -44,3 +44,47 @@ func TestCheckPersonInvalidEmail(t *testing.T) {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
+func TestCheckPersonInvalidPet(t *testing.T) {
+	p := createValidPerson()
+	p.Pets[0].Kind = "spider"
+	err := p.Validate()
+	if len(err) != 1 {
+		t.Fatal(err)
+	}
+	if got, want := err[0].Id, "pet1"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestCheckPersonInvalidPetMapValue(t *testing.T) {
+	p := createValidPerson()
+	p.Favorites["test"].Kind = "spider"
+	err := p.Validate()
+	if len(err) != 1 {
+		t.Fatal(err)
+	}
+	if got, want := err[0].Id, "pet1"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestCheckPersonInvalidName(t *testing.T) {
+	p := createValidPerson()
+	p.Name = "?"
+	err := p.Validate()
+	if len(err) != 1 {
+		t.Fatal(err)
+	}
+	if got, want := err[0].Fail, "name must be longer than 1"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
+}
+func TestCheckPersonInvalidBirthdate(t *testing.T) {
+	p := createValidPerson()
+	p.BirthDate = &timestamppb.Timestamp{Seconds: 0}
+	err := p.Validate()
+	if len(err) != 1 {
+		t.Fatal(err)
+	}
+	if got, want := err[0].Fail, "[this.birth_date.getFullYear() > 2000] is false"; got != want {
+		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
+	}
+}
