@@ -1,5 +1,8 @@
 # protocheck
 
+[![Go](https://github.com/emicklei/protocheck/actions/workflows/go.yml/badge.svg)](https://github.com/emicklei/protocheck/actions/workflows/go.yml)
+[![GoDoc](https://pkg.go.dev/badge/github.com/emicklei/protocheck)](https://pkg.go.dev/github.com/emicklei/protocheck)
+
 Lightweight solution to ProtocolBuffers message validation.
 `protocheck-proto-gen` is a `protoc` plugin that generates Go code.
 
