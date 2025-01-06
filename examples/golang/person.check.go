@@ -202,7 +202,7 @@ func (x *Person) Validate() protocheck.ValidationError {
 		}
 	})
 	ve := personValidator.Validate(x)
-	for _, nve := range x.GetHealth().Validate() {
+	for _, nve := range x.GetHealth().Validate() { // Health
 		ve = append(ve, nve.WithPath(".Health"))
 	}
 	for key, msg := range x.GetPets() { // Pets
@@ -213,16 +213,6 @@ func (x *Person) Validate() protocheck.ValidationError {
 	for key, msg := range x.GetFavorites() { // Favorites
 		for _, nve := range msg.Validate() {
 			ve = append(ve, nve.WithParentField("Favorites", key))
-		}
-	}
-	for key, msg := range x.GetNoCheckFavorites() { // NoCheckFavorites
-		for _, nve := range msg.Validate() {
-			ve = append(ve, nve.WithParentField("NoCheckFavorites", key))
-		}
-	}
-	for key, msg := range x.GetNoCheckPets() { // NoCheckPets
-		for _, nve := range msg.Validate() {
-			ve = append(ve, nve.WithParentField("NoCheckPets", key))
 		}
 	}
 	return ve
