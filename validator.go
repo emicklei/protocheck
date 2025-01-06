@@ -7,11 +7,13 @@ import (
 	"github.com/google/cel-go/cel"
 )
 
+// MessageValidator holds a collection of checkers to validate a message.
 type MessageValidator struct {
 	fieldCheckers   []Checker
 	messageCheckers []Checker
 }
 
+// Validator is an interface that can be implemented by a message to validate itself.
 type Validator interface {
 	Validate() ValidationError
 }
@@ -42,7 +44,9 @@ func (m MessageValidator) Validate(this any) ValidationError {
 		methodName := "Get" + each.fieldName
 		method := rv.MethodByName(methodName)
 		if !method.IsValid() {
-			panic(fmt.Errorf("method [%s] not found in %T", methodName, this))
+			ve := CheckError{Id: each.check.Id, Err: fmt.Errorf("method [%s] not found in %T", methodName, this)}
+			result = append(result, ve)
+			continue
 		}
 		getValue := method.Call([]reflect.Value{})
 		if len(getValue) == 0 && each.isOptional {

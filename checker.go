@@ -26,7 +26,7 @@ func (c CheckError) WithParentField(parent string, key any) CheckError {
 	return c
 }
 
-// WithPath returns a new CheckError with the parent field prepended to the path.
+// WithPath returns a new CheckError with the path set.
 func (c CheckError) WithPath(path string) CheckError {
 	c.Path = path
 	return c

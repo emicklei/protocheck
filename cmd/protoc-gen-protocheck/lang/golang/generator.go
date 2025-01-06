@@ -2,6 +2,7 @@ package golang
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/emicklei/protocheck"
@@ -160,7 +161,7 @@ func buildMessageCheckerData(m *protogen.Message) ([]CheckerData, bool) {
 
 		// validate the syntax at generation time
 		if iss := parseCEL(each.Cel); iss != nil {
-			panic(fmt.Sprintf("invalid CEL expression [%s] for message [%s], error [%v]", each.Cel, m.Desc.FullName(), iss))
+			abort(fmt.Sprintf("invalid CEL expression [%s] for message [%s], error [%v]", each.Cel, m.Desc.FullName(), iss))
 		}
 		cds = append(cds, CheckerData{
 			Comment: ifEmpty(each.Id, each.Cel),
@@ -196,7 +197,7 @@ func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
 
 	// validate the syntax at generation time
 	if iss := parseCEL(ext.Cel); iss != nil {
-		panic(fmt.Sprintf("invalid CEL expression [%s] for field [%s], error [%v]", ext.Cel, f.Desc.FullName(), iss))
+		abort(fmt.Sprintf("invalid CEL expression [%s] for field [%s], error [%v]", ext.Cel, f.Desc.FullName(), iss))
 	}
 	oneOfType := ""  // not a field of oneof
 	oneOfField := "" // not for a field of oneof
@@ -210,7 +211,7 @@ func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
 			}
 		}
 		if found == nil {
-			panic("should have found the matching one of field")
+			abort("should have found the matching one of field")
 		}
 		oneOfType = string(found.GoIdent.GoName)
 		oneOfField = f.Oneof.GoName
@@ -232,4 +233,9 @@ func ifEmpty(content, alt string) string {
 		return alt
 	}
 	return content
+}
+
+func abort(message string) {
+	fmt.Println(message)
+	os.Exit(1)
 }
