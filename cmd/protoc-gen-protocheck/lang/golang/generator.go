@@ -22,7 +22,7 @@ func Process(p *protogen.Plugin, f *protogen.File) error {
 		return err
 	}
 	outName := f.GeneratedFilenamePrefix + ".check.go"
-	slog.Info("writing", "file", outName)
+	slog.Debug("writing", "file", outName)
 	out := p.NewGeneratedFile(outName, f.GoImportPath)
 	out.P(content)
 
@@ -34,12 +34,16 @@ func buildFileData(f *protogen.File) FileData {
 		PkgName: string(f.GoPackageName),
 	}
 	init := "file_" +
-		strings.ReplaceAll(string(f.Desc.Path()), ".", "_") +
+		dotsAndSlashsToUnderscore(string(f.Desc.Path())) +
 		"_init"
 	for _, each := range f.Messages {
 		fd.Messages = addMessageDataTo(f, each, init, fd.Messages)
 	}
 	return fd
+}
+
+func dotsAndSlashsToUnderscore(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, ".", "_"), "/", "_")
 }
 
 func addMessageDataTo(f *protogen.File, msg *protogen.Message, init string, list []MessageData) []MessageData {

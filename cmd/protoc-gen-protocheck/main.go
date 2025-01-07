@@ -30,7 +30,7 @@ func run(p *protogen.Plugin) error {
 		if !importsCheck(each) {
 			continue
 		}
-		slog.Info("destination",
+		slog.Debug("destination",
 			"pkg", each.GoPackageName,
 			"path", each.Desc.Path(),
 			"prefix", each.GeneratedFilenamePrefix,
