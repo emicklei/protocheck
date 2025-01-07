@@ -56,3 +56,7 @@ message Pet {
   string name = 2 [(check.field) = { cel:"size(this.name) > 0" fail:"name cannot be empty" }];
 }
 
+// message without checks
+message Group {
+  string name = 1;
+}

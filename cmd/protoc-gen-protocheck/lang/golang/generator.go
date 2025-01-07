@@ -53,6 +53,9 @@ func addMessageDataTo(f *protogen.File, msg *protogen.Message, init string, list
 		}
 	}
 	md := buildMessageData(msg)
+	if !md.HasChecker() {
+		return list
+	}
 	md.InitFuncName = init
 	return append(list, md)
 }

@@ -245,6 +245,51 @@ func (x *Pet) GetName() string {
 	return ""
 }
 
+// message without checks
+type Group struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Group) Reset() {
+	*x = Group{}
+	mi := &file_person_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Group) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Group) ProtoMessage() {}
+
+func (x *Group) ProtoReflect() protoreflect.Message {
+	mi := &file_person_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Group.ProtoReflect.Descriptor instead.
+func (*Group) Descriptor() ([]byte, []int) {
+	return file_person_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Group) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 // nested message
 type Person_Health struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -255,7 +300,7 @@ type Person_Health struct {
 
 func (x *Person_Health) Reset() {
 	*x = Person_Health{}
-	mi := &file_person_proto_msgTypes[2]
+	mi := &file_person_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -267,7 +312,7 @@ func (x *Person_Health) String() string {
 func (*Person_Health) ProtoMessage() {}
 
 func (x *Person_Health) ProtoReflect() protoreflect.Message {
-	mi := &file_person_proto_msgTypes[2]
+	mi := &file_person_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -406,11 +451,12 @@ var file_person_proto_rawDesc = []byte{
 	0x4c, 0x2b, 0x12, 0x14, 0x6e, 0x61, 0x6d, 0x65, 0x20, 0x63, 0x61, 0x6e, 0x6e, 0x6f, 0x74, 0x20,
 	0x62, 0x65, 0x20, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x13, 0x73, 0x69, 0x7a, 0x65, 0x28, 0x74,
 	0x68, 0x69, 0x73, 0x2e, 0x6e, 0x61, 0x6d, 0x65, 0x29, 0x20, 0x3e, 0x20, 0x30, 0x52, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x65, 0x6d, 0x69, 0x63, 0x6b, 0x6c, 0x65, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x63, 0x68, 0x65, 0x63, 0x6b, 0x2d, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x2f, 0x67, 0x6f,
-	0x6c, 0x61, 0x6e, 0x67, 0x3b, 0x67, 0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x61, 0x6d, 0x65, 0x22, 0x1b, 0x0a, 0x05, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x12, 0x12, 0x0a, 0x04,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x42, 0x36, 0x5a, 0x34, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x65,
+	0x6d, 0x69, 0x63, 0x6b, 0x6c, 0x65, 0x69, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x68, 0x65,
+	0x63, 0x6b, 0x2d, 0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x2f, 0x67, 0x6f, 0x6c, 0x61, 0x6e,
+	0x67, 0x3b, 0x67, 0x6f, 0x6c, 0x61, 0x6e, 0x67, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -425,22 +471,23 @@ func file_person_proto_rawDescGZIP() []byte {
 	return file_person_proto_rawDescData
 }
 
-var file_person_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_person_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_person_proto_goTypes = []any{
 	(*Person)(nil),                // 0: golang.Person
 	(*Pet)(nil),                   // 1: golang.Pet
-	(*Person_Health)(nil),         // 2: golang.Person.Health
-	nil,                           // 3: golang.Person.AttributesEntry
-	nil,                           // 4: golang.Person.FavoritesEntry
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*Group)(nil),                 // 2: golang.Group
+	(*Person_Health)(nil),         // 3: golang.Person.Health
+	nil,                           // 4: golang.Person.AttributesEntry
+	nil,                           // 5: golang.Person.FavoritesEntry
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
 }
 var file_person_proto_depIdxs = []int32{
-	5, // 0: golang.Person.birth_date:type_name -> google.protobuf.Timestamp
-	2, // 1: golang.Person.health:type_name -> golang.Person.Health
+	6, // 0: golang.Person.birth_date:type_name -> google.protobuf.Timestamp
+	3, // 1: golang.Person.health:type_name -> golang.Person.Health
 	1, // 2: golang.Person.pets:type_name -> golang.Pet
-	3, // 3: golang.Person.attributes:type_name -> golang.Person.AttributesEntry
-	4, // 4: golang.Person.favorites:type_name -> golang.Person.FavoritesEntry
-	5, // 5: golang.Person.no_check_date:type_name -> google.protobuf.Timestamp
+	4, // 3: golang.Person.attributes:type_name -> golang.Person.AttributesEntry
+	5, // 4: golang.Person.favorites:type_name -> golang.Person.FavoritesEntry
+	6, // 5: golang.Person.no_check_date:type_name -> google.protobuf.Timestamp
 	1, // 6: golang.Person.FavoritesEntry.value:type_name -> golang.Pet
 	7, // [7:7] is the sub-list for method output_type
 	7, // [7:7] is the sub-list for method input_type
@@ -464,7 +511,7 @@ func file_person_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_person_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

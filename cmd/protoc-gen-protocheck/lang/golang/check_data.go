@@ -23,6 +23,11 @@ type MessageData struct {
 	MessageFieldNames    []string
 	ContainerFieldNames  []string
 }
+
+func (md MessageData) HasChecker() bool {
+	return len(md.FieldCheckers) > 0 || len(md.MessageCheckers) > 0
+}
+
 type CheckerData struct {
 	Comment        string
 	FieldName      string // empty for message level
