@@ -7,5 +7,6 @@ gen: install
 		--go_out=. \
 		--go_opt=paths=source_relative \
 		--protocheck_out=. \
+		--protocheck_opt=paths=source_relative \
 	person.proto
 	gofmt -w person.check.go

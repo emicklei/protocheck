@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log/slog"
+	"strings"
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/golang"
 	"google.golang.org/protobuf/compiler/protogen"
@@ -31,7 +32,9 @@ func run(p *protogen.Plugin) error {
 		}
 		slog.Info("destination",
 			"pkg", each.GoPackageName,
-			"file", each.Desc.Path())
+			"path", each.Desc.Path(),
+			"prefix", each.GeneratedFilenamePrefix,
+		)
 
 		switch *lang {
 		case "go":
@@ -49,7 +52,7 @@ func run(p *protogen.Plugin) error {
 func importsCheck(f *protogen.File) bool {
 	for i := 0; i < f.Desc.Imports().Len(); i++ {
 		entry := f.Desc.Imports().Get(i)
-		if entry.Path() == "check.proto" {
+		if strings.HasSuffix(entry.Path(), "check.proto") {
 			return true
 		}
 	}

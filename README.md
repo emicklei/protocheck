@@ -15,14 +15,10 @@ Lightweight solution to ProtocolBuffers message validation.
 - syntax validation of CEL expressions at generation time
 - supports proto3 and editions
 
-## status
-
-  Work in progress
-
 ## install
 
 ```bash
-  go install github.com/emicklei/protocheck/cmd/protocheck-proto-gen@latest
+  go install github.com/emicklei/protocheck/cmd/protoc-gen-protocheck@latest
 ```
 
 ### generate

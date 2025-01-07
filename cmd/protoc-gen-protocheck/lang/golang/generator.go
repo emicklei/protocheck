@@ -2,6 +2,7 @@ package golang
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -15,13 +16,13 @@ import (
 )
 
 func Process(p *protogen.Plugin, f *protogen.File) error {
-
 	fd := buildFileData(f)
 	content, err := generate(fd)
 	if err != nil {
 		return err
 	}
-	outName := strings.Replace(f.Desc.Path(), ".proto", ".check.go", -1)
+	outName := f.GeneratedFilenamePrefix + ".check.go"
+	slog.Info("writing", "file", outName)
 	out := p.NewGeneratedFile(outName, f.GoImportPath)
 	out.P(content)
 
