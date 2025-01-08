@@ -2,7 +2,6 @@ package protocheck
 
 import (
 	"fmt"
-	reflect "reflect"
 
 	"github.com/google/cel-go/cel"
 )
@@ -34,22 +33,14 @@ func (m MessageValidator) Validate(this any) ValidationError {
 	if len(m.fieldCheckers) == 0 {
 		return result
 	}
-	rv := reflect.ValueOf(this)
 	for _, each := range m.fieldCheckers {
 		// check is enabled
 		if each.enabledFunc != nil && !each.enabledFunc(this) {
 			continue
 		}
-		// check is set
-		methodName := "Get" + each.fieldName
-		method := rv.MethodByName(methodName)
-		if !method.IsValid() {
-			ve := CheckError{Id: each.check.Id, Err: fmt.Errorf("method [%s] not found in %T", methodName, this)}
-			result = append(result, ve)
-			continue
-		}
-		getValue := method.Call([]reflect.Value{})
-		if len(getValue) == 0 && each.isOptional {
+		// is it set
+		isSet := each.isSetFunc(this, each.fieldName)
+		if !isSet && each.isOptional {
 			continue
 		}
 		result = append(result, evalChecker(each, env)...)

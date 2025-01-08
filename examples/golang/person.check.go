@@ -244,6 +244,9 @@ func file_pet_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "name cannot be empty", expr, "Name", false, prg)
+			// ch = ch.WithIsSetFunc(func(message any, fieldName string) bool {
+			// 	return message.(*Pet).GetName() != ""
+			// })
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}

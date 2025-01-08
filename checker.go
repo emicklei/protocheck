@@ -2,6 +2,7 @@ package protocheck
 
 import (
 	"fmt"
+	reflect "reflect"
 	"strings"
 
 	"github.com/google/cel-go/cel"
@@ -63,7 +64,8 @@ type Checker struct {
 	program     cel.Program
 	fieldName   string // for field level checks
 	isOptional  bool
-	enabledFunc func(any) bool // if set then call it to see if check is enabled
+	enabledFunc func(message any) bool // if set then call it to see if check is enabled
+	isSetFunc   func(message any, fieldName string) bool
 }
 
 // NewChecker creates a Checker
@@ -77,9 +79,27 @@ func NewChecker(id string, fail string, cel string, fieldName string, isOptional
 		fieldName:  fieldName,
 		isOptional: isOptional,
 		program:    program,
+		isSetFunc:  reflectIsSet,
 	}
 }
+
+// for proto3
+func reflectIsSet(message any, fieldName string) bool {
+	rv := reflect.ValueOf(message)
+	methodName := "Get" + fieldName
+	method := rv.MethodByName(methodName)
+	if !method.IsValid() {
+		return false
+	}
+	getValue := method.Call([]reflect.Value{})
+	return len(getValue) != 0
+}
+
 func (c Checker) WithEnabledFunc(enabledFunc func(any) bool) Checker {
 	c.enabledFunc = enabledFunc
+	return c
+}
+func (c Checker) WithIsSetFunc(fun func(message any, fieldName string) bool) Checker {
+	c.isSetFunc = fun
 	return c
 }
