@@ -7,6 +7,7 @@ import (
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/golang"
 	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 var lang *string
@@ -22,7 +23,10 @@ func main() {
 
 // https://rotemtam.com/2021/03/22/creating-a-protoc-plugin-to-gen-go-code/
 func run(p *protogen.Plugin) error {
-	p.SupportedFeatures = p.SupportedFeatures + 1 // FEATURE_PROTO3_OPTIONAL
+	p.SupportedFeatures = p.SupportedFeatures + 1 + 2 // FEATURE_PROTO3_OPTIONAL, FEATURE_SUPPORTS_EDITIONS
+	p.SupportedEditionsMinimum = descriptorpb.Edition_EDITION_PROTO3
+	p.SupportedEditionsMaximum = descriptorpb.Edition_EDITION_2023
+
 	for _, each := range p.Files {
 		if !each.Generate {
 			continue
