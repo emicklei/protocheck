@@ -73,10 +73,10 @@ func buildMessageData(m *protogen.Message) MessageData {
 		md.MessageCheckers = append(md.MessageCheckers, cds...)
 	}
 	for _, each := range m.Fields {
-		// normal or oneof field
-		cd, ok := buildFieldCheckerData(each)
+		// normal or oneof fields
+		cds, ok := buildFieldCheckerData(each)
 		if ok {
-			md.FieldCheckers = append(md.FieldCheckers, cd)
+			md.FieldCheckers = append(md.FieldCheckers, cds...)
 		}
 		// direct Message type, non repeated
 		if messageHasChecks(each.Desc.Message()) && !each.Desc.IsList() && !each.Desc.IsMap() {
@@ -187,53 +187,57 @@ func parseCEL(expr string) *cel.Issues {
 	return err
 }
 
-func buildFieldCheckerData(f *protogen.Field) (CheckerData, bool) {
+func buildFieldCheckerData(f *protogen.Field) (list []CheckerData, ok bool) {
 	opts := f.Desc.Options()
 	if opts == nil {
-		return CheckerData{}, false
+		return list, false
 	}
 	fops := opts.(*descriptorpb.FieldOptions)
 	if !proto.HasExtension(fops, protocheck.E_Field) {
-		return CheckerData{}, false
+		return list, false
 	}
-	ext, ok := proto.GetExtension(fops, protocheck.E_Field).(*protocheck.Check)
+	exts, ok := proto.GetExtension(fops, protocheck.E_Field).([]*protocheck.Check)
 	if !ok {
-		return CheckerData{}, false
+		return list, false
 	}
-	// this is needed to escape backslashes in the generated code
-	ext.Cel = strings.ReplaceAll(ext.Cel, "\\", "\\\\")
+	for _, ext := range exts {
+		// this is needed to escape backslashes in the generated code
+		ext.Cel = strings.ReplaceAll(ext.Cel, "\\", "\\\\")
 
-	// validate the syntax at generation time
-	if iss := parseCEL(ext.Cel); iss != nil {
-		abort(fmt.Sprintf("invalid CEL expression [%s] for field [%s], error [%v]", ext.Cel, f.Desc.FullName(), iss))
-	}
-	oneOfType := ""  // not a field of oneof
-	oneOfField := "" // not for a field of oneof
-	// optionals are oneof like
-	if !f.Desc.HasOptionalKeyword() && f.Oneof != nil {
-		// find the matching field
-		var found *protogen.Field
-		for _, each := range f.Oneof.Fields {
-			if each.Desc.Name() == f.Desc.Name() {
-				found = each
+		// validate the syntax at generation time
+		if iss := parseCEL(ext.Cel); iss != nil {
+			abort(fmt.Sprintf("invalid CEL expression [%s] for field [%s], error [%v]", ext.Cel, f.Desc.FullName(), iss))
+		}
+		oneOfType := ""  // not a field of oneof
+		oneOfField := "" // not for a field of oneof
+		// optionals are oneof like
+		if !f.Desc.HasOptionalKeyword() && f.Oneof != nil {
+			// find the matching field
+			var found *protogen.Field
+			for _, each := range f.Oneof.Fields {
+				if each.Desc.Name() == f.Desc.Name() {
+					found = each
+				}
 			}
+			if found == nil {
+				abort("should have found the matching one of field")
+			}
+			oneOfType = string(found.GoIdent.GoName)
+			oneOfField = f.Oneof.GoName
 		}
-		if found == nil {
-			abort("should have found the matching one of field")
+		cd := CheckerData{
+			Comment:        f.GoName,
+			FieldName:      f.GoName,
+			IsOptional:     f.Desc.HasOptionalKeyword(),
+			OneOfType:      oneOfType,
+			OneOfFieldName: oneOfField,
+			ID:             ext.Id,
+			Fail:           ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
+			Expr:           ext.Cel,
 		}
-		oneOfType = string(found.GoIdent.GoName)
-		oneOfField = f.Oneof.GoName
+		list = append(list, cd)
 	}
-	return CheckerData{
-		Comment:        f.GoName,
-		FieldName:      f.GoName,
-		IsOptional:     f.Desc.HasOptionalKeyword(),
-		OneOfType:      oneOfType,
-		OneOfFieldName: oneOfField,
-		ID:             ext.Id,
-		Fail:           ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
-		Expr:           ext.Cel,
-	}, true
+	return list, true
 }
 
 func ifEmpty(content, alt string) string {

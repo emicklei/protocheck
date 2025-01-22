@@ -167,6 +167,15 @@ func file_person_check_proto_init() error {
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
+	{ // Nicknames
+		expr := `this.nicknames.all(x,size(x)>0)`
+		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
+			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		} else {
+			ch := protocheck.NewChecker("", "nickname cannot be empty", expr, "Nicknames", false, prg)
+			fieldCheckers = append(fieldCheckers, ch)
+		}
+	}
 	{ // Pets
 		expr := `size(this.pets) > 0`
 		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
@@ -252,9 +261,6 @@ func file_pet_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "name cannot be empty", expr, "Name", false, prg)
-			// ch = ch.WithIsSetFunc(func(message any, fieldName string) bool {
-			// 	return message.(*Pet).GetName() != ""
-			// })
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}

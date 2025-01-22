@@ -37,7 +37,9 @@ message Person {
   }
 
   // repeated with field check
-  repeated string nicknames = 8 [(check.field) = { cel:"size(this.nicknames) > 0 && this.nicknames.all(x,size(x)>0)" fail:"at least one nickname is required" }]; 
+  repeated string nicknames = 8 [
+      (check.field) = { cel:"size(this.nicknames) > 0 && this.nicknames.all(x,size(x)>0)" fail:"at least one nickname is required" } ,
+      (check.field) = { cel:"this.nicknames.all(x,size(x)>0)" fail:"nickname cannot be empty" } ]; 
 
   // repeated proto message with  check
   repeated Pet pets = 9 [(check.field) = { cel:"size(this.pets) > 0" fail:"at least one Pet is required" }];
