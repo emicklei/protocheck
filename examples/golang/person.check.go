@@ -79,6 +79,14 @@ func file_person_check_proto_init() error {
 			messageCheckers = append(messageCheckers, ch)
 		}
 	}
+	{ // person_health_weight_invariant
+		if prg, err := protocheck.MakeProgram(env, `this.health.weight <= 300`); err != nil {
+			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		} else {
+			ch := protocheck.NewChecker("person_health_weight_invariant", "weight cannot be larger than 300", `this.health.weight <= 300`, "", false, prg)
+			messageCheckers = append(messageCheckers, ch)
+		}
+	}
 	fieldCheckers := []protocheck.Checker{}
 	{ // Name
 		expr := `size(this.name) > 1`
@@ -151,7 +159,7 @@ func file_person_check_proto_init() error {
 		}
 	}
 	{ // Nicknames
-		expr := `size(this.nicknames) > 0`
+		expr := `size(this.nicknames) > 0 && this.nicknames.all(x,size(x)>0)`
 		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
