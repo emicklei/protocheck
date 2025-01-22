@@ -59,10 +59,9 @@ message Person {
       cel:"this.birth_date.getFullYear() > 2000" 
       id:"check_birth_date" }];
 ```
+`getFullYear` is one of the supported [CEL macros](https://github.com/google/cel-spec/blob/master/doc/langdef.md#macros).
 
 See [CEL language definition](https://github.com/google/cel-spec/blob/master/doc/langdef.md) for creating CEL expressions.
-
-`getFullYear` is one of the supported [CEL macros](https://github.com/google/cel-spec/blob/master/doc/langdef.md#macros).
 
 ### usage
 
