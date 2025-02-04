@@ -47,10 +47,10 @@ func file_person_health_check_proto_init() error {
 }
 
 // Validate checks the validity of the Person_Health message.
-// Returns an error if the validation fails.
-func (x *Person_Health) Validate() protocheck.ValidationError {
+// Returns a non-empty error if the validation fails, nil otherwise.
+func (x *Person_Health) Validate() error {
 	if x == nil {
-		return protocheck.ValidationError{}
+		return nil
 	}
 	person_healthValidatorOnce.Do(func() {
 		if err := file_person_health_check_proto_init(); err != nil {
@@ -58,6 +58,9 @@ func (x *Person_Health) Validate() protocheck.ValidationError {
 		}
 	})
 	ve := person_healthValidator.Validate(x)
+	if len(ve) == 0 {
+		return nil
+	}
 	return ve
 }
 func file_person_check_proto_init() error {
@@ -208,10 +211,10 @@ func file_person_check_proto_init() error {
 }
 
 // Validate checks the validity of the Person message.
-// Returns an error if the validation fails.
-func (x *Person) Validate() protocheck.ValidationError {
+// Returns a non-empty error if the validation fails, nil otherwise.
+func (x *Person) Validate() error {
 	if x == nil {
-		return protocheck.ValidationError{}
+		return nil
 	}
 	personValidatorOnce.Do(func() {
 		if err := file_person_check_proto_init(); err != nil {
@@ -219,18 +222,21 @@ func (x *Person) Validate() protocheck.ValidationError {
 		}
 	})
 	ve := personValidator.Validate(x)
-	for _, nve := range x.GetHealth().Validate() { // Health
+	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate()) { // Health
 		ve = append(ve, nve.WithPath(".Health"))
 	}
 	for key, msg := range x.GetPets() { // Pets
-		for _, nve := range msg.Validate() {
+		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
 			ve = append(ve, nve.WithParentField("Pets", key))
 		}
 	}
 	for key, msg := range x.GetFavorites() { // Favorites
-		for _, nve := range msg.Validate() {
+		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
 			ve = append(ve, nve.WithParentField("Favorites", key))
 		}
+	}
+	if len(ve) == 0 {
+		return nil
 	}
 	return ve
 }
@@ -269,10 +275,10 @@ func file_pet_check_proto_init() error {
 }
 
 // Validate checks the validity of the Pet message.
-// Returns an error if the validation fails.
-func (x *Pet) Validate() protocheck.ValidationError {
+// Returns a non-empty error if the validation fails, nil otherwise.
+func (x *Pet) Validate() error {
 	if x == nil {
-		return protocheck.ValidationError{}
+		return nil
 	}
 	petValidatorOnce.Do(func() {
 		if err := file_pet_check_proto_init(); err != nil {
@@ -280,5 +286,8 @@ func (x *Pet) Validate() protocheck.ValidationError {
 		}
 	})
 	ve := petValidator.Validate(x)
+	if len(ve) == 0 {
+		return nil
+	}
 	return ve
 }

@@ -23,8 +23,8 @@ func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValida
 }
 
 // Validate runs all message and field checkers with the message.
-func (m MessageValidator) Validate(this any) ValidationError {
-	var result ValidationError
+// Always returns a ValidationError which can be empty (no failed checks)
+func (m MessageValidator) Validate(this any) (result ValidationError) {
 	env := map[string]interface{}{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
@@ -45,7 +45,7 @@ func (m MessageValidator) Validate(this any) ValidationError {
 		}
 		result = append(result, evalChecker(each, env)...)
 	}
-	return result
+	return
 
 }
 
@@ -78,4 +78,17 @@ func MakeProgram(env *cel.Env, expression string) (cel.Program, error) {
 		return nil, fmt.Errorf("protocheck: failed to make CEL program: %w", err)
 	}
 	return prg, nil
+}
+
+var emptyValidationError = ValidationError{} // TODO is this an optimization?
+
+// AsValidationError converts an error or nil to a valid ValidationError.
+func AsValidationError(err error) ValidationError {
+	if err == nil {
+		return emptyValidationError
+	}
+	if ve, ok := err.(ValidationError); ok {
+		return ve
+	}
+	return emptyValidationError
 }
