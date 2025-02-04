@@ -30,7 +30,7 @@ func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
 		t.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func TestCheckPersonInvalidEmail(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestCheckPersonInvalidPet(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestCheckPersonInvalidPetMapValue(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
 		t.Fatal(err)
 	}
@@ -88,7 +88,7 @@ func TestCheckPersonInvalidName(t *testing.T) {
 	p := createValidPerson()
 	p.Name = "?"
 	err := p.Validate()
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if got, want := ve[0].Fail, "name must be longer than 1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
@@ -97,7 +97,7 @@ func TestCheckPersonInvalidBirthdate(t *testing.T) {
 	p := createValidPerson()
 	p.BirthDate = &timestamppb.Timestamp{Seconds: 0}
 	err := p.Validate()
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
 		t.Fatal(err)
 	}
@@ -110,7 +110,7 @@ func TestCheckPersonInvalidHealth(t *testing.T) {
 	p := createValidPerson()
 	p.Health.Weight = -1
 	err := p.Validate()
-	ve := err.(protocheck.ValidationError)
+	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
 		t.Fatal(err)
 	}

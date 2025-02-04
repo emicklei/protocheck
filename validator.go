@@ -14,7 +14,7 @@ type MessageValidator struct {
 
 // Validator is an interface that can be implemented by a message to validate itself.
 type Validator interface {
-	Validate() ValidationError
+	Validate() error
 }
 
 // NewMessageValidator creates a MessageValidator using two collections of checkers
@@ -78,17 +78,4 @@ func MakeProgram(env *cel.Env, expression string) (cel.Program, error) {
 		return nil, fmt.Errorf("protocheck: failed to make CEL program: %w", err)
 	}
 	return prg, nil
-}
-
-var emptyValidationError = ValidationError{} // TODO is this an optimization?
-
-// AsValidationError converts an error or nil to a valid ValidationError.
-func AsValidationError(err error) ValidationError {
-	if err == nil {
-		return emptyValidationError
-	}
-	if ve, ok := err.(ValidationError); ok {
-		return ve
-	}
-	return emptyValidationError
 }

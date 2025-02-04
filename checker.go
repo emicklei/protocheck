@@ -33,31 +33,6 @@ func (c CheckError) WithPath(path string) CheckError {
 	return c
 }
 
-// ValidationError is a collection of CheckError.
-type ValidationError []CheckError
-
-// Error implements error
-func (v ValidationError) Error() string {
-	b := new(strings.Builder)
-	plural := ""
-	if len(v) > 1 {
-		plural = "s"
-	}
-	fmt.Fprintf(b, "%d error%s occurred:\n", len(v), plural)
-	for _, each := range v {
-		fail := each.Fail
-		if fail == "" {
-			fail = "id=" + each.Id
-		}
-		if each.Err == nil {
-			fmt.Fprintf(b, "\t* %s%s\n", each.Path, fail)
-		} else {
-			fmt.Fprintf(b, "\t* %s%s err=%s\n", each.Path, fail, each.Err.Error())
-		}
-	}
-	return b.String()
-}
-
 // Checker performs one check using a CEL program.
 type Checker struct {
 	check       *Check
