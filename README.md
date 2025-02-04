@@ -38,8 +38,8 @@ message Person {
   
   // message cross-field checks
   option (check.message) = { 
-    cel:"size(this.name + this.surname) > 0" 
-    fail:"name and surname cannot be empty" 
+    cel:"size(this.name + this.surname) > 0"  // cel is required
+    fail:"name and surname cannot be empty"  // fail is optional
     id:"person_invariant" }; // id is optional
   
   // with per field state checks
@@ -70,7 +70,12 @@ p := &Person{
     Name:      "",
     BirthDate: &timestamppb.Timestamp{Seconds:1}
 }
-err := p.Validate() // a protocheck.ValidationError
+if err := p.Validate() ; err != nil {
+  verr := protocheck.AsValidationError(err)
+  for _ , each := range verr {
+    log.Println(each)
+  }
+}
 ```
 
 ### considerations
