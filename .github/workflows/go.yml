@@ -19,7 +19,13 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.23'
+        go-version: '1.24'
 
     - name: Test
-      run: go test -v ./...
+      run: go test -v -coverprofile=coverage.txt
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: emicklei/protocheck
