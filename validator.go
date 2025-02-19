@@ -73,9 +73,5 @@ func MakeProgram(env *cel.Env, expression string) (cel.Program, error) {
 	if err := iss.Err(); err != nil {
 		return nil, fmt.Errorf("protocheck: failed to compile CEL expression: %w", err)
 	}
-	prg, err := env.Program(ast)
-	if err != nil {
-		return nil, fmt.Errorf("protocheck: failed to make CEL program: %w", err)
-	}
-	return prg, nil
+	return env.Program(ast)
 }

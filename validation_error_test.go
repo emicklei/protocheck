@@ -44,3 +44,14 @@ func TestAsValidationError(t *testing.T) {
 	}
 
 }
+
+func TestValidationErrorError(t *testing.T) {
+	ve := ValidationError{CheckError{
+		Id:  "1",
+		Err: errors.New("error"),
+	}}
+	msg := ve.Error()
+	if msg != "1 error occurred:\n\t* id=1 err=error\n" {
+		t.Errorf("expected msg, got [%v]", msg)
+	}
+}

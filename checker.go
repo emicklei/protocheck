@@ -67,7 +67,10 @@ func reflectIsSet(message any, fieldName string) bool {
 		return false
 	}
 	getValue := method.Call([]reflect.Value{})
-	return len(getValue) != 0
+	if len(getValue) == 0 {
+		return false
+	}
+	return !getValue[0].IsZero()
 }
 
 func (c Checker) WithEnabledFunc(enabledFunc func(any) bool) Checker {
