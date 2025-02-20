@@ -39,6 +39,13 @@ func file_person_health_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "weight in kg must be positive", expr, "Weight", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person_Health)
+				return typedX.GetWeight() != 0
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -97,6 +104,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "name must be longer than 1", expr, "Name", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetName() != ""
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -106,6 +120,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "middle name (if set) cannot be empty", expr, "MiddleName", true, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetMiddleName() != ""
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -115,6 +136,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "surname must be longer than 1", expr, "Surname", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetSurname() != ""
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -124,6 +152,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("check_birth_date", "[this.birth_date.getFullYear() > 2000] is false", expr, "BirthDate", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetBirthDate() != nil
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -133,6 +168,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("email", "email is not valid", expr, "Email", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetEmail() != ""
+			})
 			ch = ch.WithEnabledFunc(func(x any) bool {
 				if x == nil {
 					return false
@@ -150,6 +192,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "phone is not valid", expr, "Phone", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetPhone() != ""
+			})
 			ch = ch.WithEnabledFunc(func(x any) bool {
 				if x == nil {
 					return false
@@ -258,6 +307,13 @@ func file_pet_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("pet1", "only dog or cat is allowed", expr, "Kind", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Pet)
+				return typedX.GetKind() != ""
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -267,6 +323,13 @@ func file_pet_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "name cannot be empty", expr, "Name", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Pet)
+				return typedX.GetName() != ""
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}

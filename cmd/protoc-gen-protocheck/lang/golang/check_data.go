@@ -30,14 +30,16 @@ func (md MessageData) HasChecker() bool {
 }
 
 type CheckerData struct {
-	Comment        string
-	FieldName      string // empty for message level
-	IsOptional     bool
-	OneOfType      string // set for oneof
-	OneOfFieldName string // set for oneof
-	ID             string
-	Expr           string
-	Fail           string
+	Comment              string
+	FieldName            string // empty for message level
+	IsOptional           bool
+	OneOfType            string // set for oneof
+	OneOfFieldName       string // set for oneof
+	ID                   string
+	Expr                 string
+	Fail                 string
+	IsSetFuncRequired    bool
+	IsSetConditionSource string
 }
 
 func generate(fd FileData) (string, error) {

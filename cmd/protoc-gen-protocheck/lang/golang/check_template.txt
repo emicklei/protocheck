@@ -53,6 +53,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}",expr,"{{.FieldName}}", {{.IsOptional}}, prg)
+			{{- if .IsSetFuncRequired }}
 			{{- if $hasHas }}
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 
 				if x == nil {
@@ -61,6 +62,15 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 				typedX, _ := x.(*{{$msgName}})
 				return typedX.Has{{.FieldName}}
 			})
+			{{- else }}
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*{{$msgName}})
+				return {{.IsSetConditionSource}}
+			})
+			{{- end }}
 			{{- end }}
 			{{- if ne .OneOfType "" }}
 			ch = ch.WithEnabledFunc(func(x any) bool { 
