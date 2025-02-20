@@ -23,6 +23,7 @@ func TestEnabledChecker(t *testing.T) {
 }
 
 func TestForCoverage(t *testing.T) {
+	file_check_proto_init()
 	c := new(Check)
 	c.GetCel()
 	c.GetFail()
