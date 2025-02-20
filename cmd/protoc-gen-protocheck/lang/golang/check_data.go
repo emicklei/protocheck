@@ -22,6 +22,7 @@ type MessageData struct {
 	FieldCheckers        []CheckerData
 	MessageFieldNames    []string
 	ContainerFieldNames  []string
+	HasMethodsAvailable  bool // false for proto2,proto3, true for edition2023
 }
 
 func (md MessageData) HasChecker() bool {

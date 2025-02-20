@@ -45,6 +45,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
     {{- end }}	
 	fieldCheckers := []protocheck.Checker{}
 	{{- $msgName := .MessageName}}
+	{{- $hasHas := .HasMethodsAvailable}}
 	{{- range .FieldCheckers }}	
 	{ // {{.Comment}}
 		expr := `{{.Expr}}`
@@ -52,6 +53,15 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}",expr,"{{.FieldName}}", {{.IsOptional}}, prg)
+			{{- if $hasHas }}
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*{{$msgName}})
+				return typedX.Has{{.FieldName}}
+			})
+			{{- end }}
 			{{- if ne .OneOfType "" }}
 			ch = ch.WithEnabledFunc(func(x any) bool { 
 				if x == nil {
