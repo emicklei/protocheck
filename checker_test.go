@@ -5,7 +5,7 @@ import "testing"
 func TestWithParentField(t *testing.T) {
 	err := CheckError{}
 	err = err.WithParentField("parent", "key")
-	if err.Path != ".parent[key] " {
+	if err.Path != ".parent[key]" {
 		t.Errorf("expected .parent[key], got %s", err.Path)
 	}
 	err2 := CheckError{}.WithPath("here")
@@ -15,13 +15,33 @@ func TestWithParentField(t *testing.T) {
 	}
 }
 
-func TestReflectIsSet(t *testing.T) {
+func TestEnabledChecker(t *testing.T) {
+	ch := new(Checker).WithEnabledFunc(func(any) bool { return true })
+	if ch.enabledFunc == nil {
+		t.Fail()
+	}
+}
+
+func TestForCoverage(t *testing.T) {
 	c := new(Check)
-	if reflectIsSet(c, "Fail") {
-		t.Fail()
-	}
-	c.Fail = "Failed"
-	if !reflectIsSet(c, "Fail") {
-		t.Fail()
-	}
+	c.GetCel()
+	c.GetFail()
+	c.GetId()
+	c.Reset()
+	s := ""
+	c.Id = s
+	c.Fail = s
+	c.Cel = s
+	c.GetCel()
+	c.GetFail()
+	c.GetId()
+	c.Descriptor()
+	_ = c.String()
+	c.ProtoMessage()
+	_ = c.ProtoReflect()
+	var d *Check = nil
+	d.GetCel()
+	d.GetFail()
+	d.GetId()
+	_ = d.ProtoReflect()
 }

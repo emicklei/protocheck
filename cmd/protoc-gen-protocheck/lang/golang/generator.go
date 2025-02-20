@@ -283,7 +283,7 @@ func isSetConditionSource(f *protogen.Field) string {
 		f.Desc.Kind() == protoreflect.Fixed64Kind {
 		return fmt.Sprintf("typedX.Get%s() != 0", f.GoName)
 	}
-	if f.Desc.Kind() == protoreflect.DoubleKind {
+	if f.Desc.Kind() == protoreflect.DoubleKind || f.Desc.Kind() == protoreflect.FloatKind {
 		return fmt.Sprintf("typedX.Get%s() != 0.0", f.GoName)
 	}
 	if f.Desc.Kind() == protoreflect.BytesKind {

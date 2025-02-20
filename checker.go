@@ -2,7 +2,6 @@ package protocheck
 
 import (
 	"fmt"
-	reflect "reflect"
 	"strings"
 
 	"github.com/google/cel-go/cel"
@@ -18,7 +17,7 @@ type CheckError struct {
 
 // WithParentField returns a new CheckError with the parent field prepended to the path.
 func (c CheckError) WithParentField(parent string, key any) CheckError {
-	path := fmt.Sprintf("%s[%v] ", parent, key)
+	path := fmt.Sprintf("%s[%v]", parent, key)
 	if c.Path == "" {
 		c.Path = "." + path
 	} else {
@@ -54,23 +53,7 @@ func NewChecker(id string, fail string, cel string, fieldName string, isOptional
 		fieldName:  fieldName,
 		isOptional: isOptional,
 		program:    program,
-		isSetFunc:  reflectIsSet,
 	}
-}
-
-// for proto3
-func reflectIsSet(message any, fieldName string) bool {
-	rv := reflect.ValueOf(message)
-	methodName := "Get" + fieldName
-	method := rv.MethodByName(methodName)
-	if !method.IsValid() {
-		return false
-	}
-	getValue := method.Call([]reflect.Value{})
-	if len(getValue) == 0 {
-		return false
-	}
-	return !getValue[0].IsZero()
 }
 
 func (c Checker) WithEnabledFunc(enabledFunc func(any) bool) Checker {

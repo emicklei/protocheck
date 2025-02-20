@@ -49,6 +49,22 @@ func file_person_health_check_proto_init() error {
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
+	{ // AvgHartRate
+		expr := `this.avg_hart_rate > 0.0`
+		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
+			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		} else {
+			ch := protocheck.NewChecker("", "average heart rate must be positive", expr, "AvgHartRate", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person_Health)
+				return typedX.GetAvgHartRate() != 0.0
+			})
+			fieldCheckers = append(fieldCheckers, ch)
+		}
+	}
 	person_healthValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
 	return nil
 }

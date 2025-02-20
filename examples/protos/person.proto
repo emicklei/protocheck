@@ -21,6 +21,7 @@ message Person {
   // nested message
   message Health {
     int32 weight = 1 [(check.field) = { cel:"this.weight > 0" fail:"weight in kg must be positive" }];
+    double avg_hart_rate = 2 [(check.field) = { cel:"this.avg_hart_rate > 0.0" fail:"average heart rate must be positive" }];
   }
   Health health = 5;
 
@@ -51,6 +52,13 @@ message Person {
   map<string, Pet> favorites = 11 [(check.field) = { cel:"size(this.favorites) > 0" fail:"at least one favorite is required" }];
 
   google.protobuf.Timestamp no_check_date = 12;
+
+  enum Gender {
+    UNKNOWN = 0;
+    MALE = 1;
+    FEMALE = 2;
+  }
+  Gender gender = 13;
 }
 
 // second message in same file

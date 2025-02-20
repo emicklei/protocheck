@@ -55,3 +55,14 @@ func TestValidationErrorError(t *testing.T) {
 		t.Errorf("expected msg, got [%v]", msg)
 	}
 }
+
+func TestValidationErrorErrorWithPath(t *testing.T) {
+	ve := ValidationError{CheckError{
+		Path: "path",
+		Id:   "1",
+	}}
+	msg := ve.Error()
+	if msg != "1 error occurred:\n\t* path id=1\n" {
+		t.Errorf("expected msg, got [%v]", msg)
+	}
+}
