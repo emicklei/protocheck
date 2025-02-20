@@ -226,14 +226,18 @@ func buildFieldCheckerData(f *protogen.Field) (list []CheckerData, ok bool) {
 			oneOfField = f.Oneof.GoName
 		}
 		cd := CheckerData{
-			Comment:        f.GoName,
-			FieldName:      f.GoName,
-			IsOptional:     f.Desc.HasOptionalKeyword(),
-			OneOfType:      oneOfType,
-			OneOfFieldName: oneOfField,
-			ID:             ext.Id,
-			Fail:           ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
-			Expr:           ext.Cel,
+			Comment:           f.GoName,
+			FieldName:         f.GoName,
+			IsOptional:        f.Desc.HasOptionalKeyword(),
+			OneOfType:         oneOfType,
+			OneOfFieldName:    oneOfField,
+			ID:                ext.Id,
+			Fail:              ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
+			Expr:              ext.Cel,
+			IsSetFuncRequired: isSetRequired(f),
+		}
+		if cd.IsSetFuncRequired {
+			cd.IsSetConditionSource = isSetConditionSource(f)
 		}
 		list = append(list, cd)
 	}
@@ -250,4 +254,44 @@ func ifEmpty(content, alt string) string {
 func abort(message string) {
 	fmt.Println(message)
 	os.Exit(1)
+}
+
+func isSetRequired(f *protogen.Field) bool {
+	if f.Desc.IsList() || f.Desc.IsMap() {
+		return false
+	}
+	return true
+}
+
+func isSetConditionSource(f *protogen.Field) string {
+	// not for list or map
+	if f.Desc.Kind() == protoreflect.MessageKind {
+		return fmt.Sprintf("typedX.Get%s() != nil", f.GoName)
+	}
+	if f.Desc.Kind() == protoreflect.StringKind {
+		return fmt.Sprintf("typedX.Get%s() != \"\"", f.GoName)
+	}
+	if f.Desc.Kind() == protoreflect.Int32Kind ||
+		f.Desc.Kind() == protoreflect.Int64Kind ||
+		f.Desc.Kind() == protoreflect.Uint32Kind ||
+		f.Desc.Kind() == protoreflect.Uint64Kind ||
+		f.Desc.Kind() == protoreflect.Sint32Kind ||
+		f.Desc.Kind() == protoreflect.Sint64Kind ||
+		f.Desc.Kind() == protoreflect.Sfixed32Kind ||
+		f.Desc.Kind() == protoreflect.Sfixed64Kind ||
+		f.Desc.Kind() == protoreflect.Fixed32Kind ||
+		f.Desc.Kind() == protoreflect.Fixed64Kind {
+		return fmt.Sprintf("typedX.Get%s() != 0", f.GoName)
+	}
+	if f.Desc.Kind() == protoreflect.DoubleKind || f.Desc.Kind() == protoreflect.FloatKind {
+		return fmt.Sprintf("typedX.Get%s() != 0.0", f.GoName)
+	}
+	if f.Desc.Kind() == protoreflect.BytesKind {
+		return fmt.Sprintf("len(typedX.Get%s()) > 0", f.GoName)
+	}
+	if f.Desc.Kind() == protoreflect.BoolKind {
+		return fmt.Sprintf("typedX.Get%s() != false", f.GoName)
+	}
+	fmt.Fprintln(os.Stderr, "unsupported field type", f.Desc.Kind())
+	return ""
 }

@@ -1,6 +1,7 @@
 package protocheck
 
 import (
+	reflect "reflect"
 	"testing"
 
 	"github.com/google/cel-go/cel"
@@ -60,6 +61,7 @@ func TestEvalChecker(t *testing.T) {
 			t.Errorf("expected 0 error, got %d, %v", len(result), result[0])
 		}
 	}
+	checker = checker.WithIsSetFunc(reflectIsSet)
 	mv := NewMessageValidator([]Checker{checker}, []Checker{checker})
 	ve := mv.Validate(new(Check))
 	if len(ve) != 2 {
@@ -142,4 +144,19 @@ func TestEvalCheckerNonBoolean(t *testing.T) {
 			t.Errorf("expected 1 error")
 		}
 	}
+}
+
+// for testing io. generated func
+func reflectIsSet(message any, fieldName string) bool {
+	rv := reflect.ValueOf(message)
+	methodName := "Get" + fieldName
+	method := rv.MethodByName(methodName)
+	if !method.IsValid() {
+		return false
+	}
+	getValue := method.Call([]reflect.Value{})
+	if len(getValue) == 0 {
+		return false
+	}
+	return !getValue[0].IsZero()
 }

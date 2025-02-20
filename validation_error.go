@@ -21,10 +21,14 @@ func (v ValidationError) Error() string {
 		if fail == "" {
 			fail = "id=" + each.Id
 		}
+		path := each.Path
+		if path != "" {
+			path += " "
+		}
 		if each.Err == nil {
-			fmt.Fprintf(b, "\t* %s%s\n", each.Path, fail)
+			fmt.Fprintf(b, "\t* %s%s\n", path, fail)
 		} else {
-			fmt.Fprintf(b, "\t* %s%s err=%s\n", each.Path, fail, each.Err.Error())
+			fmt.Fprintf(b, "\t* %s%s err=%s\n", path, fail, each.Err.Error())
 		}
 	}
 	return b.String()

@@ -14,7 +14,7 @@ func createValidPerson() *Person {
 		Surname:    notempty,
 		MiddleName: &notempty,
 		BirthDate:  &timestamppb.Timestamp{Seconds: 200 * 365 * 60 * 60 * 60},
-		Health:     &Person_Health{Weight: 1}}
+		Health:     &Person_Health{Weight: 1, AvgHartRate: 60.0}}
 	p.Identification = &Person_Email{Email: "a.b@here.com"}
 	p.Pets = append(p.Pets, &Pet{Kind: "dog", Name: notempty})
 	p.Attributes = map[string]string{notempty: notempty}
@@ -23,7 +23,7 @@ func createValidPerson() *Person {
 	return p
 }
 
-// go test -bench=. -count=5 -run=^#
+// go test -bench=. -count=5 -run=^# -cpuprofile=cpu.prof -memprofile=mem.prof
 func BenchmarkValidation(t *testing.B) {
 	p := createValidPerson()
 	for i := 0; i < t.N; i++ {
@@ -114,7 +114,7 @@ func TestCheckPersonInvalidBirthdate(t *testing.T) {
 	}
 }
 
-func TestCheckPersonInvalidHealth(t *testing.T) {
+func TestCheckPersonInvalidHealthWeight(t *testing.T) {
 	p := createValidPerson()
 	p.Health.Weight = -1
 	err := p.Validate()
@@ -123,6 +123,19 @@ func TestCheckPersonInvalidHealth(t *testing.T) {
 		t.Fatal(err)
 	}
 	if got, want := ve[0].Fail, "weight in kg must be positive"; got != want {
+		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
+	}
+}
+
+func TestCheckPersonInvalidHealthHeartRate(t *testing.T) {
+	p := createValidPerson()
+	p.Health.AvgHartRate = -1
+	err := p.Validate()
+	ve := protocheck.AsValidationError(err)
+	if len(ve) != 1 {
+		t.Fatal(err)
+	}
+	if got, want := ve[0].Fail, "average heart rate must be positive"; got != want {
 		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
 	}
 }
