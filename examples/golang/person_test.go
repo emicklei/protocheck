@@ -23,6 +23,14 @@ func createValidPerson() *Person {
 	return p
 }
 
+// go test -bench=. -count=5 -run=^#
+func BenchmarkValidation(t *testing.B) {
+	p := createValidPerson()
+	for i := 0; i < t.N; i++ {
+		_ = p.Validate()
+	}
+}
+
 func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 	p := createValidPerson()
 	p.Favorites["test"].Kind = "spider"
