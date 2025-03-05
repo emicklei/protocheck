@@ -6,6 +6,11 @@ import (
 	"github.com/google/cel-go/cel"
 )
 
+type ValidationOption byte
+
+const AllFields ValidationOption = 1
+const FieldsSetOnly ValidationOption = 2
+
 // MessageValidator holds a collection of checkers to validate a message.
 type MessageValidator struct {
 	fieldCheckers   []Checker
@@ -24,7 +29,9 @@ func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValida
 
 // Validate runs all message and field checkers with the message.
 // Always returns a ValidationError which can be empty (no failed checks)
-func (m MessageValidator) Validate(this any) (result ValidationError) {
+// With options you can control what to validations to skip.
+func (m MessageValidator) Validate(this any, options ...ValidationOption) (result ValidationError) {
+	optionsMask := optionsMask(options)
 	env := map[string]interface{}{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
@@ -38,15 +45,33 @@ func (m MessageValidator) Validate(this any) (result ValidationError) {
 		if each.enabledFunc != nil && !each.enabledFunc(this) {
 			continue
 		}
-		// is it set
-		isSet := each.isSetFunc(this, each.fieldName)
-		if !isSet && each.isOptional {
-			continue
+		if each.isSetFunc != nil {
+			// is it set?
+			isSet := each.isSetFunc(this, each.fieldName)
+			// skip unset?
+			if !isSet && hasOption(optionsMask, FieldsSetOnly) {
+				continue
+			}
+			if !isSet && each.isOptional {
+				continue
+			}
 		}
 		result = append(result, evalChecker(each, env)...)
 	}
 	return
 
+}
+
+func optionsMask(options []ValidationOption) byte {
+	var mask byte
+	for _, each := range options {
+		mask |= byte(each)
+	}
+	return mask
+}
+
+func hasOption(mask byte, option ValidationOption) bool {
+	return mask&byte(option) != 0
 }
 
 func evalChecker(each Checker, env map[string]interface{}) (result []CheckError) {

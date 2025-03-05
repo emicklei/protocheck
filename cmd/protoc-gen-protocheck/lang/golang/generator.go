@@ -226,18 +226,15 @@ func buildFieldCheckerData(f *protogen.Field) (list []CheckerData, ok bool) {
 			oneOfField = f.Oneof.GoName
 		}
 		cd := CheckerData{
-			Comment:           f.GoName,
-			FieldName:         f.GoName,
-			IsOptional:        f.Desc.HasOptionalKeyword(),
-			OneOfType:         oneOfType,
-			OneOfFieldName:    oneOfField,
-			ID:                ext.Id,
-			Fail:              ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
-			Expr:              ext.Cel,
-			IsSetFuncRequired: isSetRequired(f),
-		}
-		if cd.IsSetFuncRequired {
-			cd.IsSetConditionSource = isSetConditionSource(f)
+			Comment:              f.GoName,
+			FieldName:            f.GoName,
+			IsOptional:           f.Desc.HasOptionalKeyword(),
+			OneOfType:            oneOfType,
+			OneOfFieldName:       oneOfField,
+			ID:                   ext.Id,
+			Fail:                 ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
+			Expr:                 ext.Cel,
+			IsSetConditionSource: isSetConditionSource(f),
 		}
 		list = append(list, cd)
 	}
@@ -257,14 +254,13 @@ func abort(message string) {
 }
 
 func isSetRequired(f *protogen.Field) bool {
-	if f.Desc.IsList() || f.Desc.IsMap() {
-		return false
-	}
-	return true
+	return true // !f.Desc.IsList() // TODO in editions2023 ? maybe always true
 }
 
 func isSetConditionSource(f *protogen.Field) string {
-	// not for list or map
+	if f.Desc.IsList() {
+		return fmt.Sprintf("typedX.Get%s() != nil", f.GoName)
+	}
 	if f.Desc.Kind() == protoreflect.MessageKind {
 		return fmt.Sprintf("typedX.Get%s() != nil", f.GoName)
 	}
