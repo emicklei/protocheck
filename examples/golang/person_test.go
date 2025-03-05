@@ -139,3 +139,17 @@ func TestCheckPersonInvalidHealthHeartRate(t *testing.T) {
 		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
 	}
 }
+
+func TestValidateSetFieldsOn(t *testing.T) {
+	notempty := "test"
+	p := &Person{
+		Name:       notempty,
+		Nicknames:  nil, // mark not set
+		Pets:       nil, // mark not set
+		Attributes: nil, // mark not set
+		Favorites:  nil} // mark not set
+	err := p.Validate(protocheck.FieldsSetOnly)
+	if err != nil {
+		t.Error("unexpected", err)
+	}
+}

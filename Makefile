@@ -13,3 +13,6 @@ fmt:
 
 install:
 	cd cmd/protoc-gen-protocheck && go install
+
+test:
+	go test -v -race -cover

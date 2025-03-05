@@ -38,7 +38,6 @@ type CheckerData struct {
 	ID                   string
 	Expr                 string
 	Fail                 string
-	IsSetFuncRequired    bool
 	IsSetConditionSource string
 }
 

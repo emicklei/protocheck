@@ -71,7 +71,7 @@ func file_person_health_check_proto_init() error {
 
 // Validate checks the validity of the Person_Health message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Person_Health) Validate() error {
+func (x *Person_Health) Validate(options ...protocheck.ValidationOption) error {
 	if x == nil {
 		return nil
 	}
@@ -80,7 +80,7 @@ func (x *Person_Health) Validate() error {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := person_healthValidator.Validate(x)
+	ve := person_healthValidator.Validate(x, options...)
 	if len(ve) == 0 {
 		return nil
 	}
@@ -232,6 +232,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one nickname is required", expr, "Nicknames", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetNicknames() != nil
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -241,6 +248,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "nickname cannot be empty", expr, "Nicknames", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetNicknames() != nil
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -250,6 +264,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one Pet is required", expr, "Pets", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetPets() != nil
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -259,6 +280,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one attribute is required", expr, "Attributes", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetAttributes() != nil
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -268,6 +296,13 @@ func file_person_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one favorite is required", expr, "Favorites", false, prg)
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
+				if x == nil {
+					return false
+				}
+				typedX, _ := x.(*Person)
+				return typedX.GetFavorites() != nil
+			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
 	}
@@ -277,7 +312,7 @@ func file_person_check_proto_init() error {
 
 // Validate checks the validity of the Person message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Person) Validate() error {
+func (x *Person) Validate(options ...protocheck.ValidationOption) error {
 	if x == nil {
 		return nil
 	}
@@ -286,17 +321,17 @@ func (x *Person) Validate() error {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := personValidator.Validate(x)
-	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate()) { // Health
+	ve := personValidator.Validate(x, options...)
+	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate(options...)) { // Health
 		ve = append(ve, nve.WithPath(".Health"))
 	}
 	for key, msg := range x.GetPets() { // Pets
-		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
+		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
 			ve = append(ve, nve.WithParentField("Pets", key))
 		}
 	}
 	for key, msg := range x.GetFavorites() { // Favorites
-		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
+		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
 			ve = append(ve, nve.WithParentField("Favorites", key))
 		}
 	}
@@ -355,7 +390,7 @@ func file_pet_check_proto_init() error {
 
 // Validate checks the validity of the Pet message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Pet) Validate() error {
+func (x *Pet) Validate(options ...protocheck.ValidationOption) error {
 	if x == nil {
 		return nil
 	}
@@ -364,7 +399,7 @@ func (x *Pet) Validate() error {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := petValidator.Validate(x)
+	ve := petValidator.Validate(x, options...)
 	if len(ve) == 0 {
 		return nil
 	}
