@@ -9,7 +9,10 @@ import (
 
 type ValidationOption byte
 
-const AllFields ValidationOption = 0 // effectively no options
+// effectively no options
+const AllFields ValidationOption = 0
+
+// Only if a field is set (non-zero value for proto3) then validate its content.
 const FieldsSetOnly ValidationOption = 1
 
 // MessageValidator holds a collection of checkers to validate a message.
@@ -20,7 +23,7 @@ type MessageValidator struct {
 
 // Validator is an interface that can be implemented by a message to validate itself.
 type Validator interface {
-	Validate() error
+	Validate(options ...ValidationOption) error
 }
 
 // NewMessageValidator creates a MessageValidator using two collections of checkers
@@ -32,7 +35,7 @@ func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValida
 // Always returns a ValidationError which can be empty (no failed checks)
 // With options you can control what to validations to skip.
 func (m MessageValidator) Validate(this any, options ...ValidationOption) (result ValidationError) {
-	env := map[string]interface{}{"this": this}
+	env := map[string]any{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
 	}
