@@ -16,7 +16,7 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
         messageCheckers.add(checker);
     }
 
-    public void validate(M message, ValidatorOption... options) throws ValidationException {
+    public void validate(M message, ValidationOption... options) throws ValidationException {
         List<CheckError> errors = new ArrayList<CheckError>();
         Map<String, com.google.protobuf.GeneratedMessage> envMap = Map.of("this", message);
         for (Checker checker : fieldCheckers) {
@@ -27,9 +27,10 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
         }
     }
 
-    private void evalChecker(Checker checker, Map<String, com.google.protobuf.GeneratedMessage> envMap, List<CheckError> errors ) {
+    private void evalChecker(Checker checker, Map<String, com.google.protobuf.GeneratedMessage> envMap,
+            List<CheckError> errors) {
         try {
-            if (!(boolean)checker.program.eval(envMap)) {
+            if (!(boolean) checker.program.eval(envMap)) {
                 errors.add(new CheckError(checker.fieldName, checker.check.getId(), checker.check.getFail()));
             }
         } catch (Exception ex) {

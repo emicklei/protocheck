@@ -1,9 +1,10 @@
-package org.emicklei.protocheck;
+package hr;
 
 import org.junit.Test;
 
 import hr.Person;
 import hr.PersonCheckers;
+import org.emicklei.protocheck.*;
 
 public class CheckerTest {
 

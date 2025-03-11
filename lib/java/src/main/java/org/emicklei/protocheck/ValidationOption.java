@@ -1,5 +1,5 @@
 package org.emicklei.protocheck;
 
-public class ValidatorOption {
+public class ValidationOption {
     
 }
