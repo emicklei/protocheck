@@ -79,6 +79,10 @@ func TestEvalChecker(t *testing.T) {
 ` {
 		t.Errorf("expected CEL cannot be empty, got %s", ve.Error())
 	}
+	ve2 := mv.Validate(new(Check), FieldsSetOnly)
+	if len(ve2) != 1 {
+		t.Errorf("expected 1 error, got %d", len(ve2))
+	}
 }
 
 func TestEvalCheckerNotSetButEnabledOptional(t *testing.T) {

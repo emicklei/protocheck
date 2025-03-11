@@ -2,9 +2,15 @@ package protocheck
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/google/cel-go/cel"
 )
+
+type ValidationOption byte
+
+// Only if a field is set (non-zero value for proto3) then validate its content.
+const FieldsSetOnly ValidationOption = 1
 
 // MessageValidator holds a collection of checkers to validate a message.
 type MessageValidator struct {
@@ -14,7 +20,7 @@ type MessageValidator struct {
 
 // Validator is an interface that can be implemented by a message to validate itself.
 type Validator interface {
-	Validate() error
+	Validate(options ...ValidationOption) error
 }
 
 // NewMessageValidator creates a MessageValidator using two collections of checkers
@@ -24,8 +30,9 @@ func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValida
 
 // Validate runs all message and field checkers with the message.
 // Always returns a ValidationError which can be empty (no failed checks)
-func (m MessageValidator) Validate(this any) (result ValidationError) {
-	env := map[string]interface{}{"this": this}
+// With options you can control what to validations to skip.
+func (m MessageValidator) Validate(this any, options ...ValidationOption) (result ValidationError) {
+	env := map[string]any{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
 	}
@@ -38,10 +45,16 @@ func (m MessageValidator) Validate(this any) (result ValidationError) {
 		if each.enabledFunc != nil && !each.enabledFunc(this) {
 			continue
 		}
-		// is it set
-		isSet := each.isSetFunc(this, each.fieldName)
-		if !isSet && each.isOptional {
-			continue
+		if each.isSetFunc != nil {
+			// is it set?
+			isSet := each.isSetFunc(this, each.fieldName)
+			// skip unset?
+			if !isSet && slices.Contains(options, FieldsSetOnly) {
+				continue
+			}
+			if !isSet && each.isOptional {
+				continue
+			}
 		}
 		result = append(result, evalChecker(each, env)...)
 	}

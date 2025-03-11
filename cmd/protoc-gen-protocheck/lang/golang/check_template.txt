@@ -53,7 +53,6 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
 			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}",expr,"{{.FieldName}}", {{.IsOptional}}, prg)
-			{{- if .IsSetFuncRequired }}
 			{{- if $hasHas }}
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 
 				if x == nil {
@@ -70,7 +69,6 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 				typedX, _ := x.(*{{$msgName}})
 				return {{.IsSetConditionSource}}
 			})
-			{{- end }}
 			{{- end }}
 			{{- if ne .OneOfType "" }}
 			ch = ch.WithEnabledFunc(func(x any) bool { 
@@ -92,7 +90,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 
 // Validate checks the validity of the {{.MessageName}} message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *{{.MessageName}}) Validate() error {
+func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) error {
 	if x == nil {
 		return nil
 	}
@@ -101,15 +99,15 @@ func (x *{{.MessageName}}) Validate() error {
 			slog.Error("checkers initialization failed","err",err)
 		}
 	})
-	ve := {{.LowercaseMessageName}}Validator.Validate(x)
+	ve := {{.LowercaseMessageName}}Validator.Validate(x,options...)
 	{{- range .MessageFieldNames}}	
-	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate()) { // {{.}}
+	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate(options...)) { // {{.}}
 		ve = append(ve, nve.WithPath(".{{.}}"))
 	}
 	{{- end}}	
 	{{- range .ContainerFieldNames}}
 	for key, msg := range x.Get{{.}}() { // {{.}}
-		for _ , nve := range protocheck.AsValidationError(msg.Validate()) {
+		for _ , nve := range protocheck.AsValidationError(msg.Validate(options...)) {
 			ve = append(ve, nve.WithParentField("{{.}}", key))
 		}
 	}
