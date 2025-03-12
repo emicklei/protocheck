@@ -2,16 +2,18 @@ package org.emicklei.protocheck;
 
 import org.junit.Test;
 
+import pb.BikeOuterClass.Bike;
+
 
 public class MessageValidatorTest {
 
     @Test
     public void test()  throws Exception {
-        MessageValidator<org.emicklei.protocheck.pb.Check> mv = new MessageValidator<org.emicklei.protocheck.pb.Check>();
+        MessageValidator<Bike> mv = new MessageValidator<Bike>();
         mv.addFieldChecker(Helpers.createChecker());
-        org.emicklei.protocheck.pb.Check c = org.emicklei.protocheck.pb.Check.newBuilder().setCel("1==1").build();
+        Bike b = Bike.newBuilder().setBrand("brand").build();
         try {
-            mv.validate(c);
+            mv.validate(b);
         } catch (ValidationException ex) {
             for (CheckError e : ex.getErrors()) {
                 System.err.println(e);
