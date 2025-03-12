@@ -6,6 +6,9 @@ import "check.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/emicklei/protocheck-example/golang;golang";
+option java_multiple_files = true;
+option java_package = "hr";
+option java_outer_classname = "HRProtos";
 
 message Person {
   
