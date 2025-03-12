@@ -1,13 +1,8 @@
-package golang
+package shared
 
 import (
 	_ "embed"
-	"strings"
-	"text/template"
 )
-
-//go:embed check_template.txt
-var checkDataTemplate string
 
 type FileData struct {
 	PkgName  string
@@ -40,13 +35,4 @@ type CheckerData struct {
 	Fail                 string
 	IsSetFuncRequired    bool
 	IsSetConditionSource string
-}
-
-func generate(fd FileData) (string, error) {
-	tmpl := template.Must(template.New("check").Parse(checkDataTemplate))
-	buf := new(strings.Builder)
-	if err := tmpl.Execute(buf, fd); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
 }

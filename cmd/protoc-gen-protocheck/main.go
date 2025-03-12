@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/golang"
+	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/java"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
@@ -41,6 +42,10 @@ func run(p *protogen.Plugin) error {
 		)
 
 		switch *lang {
+		case "java":
+			if err := java.Process(p, each); err != nil {
+				return err
+			}
 		case "go":
 			if err := golang.Process(p, each); err != nil {
 				return err
