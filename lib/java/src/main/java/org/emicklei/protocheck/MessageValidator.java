@@ -27,11 +27,15 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
         }
     }
 
-    private void evalChecker(Checker checker, Map<String, com.google.protobuf.GeneratedMessage> envMap,
+    private void evalChecker(
+            Checker checker,
+            Map<String, com.google.protobuf.GeneratedMessage> envMap,
             List<CheckError> errors) {
         try {
             if (!(boolean) checker.program.eval(envMap)) {
-                errors.add(new CheckError(checker.fieldName, checker.check.getId(), checker.check.getFail()));
+                CheckError err = new CheckError(checker.fieldName, checker.check.getId(), checker.check.getFail());
+                err.setFieldValue("");
+                errors.add(err);
             }
         } catch (Exception ex) {
             errors.add(new CheckError(checker.fieldName, checker.check.getId(), ex.toString()));

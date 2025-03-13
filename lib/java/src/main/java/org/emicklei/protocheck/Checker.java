@@ -2,6 +2,8 @@ package org.emicklei.protocheck;
 
 import dev.cel.runtime.*;
 
+import java.util.function.Function;
+
 import dev.cel.common.CelAbstractSyntaxTree;
 
 public final class Checker {
@@ -11,6 +13,7 @@ public final class Checker {
     CelRuntime.Program program;
     String fieldName; // for field level checks
     boolean isOptional;
+    Function<?,Object> fieldAccess;
 
     public Checker(java.lang.String id, java.lang.String fail, java.lang.String cel, CelRuntime.Program program,
             String fieldName, boolean isOptional) {
@@ -18,6 +21,10 @@ public final class Checker {
         this.program = program;
         this.fieldName = fieldName;
         this.isOptional = isOptional;
+    }
+
+    public void setFieldAccess(Function<Object,Object> fieldAccess) {
+        this.fieldAccess = fieldAccess;
     }
 
     public static CelRuntime.Program makeProgram(CelAbstractSyntaxTree ast)

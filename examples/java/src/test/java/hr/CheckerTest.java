@@ -2,8 +2,6 @@ package hr;
 
 import org.junit.Test;
 
-import hr.Person;
-import hr.PersonCheckers;
 import org.emicklei.protocheck.*;
 
 public class CheckerTest {
@@ -14,6 +12,7 @@ public class CheckerTest {
         try {
             PersonCheckers.validate(p);
         } catch (ValidationException ex) {
+            System.err.println(ex.getMessage());
             for (CheckError e : ex.getErrors()) {
                 System.err.println(e);
             } 

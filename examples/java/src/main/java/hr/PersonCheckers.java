@@ -34,9 +34,13 @@ public final class PersonCheckers {
                     .setStandardEnvironmentEnabled(true)
                     .setResultType(SimpleType.BOOL)
                     .build();
-            Program prog = Checker.makeProgram(compiler.compile("size(this.name) > 1").getAst());
-            Checker checker = new Checker("name_id", "name must be longer than 1", "size(this.name) > 1", prog, "Name",
-                    false);
+            Program conditionProgram = Checker.makeProgram(compiler.compile("size(this.name) > 1").getAst());
+            // Program fieldAccessProgram =
+            // Checker.makeProgram(compiler.compile("this.name").getAst());
+            Checker checker = new Checker("name_id", "name must be longer than 1",
+                    "size(this.name) > 1",
+                    conditionProgram, "name", false);
+            //checker.setFieldAccess((Person p) -> p.getName());
 
             personValidator.addFieldChecker(checker);
         } catch (CelEvaluationException ex) {
