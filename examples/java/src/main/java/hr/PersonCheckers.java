@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import dev.cel.common.CelValidationException;
 import dev.cel.common.types.ProtoMessageTypeProvider;
 import dev.cel.common.types.SimpleType;
+import dev.cel.common.types.StructTypeReference;
 import dev.cel.compiler.CelCompiler;
 import dev.cel.compiler.CelCompilerFactory;
 import dev.cel.runtime.CelEvaluationException;
@@ -28,7 +29,8 @@ public final class PersonCheckers {
             ProtoMessageTypeProvider prov = new ProtoMessageTypeProvider(ImmutableList.of(Person.getDescriptor()));
             CelCompiler compiler = CelCompilerFactory.standardCelCompilerBuilder()
                     .setTypeProvider(prov)
-                    .addVar("this", prov.findType("golang.Person").get())
+                    .addVar("this", StructTypeReference.create(Person.getDescriptor().getFullName()))
+                    // .addVar("this", prov.findType("golang.Person").get())
                     .setStandardEnvironmentEnabled(true)
                     .setResultType(SimpleType.BOOL)
                     .build();
