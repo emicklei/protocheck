@@ -49,7 +49,8 @@ public final class HRProtosCheckers {
     }
 
     public static void validate(Person.Health x) throws ValidationException {
-        person_healthValidator.validate(x);
+        if (x == null) { return; }
+        person_healthValidator.validate(x);	        
     }
     private static MessageValidator<Person> personValidator= new MessageValidator<Person>();
     
@@ -60,7 +61,19 @@ public final class HRProtosCheckers {
                     .addVar("this", StructTypeReference.create(Person.getDescriptor().getFullName()))
                     .setStandardEnvironmentEnabled(true)
                     .setResultType(SimpleType.BOOL)
-                    .build();
+                    .build();	
+	        { // person_invariant
+                String expr = "size(this.name + this.surname) > 0";
+                Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
+                Checker checker = new Checker("person_invariant","name and surname cannot be empty",expr,prog,"",false);            
+                personValidator.addMessageChecker(checker);
+            }	
+	        { // person_health_weight_invariant
+                String expr = "this.health.weight <= 300";
+                Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
+                Checker checker = new Checker("person_health_weight_invariant","weight cannot be larger than 300",expr,prog,"",false);            
+                personValidator.addMessageChecker(checker);
+            }
             { // Name
                 String expr = "size(this.name) > 1";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
@@ -138,7 +151,11 @@ public final class HRProtosCheckers {
     }
 
     public static void validate(Person x) throws ValidationException {
-        personValidator.validate(x);
+        if (x == null) { return; }
+        personValidator.validate(x);	
+        //for _ , nve := range protocheck.AsValidationError(x.GetHealth().Validate()) { // Health
+        //    ve = append(ve, nve.WithPath(".Health"))
+        //}	        
     }
     private static MessageValidator<Pet> petValidator= new MessageValidator<Pet>();
     
@@ -173,6 +190,7 @@ public final class HRProtosCheckers {
     }
 
     public static void validate(Pet x) throws ValidationException {
-        petValidator.validate(x);
+        if (x == null) { return; }
+        petValidator.validate(x);	        
     }
 }

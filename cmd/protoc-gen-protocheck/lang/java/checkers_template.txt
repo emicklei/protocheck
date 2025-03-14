@@ -28,7 +28,15 @@ public final class {{.JavaOuterClassname}}Checkers {
                     .setStandardEnvironmentEnabled(true)
                     .setResultType(SimpleType.BOOL)
                     .build();
-            {{- $lowerName := .LowercaseMessageName}}                    
+            {{- $lowerName := .LowercaseMessageName}}                                        
+            {{- range .MessageCheckers }}	
+	        { // {{.Comment}}
+                String expr = "{{.Expr}}";
+                Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
+                Checker checker = new Checker("{{.ID}}","{{.Fail}}",expr,prog,"{{.FieldName}}",{{.IsOptional}});            
+                {{$lowerName}}Validator.addMessageChecker(checker);
+            }
+            {{- end}}
             {{- range .FieldCheckers }}
             { // {{.Comment}}
                 String expr = "{{.Expr}}";
@@ -48,7 +56,13 @@ public final class {{.JavaOuterClassname}}Checkers {
     }
 
     public static void validate({{.MessageName}} x) throws ValidationException {
+        if (x == null) { return; }
         {{.LowercaseMessageName}}Validator.validate(x);
+        {{- range .MessageFieldNames}}	
+        //for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate()) { // {{.}}
+        //    ve = append(ve, nve.WithPath(".{{.}}"))
+        //}
+        {{- end}}	        
     }
     {{- end }}
 }
