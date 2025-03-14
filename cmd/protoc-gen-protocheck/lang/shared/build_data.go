@@ -16,6 +16,7 @@ import (
 
 type PostBuilder interface {
 	PostBuildCheckerData(f *protogen.Field, c CheckerData) CheckerData
+	MessageIdent(m *protogen.Message) string
 }
 
 type builder struct {
@@ -58,7 +59,7 @@ func (b builder) addMessageDataTo(msg *protogen.Message, init string, list []Mes
 func (b builder) buildMessageData(m *protogen.Message) MessageData {
 	md := MessageData{
 		LowercaseMessageName: strings.ToLower(string(m.GoIdent.GoName)),
-		MessageName:          string(m.GoIdent.GoName),
+		MessageName:          b.postBuilder.MessageIdent(m),
 		ObjectTypeName:       string(m.Desc.FullName()),
 	}
 	containers := []string{}

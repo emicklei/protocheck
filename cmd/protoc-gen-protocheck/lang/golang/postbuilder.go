@@ -18,6 +18,10 @@ func (postBuilder) PostBuildCheckerData(f *protogen.Field, cd shared.CheckerData
 	return cd
 }
 
+func (postBuilder) MessageIdent(m *protogen.Message) string {
+	return string(m.GoIdent.GoName)
+}
+
 func isSetConditionSource(f *protogen.Field) string {
 	// not for list or map
 	if f.Desc.Kind() == protoreflect.MessageKind {

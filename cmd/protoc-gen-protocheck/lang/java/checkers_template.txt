@@ -19,22 +19,24 @@ public final class {{.JavaOuterClassname}}Checkers {
 
     {{- range .Messages}}
     private static MessageValidator<{{.MessageName}}> {{.LowercaseMessageName}}Validator= new MessageValidator<{{.MessageName}}>();
-    {{- end }}
-
+    
     static { 
         try {
             CelCompiler compiler = CelCompilerFactory.standardCelCompilerBuilder()
-                    .addMessageTypes(Person.getDescriptor())
-                    .addVar("this", StructTypeReference.create(Person.getDescriptor().getFullName()))
+                    .addMessageTypes({{.MessageName}}.getDescriptor())
+                    .addVar("this", StructTypeReference.create({{.MessageName}}.getDescriptor().getFullName()))
                     .setStandardEnvironmentEnabled(true)
                     .setResultType(SimpleType.BOOL)
                     .build();
-            Program prog = Checker.makeProgram(compiler.compile("size(this.name) > 1").getAst());
-            Checker checker = new Checker("name_id", "name must be longer than 1",
-                    "size(this.name) > 1",
-                    prog, "name", false);
-
-            personValidator.addFieldChecker(checker);
+            {{- $lowerName := .LowercaseMessageName}}                    
+            {{- range .FieldCheckers }}
+            { // {{.Comment}}
+                String expr = "{{.Expr}}";
+                Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
+                Checker checker = new Checker("{{.ID}}","{{.Fail}}",expr,prog,"{{.FieldName}}",{{.IsOptional}});            
+                {{$lowerName}}Validator.addFieldChecker(checker);
+            }
+            {{- end}}
         } catch (CelEvaluationException ex) {
             System.err.println("CelEvaluationException: " + ex.getMessage());
             throw new RuntimeException(ex.getCause());
@@ -45,7 +47,8 @@ public final class {{.JavaOuterClassname}}Checkers {
         }
     }
 
-    public static void validate(Person x) throws ValidationException {
-        personValidator.validate(x);
+    public static void validate({{.MessageName}} x) throws ValidationException {
+        {{.LowercaseMessageName}}Validator.validate(x);
     }
+    {{- end }}
 }
