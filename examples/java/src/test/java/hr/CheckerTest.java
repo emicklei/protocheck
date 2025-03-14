@@ -10,7 +10,7 @@ public class CheckerTest {
     public void test()  throws Exception {
         Person p = Person.newBuilder().setName("").build();
         try {
-            PersonCheckers2.validate(p);
+            HRProtosCheckers.validate(p);
         } catch (ValidationException ex) {
             System.err.println(ex.getMessage());
             for (CheckError e : ex.getErrors()) {

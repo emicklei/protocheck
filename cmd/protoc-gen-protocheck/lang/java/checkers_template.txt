@@ -2,7 +2,10 @@
 
 package {{.PkgName}};
 
+import java.util.List;
+
 import org.emicklei.protocheck.Checker;
+import org.emicklei.protocheck.CheckError;
 import org.emicklei.protocheck.MessageValidator;
 import org.emicklei.protocheck.ValidationException;
 
@@ -57,11 +60,11 @@ public final class {{.JavaOuterClassname}}Checkers {
 
     public static void validate({{.MessageName}} x) throws ValidationException {
         if (x == null) { return; }
-        {{.LowercaseMessageName}}Validator.validate(x);
+        List<CheckError> errors = {{.LowercaseMessageName}}Validator.validate(x);
         {{- range .MessageFieldNames}}	
-        //for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate()) { // {{.}}
-        //    ve = append(ve, nve.WithPath(".{{.}}"))
-        //}
+        for (CheckError each : x.Get{{.}}().Validate()) { // {{.}}
+            errors.add(each.WithPath(".{{.}}"))
+        }
         {{- end}}	        
     }
     {{- end }}

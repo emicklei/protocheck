@@ -2,7 +2,10 @@
 
 package hr;
 
+import java.util.List;
+
 import org.emicklei.protocheck.Checker;
+import org.emicklei.protocheck.CheckError;
 import org.emicklei.protocheck.MessageValidator;
 import org.emicklei.protocheck.ValidationException;
 
@@ -50,7 +53,7 @@ public final class HRProtosCheckers {
 
     public static void validate(Person.Health x) throws ValidationException {
         if (x == null) { return; }
-        person_healthValidator.validate(x);	        
+        List<CheckError> errors = person_healthValidator.validate(x);	        
     }
     private static MessageValidator<Person> personValidator= new MessageValidator<Person>();
     
@@ -152,10 +155,10 @@ public final class HRProtosCheckers {
 
     public static void validate(Person x) throws ValidationException {
         if (x == null) { return; }
-        personValidator.validate(x);	
-        //for _ , nve := range protocheck.AsValidationError(x.GetHealth().Validate()) { // Health
-        //    ve = append(ve, nve.WithPath(".Health"))
-        //}	        
+        List<CheckError> errors = personValidator.validate(x);	
+        for (CheckError each : person_healthValidator.validate(x.getHealth())) { // Health
+            errors.add(each.withPath(".Health"));
+        }	        
     }
     private static MessageValidator<Pet> petValidator= new MessageValidator<Pet>();
     
@@ -191,6 +194,6 @@ public final class HRProtosCheckers {
 
     public static void validate(Pet x) throws ValidationException {
         if (x == null) { return; }
-        petValidator.validate(x);	        
+        List<CheckError> errors = petValidator.validate(x);	        
     }
 }

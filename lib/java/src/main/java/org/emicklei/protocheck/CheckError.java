@@ -17,6 +17,12 @@ public class CheckError {
         return check;
     }
 
+    public CheckError withPath( java.lang.String path) {
+        this.path = path;
+        return this;
+    }
+
+
     public void setException(java.lang.Exception e) {
         this.exception = e;
     }
