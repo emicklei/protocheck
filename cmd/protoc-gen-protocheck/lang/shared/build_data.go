@@ -23,10 +23,10 @@ type builder struct {
 	protoFile   *protogen.File
 }
 
-func BuildFileData(f *protogen.File, pb PostBuilder) FileData {
+func BuildFileData(f *protogen.File, pb PostBuilder, pkgName string) FileData {
 	b := builder{protoFile: f, postBuilder: pb}
 	fd := FileData{
-		PkgName: string(f.GoPackageName),
+		PkgName: string(pkgName),
 	}
 	init := "file_" +
 		dotsAndSlashsToUnderscore(string(f.Desc.Path())) +

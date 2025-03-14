@@ -5,7 +5,7 @@ import org.emicklei.protocheck.pb.Check;
 public class CheckError {
     java.lang.String path; // path to the field that failed, if empty then the field is part of the root
                            // message
-   Check check; // the check that failed
+    Check check; // the check that failed
     java.lang.Exception exception; // set if the check failed due to an error
 
     public CheckError(java.lang.String path, Check check) {

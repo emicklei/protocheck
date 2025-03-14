@@ -8,7 +8,7 @@ import (
 )
 
 func Process(p *protogen.Plugin, f *protogen.File) error {
-	fd := shared.BuildFileData(f, postBuilder{})
+	fd := shared.BuildFileData(f, postBuilder{}, string(f.GoPackageName))
 	content, err := generate(fd)
 	if err != nil {
 		return err

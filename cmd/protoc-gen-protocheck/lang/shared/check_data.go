@@ -5,8 +5,9 @@ import (
 )
 
 type FileData struct {
-	PkgName  string
-	Messages []MessageData
+	PkgName            string
+	Messages           []MessageData
+	JavaOuterClassname string
 }
 type MessageData struct {
 	InitFuncName         string

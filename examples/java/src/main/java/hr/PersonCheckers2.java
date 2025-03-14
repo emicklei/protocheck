@@ -4,10 +4,7 @@ import org.emicklei.protocheck.Checker;
 import org.emicklei.protocheck.MessageValidator;
 import org.emicklei.protocheck.ValidationException;
 
-import com.google.common.collect.ImmutableList;
-
 import dev.cel.common.CelValidationException;
-import dev.cel.common.types.ProtoMessageTypeProvider;
 import dev.cel.common.types.SimpleType;
 import dev.cel.common.types.StructTypeReference;
 import dev.cel.compiler.CelCompiler;
@@ -15,11 +12,11 @@ import dev.cel.compiler.CelCompilerFactory;
 import dev.cel.runtime.CelEvaluationException;
 import dev.cel.runtime.CelRuntime.Program;
 
-public final class PersonCheckers {
+public final class PersonCheckers2 {
     private static MessageValidator<Person> personValidator= new MessageValidator<Person>();
 
     // never create an instance
-    private PersonCheckers() {
+    private PersonCheckers2() {
     }
 
     static { 
