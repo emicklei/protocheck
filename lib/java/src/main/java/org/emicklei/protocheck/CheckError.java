@@ -1,21 +1,20 @@
 package org.emicklei.protocheck;
 
+import org.emicklei.protocheck.pb.Check;
+
 public class CheckError {
     java.lang.String path; // path to the field that failed, if empty then the field is part of the root
                            // message
-    java.lang.String id; // optional id of the check that failed
-    java.lang.String fail; // optional message to display
+   Check check; // the check that failed
     java.lang.Exception exception; // set if the check failed due to an error
-    Object fieldValue; // the value of the field that failed
 
-    public CheckError(java.lang.String path, java.lang.String id, java.lang.String fail) {
+    public CheckError(java.lang.String path, Check check) {
         this.path = path;
-        this.id = id;
-        this.fail = fail;
+        this.check = check;
     }
 
-    public void setFieldValue(Object o) {
-        this.fieldValue = o;
+    public Check getCheck() {
+        return check;
     }
 
     public void setException(java.lang.Exception e) {
@@ -24,9 +23,8 @@ public class CheckError {
 
     public String toString() {
         return "path=" + path +
-                ",id=" + id +
-                ",fail=" + fail +
-                ",actual=" + (fieldValue == null ? "null" : fieldValue.toString()) +
+                ",id=" + check.getId() +
+                ",fail=" + check.getFail() +
                 ",err=" + (exception == null ? ""
                         : " (" + exception.getMessage() + ")");
 

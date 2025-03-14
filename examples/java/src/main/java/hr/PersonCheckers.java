@@ -16,31 +16,24 @@ import dev.cel.runtime.CelEvaluationException;
 import dev.cel.runtime.CelRuntime.Program;
 
 public final class PersonCheckers {
-    private static MessageValidator<Person> personValidator;
+    private static MessageValidator<Person> personValidator= new MessageValidator<Person>();
 
     // never create an instance
     private PersonCheckers() {
     }
 
-    static {
-        personValidator = new MessageValidator<Person>();
+    static { 
         try {
-            // https://github.com/google/cel-java/blob/main/common/src/main/java/dev/cel/common/types/ProtoMessageTypeProvider.java
-            ProtoMessageTypeProvider prov = new ProtoMessageTypeProvider(ImmutableList.of(Person.getDescriptor()));
             CelCompiler compiler = CelCompilerFactory.standardCelCompilerBuilder()
-                    .setTypeProvider(prov)
+                    .addMessageTypes(Person.getDescriptor())
                     .addVar("this", StructTypeReference.create(Person.getDescriptor().getFullName()))
-                    // .addVar("this", prov.findType("golang.Person").get())
                     .setStandardEnvironmentEnabled(true)
                     .setResultType(SimpleType.BOOL)
                     .build();
-            Program conditionProgram = Checker.makeProgram(compiler.compile("size(this.name) > 1").getAst());
-            // Program fieldAccessProgram =
-            // Checker.makeProgram(compiler.compile("this.name").getAst());
+            Program prog = Checker.makeProgram(compiler.compile("size(this.name) > 1").getAst());
             Checker checker = new Checker("name_id", "name must be longer than 1",
                     "size(this.name) > 1",
-                    conditionProgram, "name", false);
-            //checker.setFieldAccess((Person p) -> p.getName());
+                    prog, "name", false);
 
             personValidator.addFieldChecker(checker);
         } catch (CelEvaluationException ex) {
