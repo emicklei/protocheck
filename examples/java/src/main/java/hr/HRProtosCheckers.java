@@ -16,6 +16,7 @@ import dev.cel.compiler.CelCompiler;
 import dev.cel.compiler.CelCompilerFactory;
 import dev.cel.runtime.CelEvaluationException;
 import dev.cel.runtime.CelRuntime.Program;
+import dev.cel.parser.CelStandardMacro;
 
 public final class HRProtosCheckers {
     private HRProtosCheckers() {}
@@ -27,6 +28,7 @@ public final class HRProtosCheckers {
                     .addMessageTypes(Person.Health.getDescriptor())
                     .addVar("this", StructTypeReference.create(Person.Health.getDescriptor().getFullName()))
                     .setStandardEnvironmentEnabled(true)
+                    .setStandardMacros(CelStandardMacro.STANDARD_MACROS)
                     .setResultType(SimpleType.BOOL)
                     .build();
             { // Weight
@@ -51,9 +53,17 @@ public final class HRProtosCheckers {
         }
     }
 
+    private static List<CheckError> collectValidationErrors(Person.Health x) {
+        List<CheckError> errors = person_healthValidator.validate(x);        
+        return errors;
+    }
+
     public static void validate(Person.Health x) throws ValidationException {
         if (x == null) { return; }
-        List<CheckError> errors = person_healthValidator.validate(x);	        
+        List<CheckError> errors = collectValidationErrors(x);
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
     private static MessageValidator<Person> personValidator= new MessageValidator<Person>();
     
@@ -63,6 +73,7 @@ public final class HRProtosCheckers {
                     .addMessageTypes(Person.getDescriptor())
                     .addVar("this", StructTypeReference.create(Person.getDescriptor().getFullName()))
                     .setStandardEnvironmentEnabled(true)
+                    .setStandardMacros(CelStandardMacro.STANDARD_MACROS)
                     .setResultType(SimpleType.BOOL)
                     .build();	
 	        { // person_invariant
@@ -102,7 +113,7 @@ public final class HRProtosCheckers {
                 personValidator.addFieldChecker(checker);
             }
             { // Email
-                String expr = "this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')";
+                String expr = "this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
                 Checker checker = new Checker("email","email is not valid",expr,prog,"Email",false);            
                 personValidator.addFieldChecker(checker);
@@ -153,12 +164,33 @@ public final class HRProtosCheckers {
         }
     }
 
+    private static List<CheckError> collectValidationErrors(Person x) {
+        List<CheckError> errors = personValidator.validate(x);	         
+        for (CheckError each : collectValidationErrors(x.getHealth())) { // Health
+            errors.add(each.withPath(".Health"));
+        }
+        // Pets
+        List<Pet> list = x.getPetsList();
+        for (int i=0;i<list.size();i++) {
+            for (CheckError err : collectValidationErrors(list.get(i))) {
+                errors.add(err.withParentField("Pets", i));
+            }
+        }
+        // Favorites
+        for (java.util.Map.Entry<java.lang.String, Pet> entry : x.getFavoritesMap().entrySet()) {
+            for (CheckError err : collectValidationErrors(entry.getValue())) {
+                errors.add(err.withParentField("Favorites", entry.getKey()));
+            }
+        }        
+        return errors;
+    }
+
     public static void validate(Person x) throws ValidationException {
         if (x == null) { return; }
-        List<CheckError> errors = personValidator.validate(x);	
-        for (CheckError each : person_healthValidator.validate(x.getHealth())) { // Health
-            errors.add(each.withPath(".Health"));
-        }	        
+        List<CheckError> errors = collectValidationErrors(x);
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
     private static MessageValidator<Pet> petValidator= new MessageValidator<Pet>();
     
@@ -168,6 +200,7 @@ public final class HRProtosCheckers {
                     .addMessageTypes(Pet.getDescriptor())
                     .addVar("this", StructTypeReference.create(Pet.getDescriptor().getFullName()))
                     .setStandardEnvironmentEnabled(true)
+                    .setStandardMacros(CelStandardMacro.STANDARD_MACROS)
                     .setResultType(SimpleType.BOOL)
                     .build();
             { // Kind
@@ -192,8 +225,16 @@ public final class HRProtosCheckers {
         }
     }
 
+    private static List<CheckError> collectValidationErrors(Pet x) {
+        List<CheckError> errors = petValidator.validate(x);        
+        return errors;
+    }
+
     public static void validate(Pet x) throws ValidationException {
         if (x == null) { return; }
-        List<CheckError> errors = petValidator.validate(x);	        
+        List<CheckError> errors = collectValidationErrors(x);
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
 }

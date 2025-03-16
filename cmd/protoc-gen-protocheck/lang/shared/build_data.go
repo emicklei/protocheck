@@ -2,6 +2,7 @@ package shared
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
@@ -62,8 +63,8 @@ func (b builder) buildMessageData(m *protogen.Message) MessageData {
 		MessageName:          b.postBuilder.MessageIdent(m),
 		ObjectTypeName:       string(m.Desc.FullName()),
 	}
-	containers := []string{}
-	fieldsWithMessage := []string{}
+	md.MapFields = map[string]FieldData{}
+	md.RepeatedFields = map[string]FieldData{}
 	cds, ok := buildMessageCheckerData(m)
 	if ok {
 		md.MessageCheckers = append(md.MessageCheckers, cds...)
@@ -76,20 +77,46 @@ func (b builder) buildMessageData(m *protogen.Message) MessageData {
 		}
 		// direct Message type, non repeated
 		if messageHasChecks(each.Desc.Message()) && !each.Desc.IsList() && !each.Desc.IsMap() {
-			fieldsWithMessage = append(fieldsWithMessage, string(each.GoName))
+			md.MessageFieldNames = append(md.MessageFieldNames, string(each.GoName))
 		}
 		// repeated Message
 		if each.Desc.IsList() && messageHasChecks(each.Desc.Message()) {
-			containers = append(containers, string(each.GoName))
+			fd := FieldData{
+				Name:            string(each.GoName),
+				ElementJavaType: string(each.Desc.Message().Name()),
+			}
+			md.RepeatedFields[fd.Name] = fd
 		}
 		// map[?]Message
 		if each.Desc.IsMap() && messageHasChecks(each.Desc.MapValue().Message()) {
-			containers = append(containers, string(each.GoName))
+			mapkey := each.Desc.MapKey()
+			var kjt string
+			if mapkey.Kind() == protoreflect.MessageKind {
+				kjt = string(mapkey.Message().Name())
+			} else {
+				kjt = mapKindToJavaType(mapkey.Kind())
+			}
+			fd := FieldData{
+				Name:            string(each.GoName),
+				KeyJavaType:     kjt,
+				ElementJavaType: string(each.Desc.MapValue().Message().Name()),
+			}
+			md.MapFields[fd.Name] = fd
 		}
 	}
-	md.ContainerFieldNames = containers
-	md.MessageFieldNames = fieldsWithMessage
 	return md
+}
+
+func mapKindToJavaType(kind protoreflect.Kind) string {
+	switch kind {
+	case protoreflect.BoolKind:
+		return "Bool"
+	case protoreflect.StringKind:
+		return "java.lang.String"
+	default:
+		slog.Warn("missing mapKindToJavaType", "kind", kind)
+		return "Object"
+	}
 }
 
 func messageHasChecks(md protoreflect.MessageDescriptor) bool {

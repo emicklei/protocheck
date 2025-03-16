@@ -17,8 +17,14 @@ type MessageData struct {
 	MessageCheckers      []CheckerData
 	FieldCheckers        []CheckerData
 	MessageFieldNames    []string
-	ContainerFieldNames  []string
+	MapFields            map[string]FieldData
+	RepeatedFields       map[string]FieldData
 	HasMethodsAvailable  bool // false for proto2,proto3, true for edition2023
+}
+type FieldData struct {
+	Name            string
+	KeyJavaType     string
+	ElementJavaType string
 }
 
 func (md MessageData) HasChecker() bool {

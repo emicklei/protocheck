@@ -17,11 +17,24 @@ public class CheckError {
         return check;
     }
 
+    // withPath returns a copy with the path set.
     public CheckError withPath( java.lang.String path) {
-        this.path = path;
-        return this;
+        CheckError cpy = new CheckError(path, check);
+        cpy.path = path;
+        return cpy;
     }
 
+    // withParentField returns a copy with the path set.
+    public CheckError withParentField(String parent, Object key) {        
+        CheckError cpy = new CheckError(path, check);
+        String path = parent + "[" +key.toString() + "]";
+        if (this.path == "") {
+            cpy.path = "." + path;
+        } else {
+            cpy.path = path.substring(0, path.length() - 2) + "." + cpy.path;
+        } 
+        return cpy;
+    } 
 
     public void setException(java.lang.Exception e) {
         this.exception = e;

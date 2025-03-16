@@ -7,8 +7,10 @@ import org.emicklei.protocheck.*;
 public class CheckerTest {
 
     @Test
-    public void test()  throws Exception {
-        Person p = Person.newBuilder().setName("").build();
+    public void test()  throws Exception {        
+        Person p = Person.newBuilder()
+            .setName("")
+            .build();
         try {
             HRProtosCheckers.validate(p);
         } catch (ValidationException ex) {
