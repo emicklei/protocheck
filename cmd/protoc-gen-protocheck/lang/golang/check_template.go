@@ -2,8 +2,8 @@ package golang
 
 import (
 	_ "embed"
-	"html/template"
 	"strings"
+	"text/template"
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/shared"
 )

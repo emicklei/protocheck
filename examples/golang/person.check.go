@@ -287,17 +287,14 @@ func (x *Person) Validate() error {
 		}
 	})
 	ve := personValidator.Validate(x)
-	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate()) { // Health
+	// Health
+	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate()) {
 		ve = append(ve, nve.WithPath(".Health"))
 	}
-	for key, msg := range x.GetPets() { // Pets
+	// Pets
+	for key, msg := range x.GetPets() {
 		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
 			ve = append(ve, nve.WithParentField("Pets", key))
-		}
-	}
-	for key, msg := range x.GetFavorites() { // Favorites
-		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
-			ve = append(ve, nve.WithParentField("Favorites", key))
 		}
 	}
 	if len(ve) == 0 {

@@ -101,16 +101,18 @@ func (x *{{.MessageName}}) Validate() error {
 			slog.Error("checkers initialization failed","err",err)
 		}
 	})
-	ve := {{.LowercaseMessageName}}Validator.Validate(x)
+	ve := {{.LowercaseMessageName}}Validator.Validate(x)	
 	{{- range .MessageFieldNames}}	
-	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate()) { // {{.}}
+	// {{.}}
+	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate()) {
 		ve = append(ve, nve.WithPath(".{{.}}"))
 	}
-	{{- end}}	
-	{{- range .ContainerFieldNames}}
-	for key, msg := range x.Get{{.}}() { // {{.}}
+	{{- end}}		
+	{{- range .RepeatedFields}}
+	// {{.Name}}
+	for key, msg := range x.Get{{.Name}}() {
 		for _ , nve := range protocheck.AsValidationError(msg.Validate()) {
-			ve = append(ve, nve.WithParentField("{{.}}", key))
+			ve = append(ve, nve.WithParentField("{{.Name}}", key))
 		}
 	}
 	{{- end}}
