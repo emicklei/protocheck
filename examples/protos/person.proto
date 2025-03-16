@@ -32,7 +32,7 @@ message Person {
   // test with https://playcel.undistro.io/
   oneof identification {
     string email = 6 [(check.field) = { 
-      cel:"this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')" 
+      cel:"this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')" 
       fail:"email is not valid"
       id:"email" }];
     string phone = 7 [(check.field) = {

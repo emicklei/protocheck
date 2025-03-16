@@ -179,7 +179,7 @@ func file_person_check_proto_init() error {
 		}
 	}
 	{ // Email
-		expr := `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')`
+		expr := `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')`
 		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
 			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
 		} else {
@@ -321,15 +321,21 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) error {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := personValidator.Validate(x)
+	ve := personValidator.Validate(x, options...)
 	// Health
-	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate()) {
+	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate(options...)) {
 		ve = append(ve, nve.WithPath(".Health"))
 	}
 	// Pets
 	for key, msg := range x.GetPets() {
-		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
+		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
 			ve = append(ve, nve.WithParentField("Pets", key))
+		}
+	}
+	// Favorites
+	for key, msg := range x.GetFavorites() {
+		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+			ve = append(ve, nve.WithParentField("Favorites", key))
 		}
 	}
 	if len(ve) == 0 {

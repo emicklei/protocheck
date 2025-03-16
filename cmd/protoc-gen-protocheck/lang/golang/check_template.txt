@@ -102,18 +102,26 @@ func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) erro
 	ve := {{.LowercaseMessageName}}Validator.Validate(x,options...)
 	{{- range .MessageFieldNames}}	
 	// {{.}}
-	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate()) {
+	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate(options...)) {
 		ve = append(ve, nve.WithPath(".{{.}}"))
 	}
 	{{- end}}		
 	{{- range .RepeatedFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		for _ , nve := range protocheck.AsValidationError(msg.Validate()) {
+		for _ , nve := range protocheck.AsValidationError(msg.Validate(options...)) {
 			ve = append(ve, nve.WithParentField("{{.Name}}", key))
 		}
 	}
 	{{- end}}
+	{{- range .MapFields}}
+	// {{.Name}}
+	for key, msg := range x.Get{{.Name}}() {
+		for _ , nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+			ve = append(ve, nve.WithParentField("{{.Name}}", key))
+		}
+	}
+	{{- end}}	
 	if len(ve) == 0 {
 		return nil
 	}

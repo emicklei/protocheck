@@ -34,6 +34,7 @@ func BenchmarkValidation(t *testing.B) {
 func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 	p := createValidPerson()
 	p.Favorites["test"].Kind = "spider"
+
 	err := p.Validate()
 	if err == nil {
 		t.Fatal("expected error")

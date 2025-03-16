@@ -249,15 +249,14 @@ func (b builder) buildFieldCheckerData(f *protogen.Field) (list []CheckerData, o
 			oneOfField = f.Oneof.GoName
 		}
 		cd := CheckerData{
-			Comment:           f.GoName,
-			FieldName:         f.GoName,
-			IsOptional:        f.Desc.HasOptionalKeyword(),
-			OneOfType:         oneOfType,
-			OneOfFieldName:    oneOfField,
-			ID:                ext.Id,
-			Fail:              ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
-			Expr:              ext.Cel,
-			IsSetFuncRequired: isSetRequired(f),
+			Comment:        f.GoName,
+			FieldName:      f.GoName,
+			IsOptional:     f.Desc.HasOptionalKeyword(),
+			OneOfType:      oneOfType,
+			OneOfFieldName: oneOfField,
+			ID:             ext.Id,
+			Fail:           ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
+			Expr:           ext.Cel,
 		}
 		cd = b.postBuilder.PostBuildCheckerData(f, cd)
 		list = append(list, cd)

@@ -45,16 +45,14 @@ func (m MessageValidator) Validate(this any, options ...ValidationOption) (resul
 		if each.enabledFunc != nil && !each.enabledFunc(this) {
 			continue
 		}
-		if each.isSetFunc != nil {
-			// is it set?
-			isSet := each.isSetFunc(this, each.fieldName)
-			// skip unset?
-			if !isSet && slices.Contains(options, FieldsSetOnly) {
-				continue
-			}
-			if !isSet && each.isOptional {
-				continue
-			}
+		// is it set
+		isSet := each.isSetFunc(this, each.fieldName)
+		// skip unset?
+		if !isSet && slices.Contains(options, FieldsSetOnly) {
+			continue
+		}
+		if !isSet && each.isOptional {
+			continue
 		}
 		result = append(result, evalChecker(each, env)...)
 	}

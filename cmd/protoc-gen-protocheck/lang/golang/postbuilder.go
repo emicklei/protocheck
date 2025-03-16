@@ -12,9 +12,7 @@ import (
 type postBuilder struct{}
 
 func (postBuilder) PostBuildCheckerData(f *protogen.Field, cd shared.CheckerData) shared.CheckerData {
-	if cd.IsSetFuncRequired {
-		cd.IsSetConditionSource = isSetConditionSource(f)
-	}
+	cd.IsSetConditionSource = isSetConditionSource(f)
 	return cd
 }
 
@@ -23,7 +21,9 @@ func (postBuilder) MessageIdent(m *protogen.Message) string {
 }
 
 func isSetConditionSource(f *protogen.Field) string {
-	// not for list or map
+	if f.Desc.IsList() {
+		return fmt.Sprintf("typedX.Get%s() != nil", f.GoName)
+	}
 	if f.Desc.Kind() == protoreflect.MessageKind {
 		return fmt.Sprintf("typedX.Get%s() != nil", f.GoName)
 	}
