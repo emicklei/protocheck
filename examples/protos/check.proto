@@ -28,6 +28,9 @@ package check;
 import "google/protobuf/descriptor.proto";
 
 option go_package = "github.com/emicklei/protocheck;protocheck";
+option java_multiple_files = true;
+option java_package = "org.emicklei.protocheck.pb";
+option java_outer_classname = "CheckProtos";
 
 message Check {
   string id   = 1; // optional identifier for lookup purposes

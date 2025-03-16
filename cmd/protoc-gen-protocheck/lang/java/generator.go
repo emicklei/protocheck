@@ -1,20 +1,22 @@
-package golang
+package java
 
 import (
 	"log/slog"
+	"path"
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/shared"
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
 func Process(p *protogen.Plugin, f *protogen.File) error {
-	fd := shared.BuildFileData(f, postBuilder{}, string(f.GoPackageName))
+	fd := shared.BuildFileData(f, postBuilder{}, *f.Proto.Options.JavaPackage)
+	fd.JavaOuterClassname = *f.Proto.Options.JavaOuterClassname
 	content, err := generate(fd)
 	if err != nil {
 		return err
 	}
-	outName := f.GeneratedFilenamePrefix + ".check.go"
-	slog.Debug("writing", "file", outName)
+	outName := path.Join(*f.Proto.Options.JavaPackage, *f.Proto.Options.JavaOuterClassname+"Checkers.java")
+	slog.Info("writing", "file", outName)
 	out := p.NewGeneratedFile(outName, f.GoImportPath)
 	out.P(content)
 

@@ -321,18 +321,15 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) error {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := personValidator.Validate(x, options...)
-	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate(options...)) { // Health
+	ve := personValidator.Validate(x)
+	// Health
+	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate()) {
 		ve = append(ve, nve.WithPath(".Health"))
 	}
-	for key, msg := range x.GetPets() { // Pets
-		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+	// Pets
+	for key, msg := range x.GetPets() {
+		for _, nve := range protocheck.AsValidationError(msg.Validate()) {
 			ve = append(ve, nve.WithParentField("Pets", key))
-		}
-	}
-	for key, msg := range x.GetFavorites() { // Favorites
-		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
-			ve = append(ve, nve.WithParentField("Favorites", key))
 		}
 	}
 	if len(ve) == 0 {

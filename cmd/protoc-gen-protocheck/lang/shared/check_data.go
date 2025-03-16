@@ -1,17 +1,13 @@
-package golang
+package shared
 
 import (
 	_ "embed"
-	"strings"
-	"text/template"
 )
 
-//go:embed check_template.txt
-var checkDataTemplate string
-
 type FileData struct {
-	PkgName  string
-	Messages []MessageData
+	PkgName            string
+	Messages           []MessageData
+	JavaOuterClassname string
 }
 type MessageData struct {
 	InitFuncName         string
@@ -21,8 +17,14 @@ type MessageData struct {
 	MessageCheckers      []CheckerData
 	FieldCheckers        []CheckerData
 	MessageFieldNames    []string
-	ContainerFieldNames  []string
+	MapFields            map[string]FieldData
+	RepeatedFields       map[string]FieldData
 	HasMethodsAvailable  bool // false for proto2,proto3, true for edition2023
+}
+type FieldData struct {
+	Name            string
+	KeyJavaType     string
+	ElementJavaType string
 }
 
 func (md MessageData) HasChecker() bool {
@@ -39,13 +41,4 @@ type CheckerData struct {
 	Expr                 string
 	Fail                 string
 	IsSetConditionSource string
-}
-
-func generate(fd FileData) (string, error) {
-	tmpl := template.Must(template.New("check").Parse(checkDataTemplate))
-	buf := new(strings.Builder)
-	if err := tmpl.Execute(buf, fd); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
 }
