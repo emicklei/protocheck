@@ -20,7 +20,7 @@ type MessageValidator struct {
 
 // Validator is an interface that can be implemented by a message to validate itself.
 type Validator interface {
-	Validate(options ...ValidationOption) error
+	Validate(options ...ValidationOption) []*CheckError
 }
 
 // NewMessageValidator creates a MessageValidator using two collections of checkers
@@ -31,7 +31,7 @@ func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValida
 // Validate runs all message and field checkers with the message.
 // Always returns a ValidationError which can be empty (no failed checks)
 // With options you can control what to validations to skip.
-func (m MessageValidator) Validate(this any, options ...ValidationOption) (result ValidationError) {
+func (m MessageValidator) Validate(this any, options ...ValidationOption) (result []*CheckError) {
 	env := map[string]any{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)
@@ -57,22 +57,21 @@ func (m MessageValidator) Validate(this any, options ...ValidationOption) (resul
 		result = append(result, evalChecker(each, env)...)
 	}
 	return
-
 }
 
-func evalChecker(each Checker, env map[string]interface{}) (result []CheckError) {
+func evalChecker(each Checker, env map[string]interface{}) (result []*CheckError) {
 	out, _, err := each.program.Eval(env)
 	if err != nil {
-		result = append(result, CheckError{Id: each.check.Id, Fail: each.check.Fail, Err: err})
+		result = append(result, &CheckError{Id: each.check.Id, Fail: each.check.Fail})
 	} else {
 		valid, ok := out.Value().(bool)
 		if !ok {
-			err := fmt.Errorf("expected check expression [%s] to return a boolean, got [%T]", each.check.Cel, out.Value())
-			result = append(result, CheckError{Id: each.check.Id, Fail: each.check.Fail, Err: err})
-		} else {
-			if !valid {
-				result = append(result, CheckError{Id: each.check.Id, Fail: each.check.Fail})
-			}
+			result = append(result, &CheckError{
+				Id:   "exception",
+				Fail: fmt.Sprintf("invalid validation expression detected for %s", each.fieldName)})
+		}
+		if !valid {
+			result = append(result, &CheckError{Id: each.check.Id, Fail: each.check.Fail})
 		}
 	}
 	return

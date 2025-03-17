@@ -3,6 +3,7 @@ package org.emicklei.protocheck;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import org.emicklei.protocheck.pb.CheckError;
 
 public final class MessageValidator<M extends com.google.protobuf.GeneratedMessage> {
     private List<Checker> fieldCheckers = new ArrayList<Checker>();
@@ -16,12 +17,12 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
         messageCheckers.add(checker);
     }
 
-    public List<CheckError> validate(M message, ValidationOption... options)  {
+    public List<CheckError> validate(M message, ValidationOption... options) {
         List<CheckError> errors = new ArrayList<CheckError>();
         Map<String, com.google.protobuf.GeneratedMessage> envMap = Map.of("this", message);
         for (Checker checker : messageCheckers) {
             evalChecker(checker, envMap, errors);
-        }        
+        }
         for (Checker checker : fieldCheckers) {
             evalChecker(checker, envMap, errors);
         }
@@ -34,12 +35,19 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
             List<CheckError> errors) {
         try {
             if (!(boolean) checker.program.eval(envMap)) {
-                CheckError err = new CheckError(checker.fieldName, checker.check);
+                CheckError err = CheckError.newBuilder()
+                        .setFail(checker.check.getFail())
+                        .setId(checker.check.getId())
+                        .setPath(checker.fieldName)
+                        .build();
                 errors.add(err);
             }
         } catch (Exception ex) {
-            CheckError err = new CheckError(checker.fieldName, checker.check);
-            err.setException(ex);
+            CheckError err = CheckError.newBuilder()
+                    .setFail("invalid validation expresssion for "+checker.fieldName)
+                    .setId("exception")
+                    .setPath(checker.fieldName)
+                    .build();
             errors.add(err);
         }
     }

@@ -7,29 +7,20 @@ import (
 	"github.com/google/cel-go/cel"
 )
 
-// CheckError captures a failed check.
-type CheckError struct {
-	Path string // path to the field that failed, if empty then the field is part of the root message
-	Id   string // optional id of the check that failed
-	Fail string // optional message to display
-	Err  error  // set if the check failed due to an error
-}
-
 // WithParentField returns a new CheckError with the parent field prepended to the path.
-func (c CheckError) WithParentField(parent string, key any) CheckError {
+func (c *CheckError) WithParentField(parent string, key any) *CheckError {
 	path := fmt.Sprintf("%s[%v]", parent, key)
 	if c.Path == "" {
-		c.Path = "." + path
+		path = "." + path
 	} else {
-		c.Path = strings.TrimRight(path, " ") + "." + c.Path
+		path = strings.TrimRight(path, " ") + "." + c.Path
 	}
-	return c
+	return &CheckError{Id: c.Id, Fail: c.Fail, Path: path}
 }
 
 // WithPath returns a new CheckError with the path set.
-func (c CheckError) WithPath(path string) CheckError {
-	c.Path = path
-	return c
+func (c *CheckError) WithPath(path string) *CheckError {
+	return &CheckError{Id: c.Id, Fail: c.Fail, Path: path}
 }
 
 // Checker performs one check using a CEL program.

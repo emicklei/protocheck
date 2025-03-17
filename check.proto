@@ -46,3 +46,8 @@ extend google.protobuf.FieldOptions {
   repeated Check field = 20030916;
 }
 
+message CheckError {  
+  string id   = 1; // optional id of the check that failed
+  string fail = 2; // optional message to display
+  string path = 3; // path to the field that failed, if empty then the field is part of the root message
+}

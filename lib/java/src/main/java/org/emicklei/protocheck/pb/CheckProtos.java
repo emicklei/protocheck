@@ -54,6 +54,11 @@ public final class CheckProtos {
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_check_Check_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_check_CheckError_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_check_CheckError_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -65,13 +70,14 @@ public final class CheckProtos {
     java.lang.String[] descriptorData = {
       "\n\013check.proto\022\005check\032 google/protobuf/de" +
       "scriptor.proto\".\n\005Check\022\n\n\002id\030\001 \001(\t\022\014\n\004f" +
-      "ail\030\002 \001(\t\022\013\n\003cel\030\003 \001(\t:A\n\007message\022\037.goog" +
-      "le.protobuf.MessageOptions\030\304\313\306\t \003(\0132\014.ch" +
-      "eck.Check:=\n\005field\022\035.google.protobuf.Fie" +
-      "ldOptions\030\304\313\306\t \003(\0132\014.check.CheckBV\n\032org." +
-      "emicklei.protocheck.pbB\013CheckProtosP\001Z)g" +
-      "ithub.com/emicklei/protocheck;protocheck" +
-      "b\006proto3"
+      "ail\030\002 \001(\t\022\013\n\003cel\030\003 \001(\t\"4\n\nCheckError\022\n\n\002" +
+      "id\030\001 \001(\t\022\014\n\004fail\030\002 \001(\t\022\014\n\004path\030\003 \001(\t:A\n\007" +
+      "message\022\037.google.protobuf.MessageOptions" +
+      "\030\304\313\306\t \003(\0132\014.check.Check:=\n\005field\022\035.googl" +
+      "e.protobuf.FieldOptions\030\304\313\306\t \003(\0132\014.check" +
+      ".CheckBV\n\032org.emicklei.protocheck.pbB\013Ch" +
+      "eckProtosP\001Z)github.com/emicklei/protoch" +
+      "eck;protocheckb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -84,6 +90,12 @@ public final class CheckProtos {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_check_Check_descriptor,
         new java.lang.String[] { "Id", "Fail", "Cel", });
+    internal_static_check_CheckError_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_check_CheckError_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_check_CheckError_descriptor,
+        new java.lang.String[] { "Id", "Fail", "Path", });
     message.internalInit(descriptor.getExtensions().get(0));
     field.internalInit(descriptor.getExtensions().get(1));
     descriptor.resolveAllFeaturesImmutable();

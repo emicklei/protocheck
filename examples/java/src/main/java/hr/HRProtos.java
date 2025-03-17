@@ -65,7 +65,7 @@ public final class HRProtos {
   static {
     java.lang.String[] descriptorData = {
       "\n\014person.proto\022\006golang\032\013check.proto\032\037goo" +
-      "gle/protobuf/timestamp.proto\"\376\r\n\006Person\022" +
+      "gle/protobuf/timestamp.proto\"\375\r\n\006Person\022" +
       "D\n\004name\030\001 \001(\tB6\242\334\264L1\022\032name must be longe" +
       "r than 1\032\023size(this.name) > 1\022a\n\013middle_" +
       "name\030\002 \001(\tBG\242\334\264LB\022$middle name (if set) " +
@@ -75,49 +75,49 @@ public final class HRProtos {
       "me) > 1\022m\n\nbirth_date\030\004 \001(\0132\032.google.pro" +
       "tobuf.TimestampB=\242\334\264L8\n\020check_birth_date" +
       "\032$this.birth_date.getFullYear() > 2000\022%" +
-      "\n\006health\030\005 \001(\0132\025.golang.Person.Health\022y\n" +
-      "\005email\030\006 \001(\tBh\242\334\264Lc\n\005email\022\022email is not" +
-      " valid\032Fthis.email.matches(\'^[a-zA-Z0-9." +
-      "_%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\')H\000" +
-      "\022^\n\005phone\030\007 \001(\tBM\242\334\264LH\022\022phone is not val" +
-      "id\0322this.phone.matches(\'^[0-9]{3}-[0-9]{" +
-      "3}-[0-9]{4}$\')H\000\022\271\001\n\tnicknames\030\010 \003(\tB\245\001\242" +
-      "\334\264L`\022!at least one nickname is required\032" +
-      ";size(this.nicknames) > 0 && this.nickna" +
-      "mes.all(x,size(x)>0)\242\334\264L;\022\030nickname cann" +
-      "ot be empty\032\037this.nicknames.all(x,size(x" +
-      ")>0)\022S\n\004pets\030\t \003(\0132\013.golang.PetB8\242\334\264L3\022\034" +
-      "at least one Pet is required\032\023size(this." +
-      "pets) > 0\022x\n\nattributes\030\n \003(\0132\036.golang.P" +
-      "erson.AttributesEntryBD\242\334\264L?\022\"at least o" +
-      "ne attribute is required\032\031size(this.attr" +
-      "ibutes) > 0\022t\n\tfavorites\030\013 \003(\0132\035.golang." +
-      "Person.FavoritesEntryBB\242\334\264L=\022!at least o" +
-      "ne favorite is required\032\030size(this.favor" +
-      "ites) > 0\0221\n\rno_check_date\030\014 \001(\0132\032.googl" +
-      "e.protobuf.Timestamp\022%\n\006gender\030\r \001(\0162\025.g" +
-      "olang.Person.Gender\032\254\001\n\006Health\022E\n\006weight" +
-      "\030\001 \001(\005B5\242\334\264L0\022\035weight in kg must be posi" +
-      "tive\032\017this.weight > 0\022[\n\ravg_hart_rate\030\002" +
-      " \001(\001BD\242\334\264L?\022#average heart rate must be " +
-      "positive\032\030this.avg_hart_rate > 0.0\0321\n\017At" +
-      "tributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(" +
-      "\t:\0028\001\032=\n\016FavoritesEntry\022\013\n\003key\030\001 \001(\t\022\032\n\005" +
-      "value\030\002 \001(\0132\013.golang.Pet:\0028\001\"+\n\006Gender\022\013" +
-      "\n\007UNKNOWN\020\000\022\010\n\004MALE\020\001\022\n\n\006FEMALE\020\002:\277\001\242\334\264L" +
-      "X\n\020person_invariant\022 name and surname ca" +
-      "nnot be empty\032\"size(this.name + this.sur" +
-      "name) > 0\242\334\264L]\n\036person_health_weight_inv" +
-      "ariant\022 weight cannot be larger than 300" +
-      "\032\031this.health.weight <= 300B\020\n\016identific" +
-      "ationB\016\n\014_middle_name\"\246\001\n\003Pet\022_\n\004kind\030\001 " +
-      "\001(\tBQ\242\334\264LL\n\004pet1\022\032only dog or cat is all" +
-      "owed\032(this.kind == \'cat\' || this.kind ==" +
-      " \'dog\'\022>\n\004name\030\002 \001(\tB0\242\334\264L+\022\024name cannot" +
-      " be empty\032\023size(this.name) > 0\"\025\n\005Group\022" +
-      "\014\n\004name\030\001 \001(\tBF\n\002hrB\010HRProtosP\001Z4github." +
-      "com/emicklei/protocheck-example/golang;g" +
-      "olangb\006proto3"
+      "\n\006health\030\005 \001(\0132\025.golang.Person.Health\022x\n" +
+      "\005email\030\006 \001(\tBg\242\334\264Lb\n\005email\022\022email is not" +
+      " valid\032Ethis.email.matches(\'^[a-zA-Z0-9." +
+      "_%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$\')H\000\022" +
+      "^\n\005phone\030\007 \001(\tBM\242\334\264LH\022\022phone is not vali" +
+      "d\0322this.phone.matches(\'^[0-9]{3}-[0-9]{3" +
+      "}-[0-9]{4}$\')H\000\022\271\001\n\tnicknames\030\010 \003(\tB\245\001\242\334" +
+      "\264L`\022!at least one nickname is required\032;" +
+      "size(this.nicknames) > 0 && this.nicknam" +
+      "es.all(x,size(x)>0)\242\334\264L;\022\030nickname canno" +
+      "t be empty\032\037this.nicknames.all(x,size(x)" +
+      ">0)\022S\n\004pets\030\t \003(\0132\013.golang.PetB8\242\334\264L3\022\034a" +
+      "t least one Pet is required\032\023size(this.p" +
+      "ets) > 0\022x\n\nattributes\030\n \003(\0132\036.golang.Pe" +
+      "rson.AttributesEntryBD\242\334\264L?\022\"at least on" +
+      "e attribute is required\032\031size(this.attri" +
+      "butes) > 0\022t\n\tfavorites\030\013 \003(\0132\035.golang.P" +
+      "erson.FavoritesEntryBB\242\334\264L=\022!at least on" +
+      "e favorite is required\032\030size(this.favori" +
+      "tes) > 0\0221\n\rno_check_date\030\014 \001(\0132\032.google" +
+      ".protobuf.Timestamp\022%\n\006gender\030\r \001(\0162\025.go" +
+      "lang.Person.Gender\032\254\001\n\006Health\022E\n\006weight\030" +
+      "\001 \001(\005B5\242\334\264L0\022\035weight in kg must be posit" +
+      "ive\032\017this.weight > 0\022[\n\ravg_hart_rate\030\002 " +
+      "\001(\001BD\242\334\264L?\022#average heart rate must be p" +
+      "ositive\032\030this.avg_hart_rate > 0.0\0321\n\017Att" +
+      "ributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
+      ":\0028\001\032=\n\016FavoritesEntry\022\013\n\003key\030\001 \001(\t\022\032\n\005v" +
+      "alue\030\002 \001(\0132\013.golang.Pet:\0028\001\"+\n\006Gender\022\013\n" +
+      "\007UNKNOWN\020\000\022\010\n\004MALE\020\001\022\n\n\006FEMALE\020\002:\277\001\242\334\264LX" +
+      "\n\020person_invariant\022 name and surname can" +
+      "not be empty\032\"size(this.name + this.surn" +
+      "ame) > 0\242\334\264L]\n\036person_health_weight_inva" +
+      "riant\022 weight cannot be larger than 300\032" +
+      "\031this.health.weight <= 300B\020\n\016identifica" +
+      "tionB\016\n\014_middle_name\"\246\001\n\003Pet\022_\n\004kind\030\001 \001" +
+      "(\tBQ\242\334\264LL\n\004pet1\022\032only dog or cat is allo" +
+      "wed\032(this.kind == \'cat\' || this.kind == " +
+      "\'dog\'\022>\n\004name\030\002 \001(\tB0\242\334\264L+\022\024name cannot " +
+      "be empty\032\023size(this.name) > 0\"\025\n\005Group\022\014" +
+      "\n\004name\030\001 \001(\tBF\n\002hrB\010HRProtosP\001Z4github.c" +
+      "om/emicklei/protocheck-example/golang;go" +
+      "langb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

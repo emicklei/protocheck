@@ -3,6 +3,7 @@ package org.emicklei.protocheck;
 import org.junit.Test;
 
 import pb.BikeOuterClass.Bike;
+import org.emicklei.protocheck.pb.CheckError;
 
 
 public class MessageValidatorTest {
@@ -12,13 +13,8 @@ public class MessageValidatorTest {
         MessageValidator<Bike> mv = new MessageValidator<Bike>();
         mv.addFieldChecker(Helpers.createChecker());
         Bike b = Bike.newBuilder().setBrand("brand").build();
-        try {
-            mv.validate(b);
-        } catch (ValidationException ex) {
-            for (CheckError e : ex.getErrors()) {
-                System.err.println(e);
-            } 
-            throw ex;
-        }
+        for (CheckError e :  mv.validate(b)) {
+            System.err.println(e);
+        } 
     }
 }

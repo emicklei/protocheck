@@ -5,9 +5,8 @@ package {{.PkgName}};
 import java.util.List;
 
 import org.emicklei.protocheck.Checker;
-import org.emicklei.protocheck.CheckError;
+import org.emicklei.protocheck.pb.CheckError;
 import org.emicklei.protocheck.MessageValidator;
-import org.emicklei.protocheck.ValidationException;
 
 import dev.cel.common.CelValidationException;
 import dev.cel.common.types.SimpleType;
@@ -60,39 +59,32 @@ public final class {{.JavaOuterClassname}}Checkers {
         }
     }
 
-    private static List<CheckError> collectValidationErrors({{.MessageName}} x) {
+    public static List<CheckError> validate({{.MessageName}} x) {
+        if (x == null) { return new java.util.ArrayList<CheckError>(); }
         List<CheckError> errors = {{.LowercaseMessageName}}Validator.validate(x);
         {{- range .MessageFieldNames}}	         
-        for (CheckError each : collectValidationErrors(x.get{{.}}())) { // {{.}}
-            errors.add(each.withPath(".{{.}}"));
+        for (CheckError err : validate(x.get{{.}}())) { // {{.}}
+            errors.add(Checker.withPath(err,".{{.}}"));
         }
         {{- end}}	
         {{- range .RepeatedFields}}
         // {{.Name}}
         List<{{.ElementJavaType}}> list = x.get{{.Name}}List();
         for (int i=0;i<list.size();i++) {
-            for (CheckError err : collectValidationErrors(list.get(i))) {
-                errors.add(err.withParentField("{{.Name}}", i));
+            for (CheckError err : validate(list.get(i))) {
+                errors.add(Checker.withParentField(err,"{{.Name}}", i));
             }
         }
         {{- end}}        
         {{- range .MapFields}}
         // {{.Name}}
         for (java.util.Map.Entry<{{.KeyJavaType}}, {{.ElementJavaType}}> entry : x.get{{.Name}}Map().entrySet()) {
-            for (CheckError err : collectValidationErrors(entry.getValue())) {
-                errors.add(err.withParentField("{{.Name}}", entry.getKey()));
+            for (CheckError err : validate(entry.getValue())) {
+                errors.add(Checker.withParentField(err,"{{.Name}}", entry.getKey()));
             }
         }
         {{- end}}        
         return errors;
-    }
-
-    public static void validate({{.MessageName}} x) throws ValidationException {
-        if (x == null) { return; }
-        List<CheckError> errors = collectValidationErrors(x);
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
     }
     {{- end }}
 }

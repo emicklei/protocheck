@@ -5,9 +5,8 @@ package hr;
 import java.util.List;
 
 import org.emicklei.protocheck.Checker;
-import org.emicklei.protocheck.CheckError;
+import org.emicklei.protocheck.pb.CheckError;
 import org.emicklei.protocheck.MessageValidator;
-import org.emicklei.protocheck.ValidationException;
 
 import dev.cel.common.CelValidationException;
 import dev.cel.common.types.SimpleType;
@@ -53,17 +52,10 @@ public final class HRProtosCheckers {
         }
     }
 
-    private static List<CheckError> collectValidationErrors(Person.Health x) {
+    public static List<CheckError> validate(Person.Health x) {
+        if (x == null) { return new java.util.ArrayList<CheckError>(); }
         List<CheckError> errors = person_healthValidator.validate(x);        
         return errors;
-    }
-
-    public static void validate(Person.Health x) throws ValidationException {
-        if (x == null) { return; }
-        List<CheckError> errors = collectValidationErrors(x);
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
     }
     private static MessageValidator<Person> personValidator= new MessageValidator<Person>();
     
@@ -164,33 +156,26 @@ public final class HRProtosCheckers {
         }
     }
 
-    private static List<CheckError> collectValidationErrors(Person x) {
+    public static List<CheckError> validate(Person x) {
+        if (x == null) { return new java.util.ArrayList<CheckError>(); }
         List<CheckError> errors = personValidator.validate(x);	         
-        for (CheckError each : collectValidationErrors(x.getHealth())) { // Health
-            errors.add(each.withPath(".Health"));
+        for (CheckError err : validate(x.getHealth())) { // Health
+            errors.add(Checker.withPath(err,".Health"));
         }
         // Pets
         List<Pet> list = x.getPetsList();
         for (int i=0;i<list.size();i++) {
-            for (CheckError err : collectValidationErrors(list.get(i))) {
-                errors.add(err.withParentField("Pets", i));
+            for (CheckError err : validate(list.get(i))) {
+                errors.add(Checker.withParentField(err,"Pets", i));
             }
         }
         // Favorites
         for (java.util.Map.Entry<java.lang.String, Pet> entry : x.getFavoritesMap().entrySet()) {
-            for (CheckError err : collectValidationErrors(entry.getValue())) {
-                errors.add(err.withParentField("Favorites", entry.getKey()));
+            for (CheckError err : validate(entry.getValue())) {
+                errors.add(Checker.withParentField(err,"Favorites", entry.getKey()));
             }
         }        
         return errors;
-    }
-
-    public static void validate(Person x) throws ValidationException {
-        if (x == null) { return; }
-        List<CheckError> errors = collectValidationErrors(x);
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
     }
     private static MessageValidator<Pet> petValidator= new MessageValidator<Pet>();
     
@@ -225,16 +210,9 @@ public final class HRProtosCheckers {
         }
     }
 
-    private static List<CheckError> collectValidationErrors(Pet x) {
+    public static List<CheckError> validate(Pet x) {
+        if (x == null) { return new java.util.ArrayList<CheckError>(); }
         List<CheckError> errors = petValidator.validate(x);        
         return errors;
-    }
-
-    public static void validate(Pet x) throws ValidationException {
-        if (x == null) { return; }
-        List<CheckError> errors = collectValidationErrors(x);
-        if (!errors.isEmpty()) {
-            throw new ValidationException(errors);
-        }
     }
 }

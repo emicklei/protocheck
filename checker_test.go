@@ -3,12 +3,12 @@ package protocheck
 import "testing"
 
 func TestWithParentField(t *testing.T) {
-	err := CheckError{}
+	err := new(CheckError)
 	err = err.WithParentField("parent", "key")
 	if err.Path != ".parent[key]" {
 		t.Errorf("expected .parent[key], got %s", err.Path)
 	}
-	err2 := CheckError{}.WithPath("here")
+	err2 := new(CheckError).WithPath("here")
 	err2 = err2.WithParentField("parent", "key")
 	if err2.Path != "parent[key].here" {
 		t.Errorf("expected parent[key].here, got [%s]", err2.Path)
@@ -22,7 +22,7 @@ func TestEnabledChecker(t *testing.T) {
 	}
 }
 
-func TestForCoverage(t *testing.T) {
+func TestForCheckCoverage(t *testing.T) {
 	file_check_proto_init()
 	c := new(Check)
 	c.GetCel()
@@ -42,6 +42,29 @@ func TestForCoverage(t *testing.T) {
 	_ = c.ProtoReflect()
 	var d *Check = nil
 	d.GetCel()
+	d.GetFail()
+	d.GetId()
+	_ = d.ProtoReflect()
+}
+func TestForCheckErrorCoverage(t *testing.T) {
+	c := new(CheckError)
+	c.GetFail()
+	c.GetId()
+	c.GetPath()
+	c.Reset()
+	s := ""
+	c.Id = s
+	c.Fail = s
+	c.Path = s
+	c.GetFail()
+	c.GetId()
+	c.GetPath()
+	c.Descriptor()
+	_ = c.String()
+	c.ProtoMessage()
+	_ = c.ProtoReflect()
+	var d *CheckError = nil
+	d.GetPath()
 	d.GetFail()
 	d.GetId()
 	_ = d.ProtoReflect()

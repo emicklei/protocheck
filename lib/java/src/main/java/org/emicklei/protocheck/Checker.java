@@ -6,6 +6,7 @@ import dev.cel.common.CelAbstractSyntaxTree;
 import dev.cel.runtime.CelRuntime;
 import dev.cel.runtime.CelRuntimeFactory;
 import org.emicklei.protocheck.pb.Check;
+import org.emicklei.protocheck.pb.CheckError;
 
 public final class Checker {
     private static final CelRuntime CEL_RUNTIME = CelRuntimeFactory.standardCelRuntimeBuilder().build();
@@ -30,5 +31,28 @@ public final class Checker {
     public static CelRuntime.Program makeProgram(CelAbstractSyntaxTree ast)
             throws dev.cel.runtime.CelEvaluationException {
         return CEL_RUNTIME.createProgram(ast);
+    }
+
+    // withPath returns a copy with the path set.
+    public static CheckError withPath(CheckError err, java.lang.String path) {
+        return CheckError.newBuilder()
+                .setPath(path)
+                .setFail(err.getFail())
+                .setId(err.getId())
+                .build();
+    }
+
+    // withParentField returns a copy with the path set.
+    public static CheckError withParentField(CheckError err, String parent, Object key) {
+        CheckError.Builder b = CheckError.newBuilder();
+        b.setFail(err.getFail());
+        b.setId(err.getId());
+        String path = parent + "[" + key.toString() + "]";
+        if (err.getPath() == "") {
+            b.setPath("." + path);
+        } else {
+            b.setPath(path.substring(0, path.length() - 2) + "." + err.getPath());
+        }
+        return b.build();
     }
 }
