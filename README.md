@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/emicklei/protocheck/branch/main/graph/badge.svg)](https://codecov.io/gh/emicklei/protocheck)
 
 Lightweight solution to ProtocolBuffers message validation.
-`protocheck-proto-gen` is a `protoc` plugin that generates Go code.
+`protocheck-proto-gen` is a `protoc` plugin that generates code.
 
 ## features
 
@@ -15,17 +15,14 @@ Lightweight solution to ProtocolBuffers message validation.
 - repeated, oneof and map fields
 - syntax validation of CEL expressions at generation time
 - supports proto3 and edition 2023
+- supported languages:
+  - Go
+  - Java
 
 ## install
 
 ```bash
   go install github.com/emicklei/protocheck/cmd/protoc-gen-protocheck@latest
-```
-
-### generate
-
-```bash
-  protoc --go_out=. --go_opt=paths=source_relative --protocheck_out=.
 ```
 
 ## example
@@ -64,19 +61,49 @@ message Person {
 
 See [CEL language definition](https://github.com/google/cel-spec/blob/master/doc/langdef.md) for creating CEL expressions.
 
-### usage
+### generate Go
+
+```bash
+	protoc -I=../protos \
+		--go_out=. \
+		--go_opt=paths=source_relative \
+		--protocheck_out=. \
+		--protocheck_opt=paths=source_relative,lang=go \
+	person.proto
+```
+
+### usage Go
 
 ```go
 p := &Person{
     Name:      "",
     BirthDate: &timestamppb.Timestamp{Seconds:1}
 }
-if err := p.Validate() ; err != nil {
-  verr := protocheck.AsValidationError(err)
-  for _ , each := range verr {
-    log.Println(each)
-  }
+errors := p.Validate() 
+for _ , each := range errors {
+  log.Println(each)
 }
+```
+
+### generate Java
+
+```bash
+	protoc -I=../protos \
+		--java_out=src/main/java \
+		--protocheck_out=src/main/java \
+		--protocheck_opt=paths=source_relative,lang=java \
+		person.proto
+```
+
+### usage Java
+
+```java
+  Person p = Person.newBuilder()
+          .setName("")
+          .build();
+  for (CheckError e : OuterClassName.validate(p)) {
+      System.err.println(e);
+  }
 ```
 
 ### considerations
