@@ -90,9 +90,9 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 
 // Validate checks the validity of the {{.MessageName}} message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) error {
+func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
 	if x == nil {
-		return nil
+		return result
 	}
 	{{.LowercaseMessageName}}ValidatorOnce.Do(func() {
 		if err := file_{{.LowercaseMessageName}}_check_proto_init(); err != nil {
@@ -102,14 +102,14 @@ func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) erro
 	ve := {{.LowercaseMessageName}}Validator.Validate(x,options...)
 	{{- range .MessageFieldNames}}	
 	// {{.}}
-	for _ , nve := range protocheck.AsValidationError(x.Get{{.}}().Validate(options...)) {
+	for _ , nve := range x.Get{{.}}().Validate(options...) {
 		ve = append(ve, nve.WithPath(".{{.}}"))
 	}
 	{{- end}}		
 	{{- range .RepeatedFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		for _ , nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+		for _ , nve := range msg.Validate(options...) {
 			ve = append(ve, nve.WithParentField("{{.Name}}", key))
 		}
 	}
@@ -117,14 +117,11 @@ func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) erro
 	{{- range .MapFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		for _ , nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+		for _ , nve := range msg.Validate(options...) {
 			ve = append(ve, nve.WithParentField("{{.Name}}", key))
 		}
 	}
-	{{- end}}	
-	if len(ve) == 0 {
-		return nil
-	}
+	{{- end}}
 	return ve
 }
 {{- end }}

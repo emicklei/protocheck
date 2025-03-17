@@ -71,9 +71,9 @@ func file_person_health_check_proto_init() error {
 
 // Validate checks the validity of the Person_Health message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Person_Health) Validate(options ...protocheck.ValidationOption) error {
+func (x *Person_Health) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
 	if x == nil {
-		return nil
+		return result
 	}
 	person_healthValidatorOnce.Do(func() {
 		if err := file_person_health_check_proto_init(); err != nil {
@@ -81,9 +81,6 @@ func (x *Person_Health) Validate(options ...protocheck.ValidationOption) error {
 		}
 	})
 	ve := person_healthValidator.Validate(x, options...)
-	if len(ve) == 0 {
-		return nil
-	}
 	return ve
 }
 func file_person_check_proto_init() error {
@@ -312,9 +309,9 @@ func file_person_check_proto_init() error {
 
 // Validate checks the validity of the Person message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Person) Validate(options ...protocheck.ValidationOption) error {
+func (x *Person) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
 	if x == nil {
-		return nil
+		return result
 	}
 	personValidatorOnce.Do(func() {
 		if err := file_person_check_proto_init(); err != nil {
@@ -323,23 +320,20 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) error {
 	})
 	ve := personValidator.Validate(x, options...)
 	// Health
-	for _, nve := range protocheck.AsValidationError(x.GetHealth().Validate(options...)) {
+	for _, nve := range x.GetHealth().Validate(options...) {
 		ve = append(ve, nve.WithPath(".Health"))
 	}
 	// Pets
 	for key, msg := range x.GetPets() {
-		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+		for _, nve := range msg.Validate(options...) {
 			ve = append(ve, nve.WithParentField("Pets", key))
 		}
 	}
 	// Favorites
 	for key, msg := range x.GetFavorites() {
-		for _, nve := range protocheck.AsValidationError(msg.Validate(options...)) {
+		for _, nve := range msg.Validate(options...) {
 			ve = append(ve, nve.WithParentField("Favorites", key))
 		}
-	}
-	if len(ve) == 0 {
-		return nil
 	}
 	return ve
 }
@@ -393,9 +387,9 @@ func file_pet_check_proto_init() error {
 
 // Validate checks the validity of the Pet message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Pet) Validate(options ...protocheck.ValidationOption) error {
+func (x *Pet) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
 	if x == nil {
-		return nil
+		return result
 	}
 	petValidatorOnce.Do(func() {
 		if err := file_pet_check_proto_init(); err != nil {
@@ -403,8 +397,5 @@ func (x *Pet) Validate(options ...protocheck.ValidationOption) error {
 		}
 	})
 	ve := petValidator.Validate(x, options...)
-	if len(ve) == 0 {
-		return nil
-	}
 	return ve
 }

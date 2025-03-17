@@ -35,13 +35,12 @@ func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 	p := createValidPerson()
 	p.Favorites["test"].Kind = "spider"
 
-	err := p.Validate()
-	if err == nil {
+	ve := p.Validate()
+	if len(ve) == 0 {
 		t.Fatal("expected error")
 	}
-	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Id, "pet1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
@@ -50,13 +49,12 @@ func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 func TestCheckPersonInvalidEmail(t *testing.T) {
 	p := createValidPerson()
 	p.Identification = &Person_Email{Email: "invalid"}
-	err := p.Validate()
-	if err == nil {
+	ve := p.Validate()
+	if len(ve) == 0 {
 		t.Fatal("expected error")
 	}
-	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Id, "email"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
@@ -65,13 +63,12 @@ func TestCheckPersonInvalidEmail(t *testing.T) {
 func TestCheckPersonInvalidPet(t *testing.T) {
 	p := createValidPerson()
 	p.Pets[0].Kind = "spider"
-	err := p.Validate()
-	if err == nil {
+	ve := p.Validate()
+	if len(ve) == 0 {
 		t.Fatal("expected error")
 	}
-	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Id, "pet1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
@@ -80,24 +77,22 @@ func TestCheckPersonInvalidPet(t *testing.T) {
 func TestCheckPersonInvalidPetMapValue(t *testing.T) {
 	p := createValidPerson()
 	p.Favorites["test"].Kind = "spider"
-	err := p.Validate()
-	if err == nil {
+	ve := p.Validate()
+	if len(ve) == 0 {
 		t.Fatal("expected error")
 	}
-	ve := protocheck.AsValidationError(err)
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Id, "pet1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
-	t.Log(err)
+	t.Log(ve)
 }
 func TestCheckPersonInvalidName(t *testing.T) {
 	p := createValidPerson()
 	p.Name = "?"
-	err := p.Validate()
-	ve := protocheck.AsValidationError(err)
+	ve := p.Validate()
 	if got, want := ve[0].Fail, "name must be longer than 1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
@@ -105,10 +100,9 @@ func TestCheckPersonInvalidName(t *testing.T) {
 func TestCheckPersonInvalidBirthdate(t *testing.T) {
 	p := createValidPerson()
 	p.BirthDate = &timestamppb.Timestamp{Seconds: 0}
-	err := p.Validate()
-	ve := protocheck.AsValidationError(err)
+	ve := p.Validate()
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Fail, "[this.birth_date.getFullYear() > 2000] is false"; got != want {
 		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
@@ -118,10 +112,9 @@ func TestCheckPersonInvalidBirthdate(t *testing.T) {
 func TestCheckPersonInvalidHealthWeight(t *testing.T) {
 	p := createValidPerson()
 	p.Health.Weight = -1
-	err := p.Validate()
-	ve := protocheck.AsValidationError(err)
+	ve := p.Validate()
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Fail, "weight in kg must be positive"; got != want {
 		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
@@ -131,10 +124,9 @@ func TestCheckPersonInvalidHealthWeight(t *testing.T) {
 func TestCheckPersonInvalidHealthHeartRate(t *testing.T) {
 	p := createValidPerson()
 	p.Health.AvgHartRate = -1
-	err := p.Validate()
-	ve := protocheck.AsValidationError(err)
+	ve := p.Validate()
 	if len(ve) != 1 {
-		t.Fatal(err)
+		t.Fatal(ve)
 	}
 	if got, want := ve[0].Fail, "average heart rate must be positive"; got != want {
 		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
