@@ -71,17 +71,22 @@ func file_person_health_check_proto_init() error {
 
 // Validate checks the validity of the Person_Health message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Person_Health) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
+func (x *Person_Health) Validate(options ...protocheck.ValidationOption) (list protocheck.ValidationError) {
 	if x == nil {
-		return result
+		return nil
 	}
 	person_healthValidatorOnce.Do(func() {
 		if err := file_person_health_check_proto_init(); err != nil {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := person_healthValidator.Validate(x, options...)
-	return ve
+	if verrs := person_healthValidator.Validate(x, options...); verrs != nil {
+		list = append(list, verrs...)
+	}
+	if len(list) == 0 {
+		return nil
+	}
+	return list
 }
 func file_person_check_proto_init() error {
 	// ensure proto_init (idempotent) is called first.
@@ -309,33 +314,44 @@ func file_person_check_proto_init() error {
 
 // Validate checks the validity of the Person message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Person) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
+func (x *Person) Validate(options ...protocheck.ValidationOption) (list protocheck.ValidationError) {
 	if x == nil {
-		return result
+		return nil
 	}
 	personValidatorOnce.Do(func() {
 		if err := file_person_check_proto_init(); err != nil {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := personValidator.Validate(x, options...)
+	if verrs := personValidator.Validate(x, options...); verrs != nil {
+		list = append(list, verrs...)
+	}
 	// Health
-	for _, nve := range x.GetHealth().Validate(options...) {
-		ve = append(ve, nve.WithPath(".Health"))
+	if verrs := x.GetHealth().Validate(options...); verrs != nil {
+		for _, each := range verrs {
+			list = append(list, each.WithPath(".Health"))
+		}
 	}
 	// Pets
 	for key, msg := range x.GetPets() {
-		for _, nve := range msg.Validate(options...) {
-			ve = append(ve, nve.WithParentField("Pets", key))
+		if verrs := msg.Validate(options...); verrs != nil {
+			for _, each := range verrs {
+				list = append(list, each.WithParentField("Pets", key))
+			}
 		}
 	}
 	// Favorites
 	for key, msg := range x.GetFavorites() {
-		for _, nve := range msg.Validate(options...) {
-			ve = append(ve, nve.WithParentField("Favorites", key))
+		if verrs := msg.Validate(options...); verrs != nil {
+			for _, each := range verrs {
+				list = append(list, each.WithParentField("Favorites", key))
+			}
 		}
 	}
-	return ve
+	if len(list) == 0 {
+		return nil
+	}
+	return list
 }
 func file_pet_check_proto_init() error {
 	// ensure proto_init (idempotent) is called first.
@@ -387,15 +403,20 @@ func file_pet_check_proto_init() error {
 
 // Validate checks the validity of the Pet message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *Pet) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
+func (x *Pet) Validate(options ...protocheck.ValidationOption) (list protocheck.ValidationError) {
 	if x == nil {
-		return result
+		return nil
 	}
 	petValidatorOnce.Do(func() {
 		if err := file_pet_check_proto_init(); err != nil {
 			slog.Error("checkers initialization failed", "err", err)
 		}
 	})
-	ve := petValidator.Validate(x, options...)
-	return ve
+	if verrs := petValidator.Validate(x, options...); verrs != nil {
+		list = append(list, verrs...)
+	}
+	if len(list) == 0 {
+		return nil
+	}
+	return list
 }

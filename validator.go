@@ -20,7 +20,7 @@ type MessageValidator struct {
 
 // Validator is an interface that can be implemented by a message to validate itself.
 type Validator interface {
-	Validate(options ...ValidationOption) []*CheckError
+	Validate(options ...ValidationOption) ValidationError
 }
 
 // NewMessageValidator creates a MessageValidator using two collections of checkers
@@ -29,9 +29,9 @@ func NewMessageValidator(messageCheckers, fieldCheckers []Checker) MessageValida
 }
 
 // Validate runs all message and field checkers with the message.
-// Always returns a ValidationError which can be empty (no failed checks)
+// Always returns a ValidationError (error) which can be empty (no failed checks)
 // With options you can control what to validations to skip.
-func (m MessageValidator) Validate(this any, options ...ValidationOption) (result []*CheckError) {
+func (m MessageValidator) Validate(this any, options ...ValidationOption) (result ValidationError) {
 	env := map[string]any{"this": this}
 	for _, each := range m.messageCheckers {
 		result = append(result, evalChecker(each, env)...)

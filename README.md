@@ -79,9 +79,10 @@ p := &Person{
     Name:      "",
     BirthDate: &timestamppb.Timestamp{Seconds:1}
 }
-errors := p.Validate() 
-for _ , each := range errors {
-  log.Println(each)
+if err := p.Validate(); err != nil {
+  for _ , each := range err {
+    log.Println(each)
+  }
 }
 ```
 

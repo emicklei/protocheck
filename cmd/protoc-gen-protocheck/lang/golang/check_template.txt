@@ -90,38 +90,49 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 
 // Validate checks the validity of the {{.MessageName}} message.
 // Returns a non-empty error if the validation fails, nil otherwise.
-func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) (result []*protocheck.CheckError) {
+func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) (list protocheck.ValidationError) {
 	if x == nil {
-		return result
+		return nil
 	}
 	{{.LowercaseMessageName}}ValidatorOnce.Do(func() {
 		if err := file_{{.LowercaseMessageName}}_check_proto_init(); err != nil {
 			slog.Error("checkers initialization failed","err",err)
 		}
 	})
-	ve := {{.LowercaseMessageName}}Validator.Validate(x,options...)
+	if verrs := {{.LowercaseMessageName}}Validator.Validate(x,options...); verrs != nil {
+		list = append(list, verrs...)
+	}
 	{{- range .MessageFieldNames}}	
 	// {{.}}
-	for _ , nve := range x.Get{{.}}().Validate(options...) {
-		ve = append(ve, nve.WithPath(".{{.}}"))
+	if verrs := x.Get{{.}}().Validate(options...); verrs != nil {		
+		for _ , each := range verrs {
+			list = append(list, each.WithPath(".{{.}}"))
+		}
 	}
 	{{- end}}		
 	{{- range .RepeatedFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		for _ , nve := range msg.Validate(options...) {
-			ve = append(ve, nve.WithParentField("{{.Name}}", key))
+		if verrs := msg.Validate(options...); verrs != nil {			
+			for _ , each := range verrs {
+				list = append(list, each.WithParentField("{{.Name}}", key))
+			}
 		}
 	}
 	{{- end}}
 	{{- range .MapFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		for _ , nve := range msg.Validate(options...) {
-			ve = append(ve, nve.WithParentField("{{.Name}}", key))
+		if verrs := msg.Validate(options...); verrs != nil {	
+			for _ , each := range verrs {
+				list = append(list, each.WithParentField("{{.Name}}", key))
+			}
 		}
 	}
 	{{- end}}
-	return ve
+	if len(list) == 0 {
+		return nil
+	}
+	return list
 }
 {{- end }}
