@@ -35,6 +35,9 @@ public final class Checker {
 
     // withPath returns a copy with the path set.
     public static CheckError withPath(CheckError err, java.lang.String path) {
+        if (err.getPath() != "") {
+            path = path + "." + err.getPath();
+        }
         return CheckError.newBuilder()
                 .setPath(path)
                 .setFail(err.getFail())
@@ -49,7 +52,7 @@ public final class Checker {
         b.setId(err.getId());
         String path = parent + "[" + key.toString() + "]";
         if (err.getPath() == "") {
-            b.setPath("." + path);
+            b.setPath(path);
         } else {
             b.setPath(path.substring(0, path.length() - 2) + "." + err.getPath());
         }

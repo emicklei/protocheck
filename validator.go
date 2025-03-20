@@ -62,16 +62,18 @@ func (m MessageValidator) Validate(this any, options ...ValidationOption) (resul
 func evalChecker(each Checker, env map[string]interface{}) (result []*CheckError) {
 	out, _, err := each.program.Eval(env)
 	if err != nil {
-		result = append(result, &CheckError{Id: each.check.Id, Fail: each.check.Fail})
+		result = append(result, &CheckError{Id: each.check.Id, Fail: each.check.Fail, Path: each.fieldName})
 	} else {
 		valid, ok := out.Value().(bool)
 		if !ok {
 			result = append(result, &CheckError{
 				Id:   "exception",
-				Fail: fmt.Sprintf("invalid validation expression detected for %s", each.fieldName)})
+				Fail: fmt.Sprintf("invalid validation expression detected for %s", each.fieldName),
+				Path: each.fieldName},
+			)
 		}
 		if !valid {
-			result = append(result, &CheckError{Id: each.check.Id, Fail: each.check.Fail})
+			result = append(result, &CheckError{Id: each.check.Id, Fail: each.check.Fail, Path: each.fieldName})
 		}
 	}
 	return

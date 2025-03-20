@@ -59,6 +59,9 @@ func TestCheckPersonInvalidEmail(t *testing.T) {
 	if got, want := ve[0].Id, "email"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
+	if got, want := ve[0].Path, "Email"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
+	}
 }
 func TestCheckPersonInvalidPet(t *testing.T) {
 	p := createValidPerson()
@@ -118,6 +121,9 @@ func TestCheckPersonInvalidHealthWeight(t *testing.T) {
 	}
 	if got, want := ve[0].Fail, "weight in kg must be positive"; got != want {
 		t.Errorf("got {%[1]v:%[1]T} want [%[2]v:%[2]T]", got, want)
+	}
+	if got, want := ve[0].Path, "Health.Weight"; got != want {
+		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
 	}
 }
 

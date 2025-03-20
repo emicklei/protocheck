@@ -106,7 +106,7 @@ func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) (lis
 	// {{.}}
 	if verrs := x.Get{{.}}().Validate(options...); verrs != nil {		
 		for _ , each := range verrs {
-			list = append(list, each.WithPath(".{{.}}"))
+			list = append(list, each.WithPath("{{.}}"))
 		}
 	}
 	{{- end}}		

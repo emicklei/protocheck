@@ -64,7 +64,7 @@ public final class {{.JavaOuterClassname}}Checkers {
         List<CheckError> errors = {{.LowercaseMessageName}}Validator.validate(x);
         {{- range .MessageFieldNames}}	         
         for (CheckError err : validate(x.get{{.}}())) { // {{.}}
-            errors.add(Checker.withPath(err,".{{.}}"));
+            errors.add(Checker.withPath(err,"{{.}}"));
         }
         {{- end}}	
         {{- range .RepeatedFields}}

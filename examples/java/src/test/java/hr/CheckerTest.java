@@ -2,7 +2,6 @@ package hr;
 
 import org.junit.Test;
 
-import org.emicklei.protocheck.*;
 import org.emicklei.protocheck.pb.*;
 
 public class CheckerTest {

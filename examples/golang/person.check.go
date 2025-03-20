@@ -329,7 +329,7 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) (list protoche
 	// Health
 	if verrs := x.GetHealth().Validate(options...); verrs != nil {
 		for _, each := range verrs {
-			list = append(list, each.WithPath(".Health"))
+			list = append(list, each.WithPath("Health"))
 		}
 	}
 	// Pets

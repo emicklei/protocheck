@@ -10,9 +10,7 @@ import (
 // WithParentField returns a new CheckError with the parent field prepended to the path.
 func (c *CheckError) WithParentField(parent string, key any) *CheckError {
 	path := fmt.Sprintf("%s[%v]", parent, key)
-	if c.Path == "" {
-		path = "." + path
-	} else {
+	if c.Path != "" {
 		path = strings.TrimRight(path, " ") + "." + c.Path
 	}
 	return &CheckError{Id: c.Id, Fail: c.Fail, Path: path}
@@ -20,6 +18,9 @@ func (c *CheckError) WithParentField(parent string, key any) *CheckError {
 
 // WithPath returns a new CheckError with the path set.
 func (c *CheckError) WithPath(path string) *CheckError {
+	if c.Path != "" {
+		path = strings.TrimRight(path, " ") + "." + c.Path
+	}
 	return &CheckError{Id: c.Id, Fail: c.Fail, Path: path}
 }
 

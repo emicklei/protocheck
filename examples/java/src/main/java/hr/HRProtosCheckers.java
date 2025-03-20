@@ -160,7 +160,7 @@ public final class HRProtosCheckers {
         if (x == null) { return new java.util.ArrayList<CheckError>(); }
         List<CheckError> errors = personValidator.validate(x);	         
         for (CheckError err : validate(x.getHealth())) { // Health
-            errors.add(Checker.withPath(err,".Health"));
+            errors.add(Checker.withPath(err,"Health"));
         }
         // Pets
         List<Pet> list = x.getPetsList();

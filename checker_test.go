@@ -5,8 +5,8 @@ import "testing"
 func TestWithParentField(t *testing.T) {
 	err := new(CheckError)
 	err = err.WithParentField("parent", "key")
-	if err.Path != ".parent[key]" {
-		t.Errorf("expected .parent[key], got %s", err.Path)
+	if err.Path != "parent[key]" {
+		t.Errorf("expected parent[key], got %s", err.Path)
 	}
 	err2 := new(CheckError).WithPath("here")
 	err2 = err2.WithParentField("parent", "key")
