@@ -42,5 +42,10 @@ func TestAsValidationError(t *testing.T) {
 			t.Errorf("expected msg, got [%v]", msg)
 		}
 	}
-
+	// two
+	errors2 := ValidationError{new(CheckError), &CheckError{Path: "path"}}
+	msg := errors2.Error()
+	if msg != "2 errors occurred:\n\t* id=\n\t* path id=\n" {
+		t.Errorf("expected msg, got [%v]", msg)
+	}
 }

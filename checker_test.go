@@ -15,6 +15,14 @@ func TestWithParentField(t *testing.T) {
 	}
 }
 
+func TestWithPath(t *testing.T) {
+	err := new(CheckError)
+	err = err.WithPath("path1").WithPath("path2")
+	if err.Path != "path2.path1" {
+		t.Errorf("expected path2.path1, got %s", err.Path)
+	}
+}
+
 func TestEnabledChecker(t *testing.T) {
 	ch := new(Checker).WithEnabledFunc(func(any) bool { return true })
 	if ch.enabledFunc == nil {
