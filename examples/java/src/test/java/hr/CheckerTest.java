@@ -41,7 +41,7 @@ public class CheckerTest {
                 .setMiddleName("Que")
                 .setSurname("Doe")
                 .addNicknames("johnny")
-                .setEmail("john.doe@mars.com")
+                .setEmail("john.doe@mars.com") 
                 .setPhone("012-345-7890")
                 .setBirthDate(Timestamp.newBuilder()
                         .setSeconds(1234567890)
@@ -53,6 +53,8 @@ public class CheckerTest {
                         .setAvgHartRate(80));
         pb.putAttributes("color", "black");
         pb.putFavorites("cat", cat);
-        return pb.build();
+        Person p = pb.build();
+        System.err.println(p);
+        return p;
     }
 }
