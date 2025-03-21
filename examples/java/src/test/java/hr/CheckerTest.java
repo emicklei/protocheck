@@ -36,13 +36,12 @@ public class CheckerTest {
 
     private Person createValidPerson() {
         Pet cat = Pet.newBuilder().setKind("cat").setName("harry").build();
-        Person.Builder pb = Person.newBuilder()
+        return Person.newBuilder()
                 .setName("John")
                 .setMiddleName("Que")
                 .setSurname("Doe")
                 .addNicknames("johnny")
-                .setEmail("john.doe@mars.com") 
-                .setPhone("012-345-7890")
+                .setPhone("012-345-7890") // either phone or email
                 .setBirthDate(Timestamp.newBuilder()
                         .setSeconds(1234567890)
                         .setNanos(123456789)
@@ -50,11 +49,9 @@ public class CheckerTest {
                 .addPets(cat)
                 .setHealth(Health.newBuilder()
                         .setWeight(45)
-                        .setAvgHartRate(80));
-        pb.putAttributes("color", "black");
-        pb.putFavorites("cat", cat);
-        Person p = pb.build();
-        System.err.println(p);
-        return p;
+                        .setAvgHartRate(80))
+                .putAttributes("color", "black")
+                .putFavorites("cat", cat)
+                .build();
     }
 }

@@ -108,12 +108,20 @@ public final class HRProtosCheckers {
                 String expr = "this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
                 Checker checker = new Checker("email","email is not valid",expr,prog,"Email",false);            
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasEmail();
+                });
                 personValidator.addFieldChecker(checker);
             }
             { // Phone
                 String expr = "this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
                 Checker checker = new Checker("","phone is not valid",expr,prog,"Phone",false);            
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasPhone();
+                });
                 personValidator.addFieldChecker(checker);
             }
             { // Nicknames

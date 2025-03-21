@@ -51,6 +51,7 @@ func (m MessageValidator) Validate(this any, options ...ValidationOption) (resul
 		if !isSet && slices.Contains(options, FieldsSetOnly) {
 			continue
 		}
+		// if not set but optional, skip
 		if !isSet && each.isOptional {
 			continue
 		}

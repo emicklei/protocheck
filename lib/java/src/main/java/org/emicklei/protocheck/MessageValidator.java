@@ -2,7 +2,10 @@ package org.emicklei.protocheck;
 
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.emicklei.protocheck.pb.CheckError;
 
 public final class MessageValidator<M extends com.google.protobuf.GeneratedMessage> {
@@ -24,6 +27,23 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
             evalChecker(checker, envMap, errors);
         }
         for (Checker checker : fieldCheckers) {
+            if (checker.isEnabledFunc != null) {
+                final boolean isEnabled = checker.isEnabledFunc.apply(message);
+                if (!isEnabled) {
+                    continue;
+                }
+            }
+            final boolean isSet = checker.isSetFunc.apply(message);
+            
+            // skip unset?
+		    if (!isSet && Arrays.asList(options).contains(ValidationOption.FieldsSetOnly)) {
+    			continue;
+		    }            
+
+            // if not set but optional, skip
+            if (!isSet && checker.isOptional) {
+                continue;
+            }            
             evalChecker(checker, envMap, errors);
         }
         return errors;

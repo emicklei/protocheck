@@ -15,6 +15,8 @@ public final class Checker {
     CelRuntime.Program program;
     String fieldName; // for field level checks
     boolean isOptional;
+    Function<Object, Boolean> isSetFunc;
+    Function<Object, Boolean> isEnabledFunc;
 
     public Checker(java.lang.String id, java.lang.String fail, java.lang.String cel, CelRuntime.Program program,
             String fieldName, boolean isOptional) {
@@ -57,5 +59,12 @@ public final class Checker {
             b.setPath(path.substring(0, path.length() - 2) + "." + err.getPath());
         }
         return b.build();
+    }
+
+    public void setIsSet(Function<Object, Boolean> func) {
+        isSetFunc = func;
+    }
+    public void setIsEnabled(Function<Object, Boolean> func) {
+        isEnabledFunc = func;
     }
 }
