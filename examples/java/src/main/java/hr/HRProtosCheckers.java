@@ -33,13 +33,23 @@ public final class HRProtosCheckers {
             { // Weight
                 String expr = "this.weight > 0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","weight in kg must be positive",expr,prog,"Weight",false);            
+                Checker checker = new Checker("","weight in kg must be positive",expr,prog,"Weight",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person.Health typedX = (Person.Health)x;
+                    return typedX.hasWeight();
+                });            
                 person_healthValidator.addFieldChecker(checker);
             }
             { // AvgHartRate
                 String expr = "this.avg_hart_rate > 0.0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","average heart rate must be positive",expr,prog,"AvgHartRate",false);            
+                Checker checker = new Checker("","average heart rate must be positive",expr,prog,"AvgHartRate",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person.Health typedX = (Person.Health)x;
+                    return typedX..hasAvgHartRate();
+                });            
                 person_healthValidator.addFieldChecker(checker);
             }
         } catch (CelEvaluationException ex) {
@@ -83,75 +93,122 @@ public final class HRProtosCheckers {
             { // Name
                 String expr = "size(this.name) > 1";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","name must be longer than 1",expr,prog,"Name",false);            
+                Checker checker = new Checker("","name must be longer than 1",expr,prog,"Name",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // MiddleName
                 String expr = "size(this.middle_name) > 0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","middle name (if set) cannot be empty",expr,prog,"MiddleName",true);            
+                Checker checker = new Checker("","middle name (if set) cannot be empty",expr,prog,"MiddleName",true);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Surname
                 String expr = "size(this.surname) > 1";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","surname must be longer than 1",expr,prog,"Surname",false);            
+                Checker checker = new Checker("","surname must be longer than 1",expr,prog,"Surname",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // BirthDate
                 String expr = "this.birth_date.getFullYear() > 2000";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("check_birth_date","[this.birth_date.getFullYear() > 2000] is false",expr,prog,"BirthDate",false);            
+                Checker checker = new Checker("check_birth_date","[this.birth_date.getFullYear() > 2000] is false",expr,prog,"BirthDate",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return typedX.hasBirthDate();
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Email
                 String expr = "this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("email","email is not valid",expr,prog,"Email",false);            
+                Checker checker = new Checker("email","email is not valid",expr,prog,"Email",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    return ((Person)x).hasEmail();
-                });
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Phone
                 String expr = "this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","phone is not valid",expr,prog,"Phone",false);            
+                Checker checker = new Checker("","phone is not valid",expr,prog,"Phone",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    return ((Person)x).hasPhone();
-                });
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Nicknames
                 String expr = "size(this.nicknames) > 0 && this.nicknames.all(x,size(x)>0)";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","at least one nickname is required",expr,prog,"Nicknames",false);            
+                Checker checker = new Checker("","at least one nickname is required",expr,prog,"Nicknames",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Nicknames
                 String expr = "this.nicknames.all(x,size(x)>0)";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","nickname cannot be empty",expr,prog,"Nicknames",false);            
+                Checker checker = new Checker("","nickname cannot be empty",expr,prog,"Nicknames",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Pets
                 String expr = "size(this.pets) > 0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","at least one Pet is required",expr,prog,"Pets",false);            
+                Checker checker = new Checker("","at least one Pet is required",expr,prog,"Pets",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Attributes
                 String expr = "size(this.attributes) > 0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","at least one attribute is required",expr,prog,"Attributes",false);            
+                Checker checker = new Checker("","at least one attribute is required",expr,prog,"Attributes",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
             { // Favorites
                 String expr = "size(this.favorites) > 0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","at least one favorite is required",expr,prog,"Favorites",false);            
+                Checker checker = new Checker("","at least one favorite is required",expr,prog,"Favorites",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Person typedX = (Person)x;
+                    return true;
+                });            
                 personValidator.addFieldChecker(checker);
             }
         } catch (CelEvaluationException ex) {
@@ -199,13 +256,23 @@ public final class HRProtosCheckers {
             { // Kind
                 String expr = "this.kind == 'cat' || this.kind == 'dog'";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("pet1","only dog or cat is allowed",expr,prog,"Kind",false);            
+                Checker checker = new Checker("pet1","only dog or cat is allowed",expr,prog,"Kind",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Pet typedX = (Pet)x;
+                    return true;
+                });            
                 petValidator.addFieldChecker(checker);
             }
             { // Name
                 String expr = "size(this.name) > 0";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("","name cannot be empty",expr,prog,"Name",false);            
+                Checker checker = new Checker("","name cannot be empty",expr,prog,"Name",false);
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    Pet typedX = (Pet)x;
+                    return true;
+                });            
                 petValidator.addFieldChecker(checker);
             }
         } catch (CelEvaluationException ex) {

@@ -32,7 +32,7 @@ public final class {{.JavaOuterClassname}}Checkers {
                     .setStandardMacros(CelStandardMacro.STANDARD_MACROS)
                     .setResultType(SimpleType.BOOL)
                     .build();
-            {{- $lowerName := .LowercaseMessageName}}                                        
+            {{- $lowerName := .LowercaseMessageName}}                                                    
             {{- range .MessageCheckers }}	
 	        { // {{.Comment}}
                 String expr = "{{.Expr}}";
@@ -41,11 +41,17 @@ public final class {{.JavaOuterClassname}}Checkers {
                 {{$lowerName}}Validator.addMessageChecker(checker);
             }
             {{- end}}
+            {{- $msgName := .MessageName}}
             {{- range .FieldCheckers }}
             { // {{.Comment}}
                 String expr = "{{.Expr}}";
                 Program prog = Checker.makeProgram(compiler.compile(expr).getAst());
-                Checker checker = new Checker("{{.ID}}","{{.Fail}}",expr,prog,"{{.FieldName}}",{{.IsOptional}});            
+                Checker checker = new Checker("{{.ID}}","{{.Fail}}",expr,prog,"{{.FieldName}}",{{.IsOptional}});
+                checker.setIsSet(x -> {
+                    if (x == null) { return false; }
+                    {{$msgName}} typedX = ({{$msgName}})x;
+                    return {{.IsSetConditionSource}}
+                });            
                 {{$lowerName}}Validator.addFieldChecker(checker);
             }
             {{- end}}

@@ -33,7 +33,7 @@ public final class MessageValidator<M extends com.google.protobuf.GeneratedMessa
                     continue;
                 }
             }
-            final boolean isSet = checker.isSetFunc.apply(message);
+            final boolean isSet = checker.isSetFunc != null && checker.isSetFunc.apply(message);
             
             // skip unset?
 		    if (!isSet && Arrays.asList(options).contains(ValidationOption.FieldsSetOnly)) {
