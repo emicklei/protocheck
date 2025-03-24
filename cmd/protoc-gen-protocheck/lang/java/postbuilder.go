@@ -2,7 +2,6 @@ package java
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/shared"
@@ -25,37 +24,11 @@ func isSetConditionSource(f *protogen.Field) string {
 	if f.Desc.HasDefault() {
 		return "true;"
 	}
-
 	if f.Desc.IsList() || f.Desc.IsMap() {
 		return "true;"
 	}
 	if f.Desc.Kind() == protoreflect.MessageKind {
-		return fmt.Sprintf("typedX.has%s();", f.GoName)
+		return fmt.Sprintf("((%s)x).has%s();", f.Parent.Desc.Name(), f.GoName)
 	}
-	if f.Desc.Kind() == protoreflect.StringKind {
-		return "true;"
-	}
-	if f.Desc.Kind() == protoreflect.Int32Kind ||
-		f.Desc.Kind() == protoreflect.Int64Kind ||
-		f.Desc.Kind() == protoreflect.Uint32Kind ||
-		f.Desc.Kind() == protoreflect.Uint64Kind ||
-		f.Desc.Kind() == protoreflect.Sint32Kind ||
-		f.Desc.Kind() == protoreflect.Sint64Kind ||
-		f.Desc.Kind() == protoreflect.Sfixed32Kind ||
-		f.Desc.Kind() == protoreflect.Sfixed64Kind ||
-		f.Desc.Kind() == protoreflect.Fixed32Kind ||
-		f.Desc.Kind() == protoreflect.Fixed64Kind {
-		return fmt.Sprintf("typedX.has%s();", f.GoName)
-	}
-	if f.Desc.Kind() == protoreflect.DoubleKind || f.Desc.Kind() == protoreflect.FloatKind {
-		return fmt.Sprintf("typedX..has%s();", f.GoName)
-	}
-	if f.Desc.Kind() == protoreflect.BytesKind {
-		return fmt.Sprintf("len(typedX.has%s();", f.GoName)
-	}
-	if f.Desc.Kind() == protoreflect.BoolKind {
-		return fmt.Sprintf("typedX.has%s();", f.GoName)
-	}
-	fmt.Fprintln(os.Stderr, "unsupported field type", f.Desc.Kind())
-	return ""
+	return "true;"
 }

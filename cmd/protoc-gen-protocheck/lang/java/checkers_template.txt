@@ -49,7 +49,6 @@ public final class {{.JavaOuterClassname}}Checkers {
                 Checker checker = new Checker("{{.ID}}","{{.Fail}}",expr,prog,"{{.FieldName}}",{{.IsOptional}});
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    {{$msgName}} typedX = ({{$msgName}})x;
                     return {{.IsSetConditionSource}}
                 });            
                 {{$lowerName}}Validator.addFieldChecker(checker);

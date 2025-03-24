@@ -36,8 +36,7 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","weight in kg must be positive",expr,prog,"Weight",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person.Health typedX = (Person.Health)x;
-                    return typedX.hasWeight();
+                    return true;
                 });            
                 person_healthValidator.addFieldChecker(checker);
             }
@@ -47,8 +46,7 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","average heart rate must be positive",expr,prog,"AvgHartRate",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person.Health typedX = (Person.Health)x;
-                    return typedX..hasAvgHartRate();
+                    return true;
                 });            
                 person_healthValidator.addFieldChecker(checker);
             }
@@ -96,7 +94,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","name must be longer than 1",expr,prog,"Name",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -107,7 +104,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","middle name (if set) cannot be empty",expr,prog,"MiddleName",true);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -118,7 +114,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","surname must be longer than 1",expr,prog,"Surname",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -129,8 +124,7 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("check_birth_date","[this.birth_date.getFullYear() > 2000] is false",expr,prog,"BirthDate",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
-                    return typedX.hasBirthDate();
+                    return ((Person)x).hasBirthDate();
                 });            
                 personValidator.addFieldChecker(checker);
             }
@@ -140,7 +134,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("email","email is not valid",expr,prog,"Email",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -151,7 +144,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","phone is not valid",expr,prog,"Phone",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -162,7 +154,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","at least one nickname is required",expr,prog,"Nicknames",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -173,7 +164,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","nickname cannot be empty",expr,prog,"Nicknames",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -184,7 +174,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","at least one Pet is required",expr,prog,"Pets",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -195,7 +184,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","at least one attribute is required",expr,prog,"Attributes",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -206,7 +194,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","at least one favorite is required",expr,prog,"Favorites",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Person typedX = (Person)x;
                     return true;
                 });            
                 personValidator.addFieldChecker(checker);
@@ -259,7 +246,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("pet1","only dog or cat is allowed",expr,prog,"Kind",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Pet typedX = (Pet)x;
                     return true;
                 });            
                 petValidator.addFieldChecker(checker);
@@ -270,7 +256,6 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","name cannot be empty",expr,prog,"Name",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    Pet typedX = (Pet)x;
                     return true;
                 });            
                 petValidator.addFieldChecker(checker);
