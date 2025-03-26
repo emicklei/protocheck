@@ -191,14 +191,14 @@ func file_person_check_proto_init() error {
 					return false
 				}
 				typedX, _ := x.(*Person)
-				return typedX.GetEmail() != ""
+				return typedX.HasEmail()
 			})
 			ch = ch.WithEnabledFunc(func(x any) bool {
 				if x == nil {
 					return false
 				}
 				typedX, _ := x.(*Person)
-				return typedX.HasEmail()
+				return typedX.HasIdentification()
 			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
@@ -214,15 +214,14 @@ func file_person_check_proto_init() error {
 					return false
 				}
 				typedX, _ := x.(*Person)
-				return typedX.GetPhone() != ""
+				return typedX.HasPhone()
 			})
 			ch = ch.WithEnabledFunc(func(x any) bool {
 				if x == nil {
 					return false
 				}
 				typedX, _ := x.(*Person)
-				_, ok := typedX.Identification.(*Person_Phone)
-				return ok
+				return typedX.HasIdentification()
 			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}

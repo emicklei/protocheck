@@ -65,7 +65,6 @@ func (b builder) buildMessageData(m *protogen.Message) MessageData {
 		LowercaseMessageName: strings.ToLower(string(m.GoIdent.GoName)),
 		MessageName:          b.postBuilder.MessageIdent(m),
 		ObjectTypeName:       string(m.Desc.FullName()),
-		//HasMethodsAvailable:  b.goApiLevel > gofeaturespb.GoFeatures_API_OPEN,
 	}
 	md.MapFields = map[string]FieldData{}
 	md.RepeatedFields = map[string]FieldData{}
@@ -253,14 +252,15 @@ func (b builder) buildFieldCheckerData(f *protogen.Field) (list []CheckerData, o
 			oneOfField = f.Oneof.GoName
 		}
 		cd := CheckerData{
-			Comment:        f.GoName,
-			FieldName:      f.GoName,
-			IsOptional:     f.Desc.HasOptionalKeyword(),
-			OneOfType:      oneOfType,
-			OneOfFieldName: oneOfField,
-			ID:             ext.Id,
-			Fail:           ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
-			Expr:           ext.Cel,
+			Comment:              f.GoName,
+			FieldName:            f.GoName,
+			IsOptional:           f.Desc.HasOptionalKeyword(),
+			OneOfType:            oneOfType,
+			OneOfFieldName:       oneOfField,
+			ID:                   ext.Id,
+			Fail:                 ifEmpty(ext.Fail, fmt.Sprintf("[%s] is false", ext.Cel)),
+			Expr:                 ext.Cel,
+			IsHasMethodAvailable: oneOfType != "" && b.goApiLevel > gofeaturespb.GoFeatures_API_OPEN,
 		}
 		cd = b.postBuilder.PostBuildCheckerData(f, cd)
 		list = append(list, cd)
