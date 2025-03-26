@@ -12,11 +12,12 @@ gen: install
 	gofmt -w person.check.go
 
 opaque: install
+	mkdir -p api_opaque/golang
 	protoc -I=../protos \
 		--experimental_allow_proto3_optional \
-		--go_out=api_opaque \
+		--go_out=api_opaque/golang \
 		--go_opt=paths=source_relative,default_api_level=API_OPAQUE \
-		--protocheck_out=api_opaque \
-		--protocheck_opt=paths=source_relative \
+		--protocheck_out=api_opaque/golang \
+		--protocheck_opt=paths=source_relative,default_api_level=API_OPAQUE \
 	person.proto
 	gofmt -w person.check.go	

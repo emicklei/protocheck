@@ -13,6 +13,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/gofeaturespb"
 )
 
 type PostBuilder interface {
@@ -23,10 +24,12 @@ type PostBuilder interface {
 type builder struct {
 	postBuilder PostBuilder
 	protoFile   *protogen.File
+	// go specific
+	goApiLevel gofeaturespb.GoFeatures_APILevel
 }
 
 func BuildFileData(f *protogen.File, pb PostBuilder, pkgName string) FileData {
-	b := builder{protoFile: f, postBuilder: pb}
+	b := builder{protoFile: f, postBuilder: pb, goApiLevel: f.APILevel}
 	fd := FileData{
 		PkgName: string(pkgName),
 	}
@@ -62,6 +65,7 @@ func (b builder) buildMessageData(m *protogen.Message) MessageData {
 		LowercaseMessageName: strings.ToLower(string(m.GoIdent.GoName)),
 		MessageName:          b.postBuilder.MessageIdent(m),
 		ObjectTypeName:       string(m.Desc.FullName()),
+		//HasMethodsAvailable:  b.goApiLevel > gofeaturespb.GoFeatures_API_OPEN,
 	}
 	md.MapFields = map[string]FieldData{}
 	md.RepeatedFields = map[string]FieldData{}

@@ -14,7 +14,7 @@ Lightweight solution to ProtocolBuffers message validation.
 - nested messages
 - repeated, oneof and map fields
 - syntax validation of CEL expressions at generation time
-- supports proto3 and edition 2023
+- supports proto3 and edition 2023 (default_api_level=API_OPAQUE)
 - supported languages:
   - Go
   - Java

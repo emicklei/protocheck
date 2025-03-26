@@ -59,7 +59,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 					return false
 				}
 				typedX, _ := x.(*{{$msgName}})
-				return typedX.Has{{.FieldName}}
+				return typedX.Has{{.FieldName}}()
 			})
 			{{- else }}
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 

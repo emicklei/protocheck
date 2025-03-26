@@ -19,7 +19,7 @@ type MessageData struct {
 	MessageFieldNames    []string
 	MapFields            map[string]FieldData
 	RepeatedFields       map[string]FieldData
-	HasMethodsAvailable  bool // false for proto2,proto3, true for edition2023
+	HasMethodsAvailable  bool // false for proto2,proto3, true for edition2023 (OPAQUE)
 }
 type FieldData struct {
 	Name            string
@@ -41,4 +41,5 @@ type CheckerData struct {
 	Expr                 string
 	Fail                 string
 	IsSetConditionSource string
+	HasMethodAvailable   bool
 }
