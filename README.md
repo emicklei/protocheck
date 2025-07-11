@@ -71,6 +71,7 @@ See [CEL language definition](https://github.com/google/cel-spec/blob/master/doc
 		--protocheck_opt=paths=source_relative,lang=go \
 	person.proto
 ```
+You can add the option `v=true` to produce verbose logging of the protocheck tool.
 
 ### usage Go
 

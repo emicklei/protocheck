@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/emicklei/protocheck/cmd/protoc-gen-protocheck/lang/golang"
@@ -12,10 +13,12 @@ import (
 )
 
 var lang *string
+var debug *bool
 
 func main() {
 	var flags flag.FlagSet
 	lang = flags.String("lang", "go", "one of the supported programming languages")
+	debug = flags.Bool("v", false, "enable verbose logging")
 	opts := &protogen.Options{
 		ParamFunc: flags.Set,
 	}
@@ -24,6 +27,15 @@ func main() {
 
 // https://rotemtam.com/2021/03/22/creating-a-protoc-plugin-to-gen-go-code/
 func run(p *protogen.Plugin) error {
+	if *debug {
+		logfile, err := os.OpenFile("protocheck.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err == nil {
+			defer logfile.Close()
+			slog.SetDefault(slog.New(slog.NewTextHandler(logfile, &slog.HandlerOptions{
+				Level: slog.LevelDebug,
+			})))
+		}
+	}
 	p.SupportedFeatures = p.SupportedFeatures + 1 + 2 // FEATURE_PROTO3_OPTIONAL, FEATURE_SUPPORTS_EDITIONS
 	p.SupportedEditionsMinimum = descriptorpb.Edition_EDITION_PROTO3
 	p.SupportedEditionsMaximum = descriptorpb.Edition_EDITION_2023
@@ -35,10 +47,11 @@ func run(p *protogen.Plugin) error {
 		if !importsCheck(each) {
 			continue
 		}
-		slog.Debug("destination",
+		slog.Debug("source",
 			"pkg", each.GoPackageName,
 			"path", each.Desc.Path(),
 			"prefix", each.GeneratedFilenamePrefix,
+			"api_level (OPEN=1, HYBRID=2 or OPAQUE=3)", each.APILevel,
 		)
 
 		switch *lang {

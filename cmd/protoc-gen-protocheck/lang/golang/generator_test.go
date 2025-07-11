@@ -34,7 +34,7 @@ func TestIsSetConditionSource(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			field := &protogen.Field{
-				Desc:   &mockFieldDescriptor{kind: tt.kind},
+				Desc:   &mockFieldDescriptor{kind: tt.kind, islist: false},
 				GoName: "Field",
 			}
 			result := isSetConditionSource(field)
@@ -47,9 +47,13 @@ func TestIsSetConditionSource(t *testing.T) {
 
 type mockFieldDescriptor struct {
 	protoreflect.FieldDescriptor
-	kind protoreflect.Kind
+	kind   protoreflect.Kind
+	islist bool
 }
 
 func (m *mockFieldDescriptor) Kind() protoreflect.Kind {
 	return m.kind
+}
+func (m *mockFieldDescriptor) IsList() bool {
+	return m.islist
 }
