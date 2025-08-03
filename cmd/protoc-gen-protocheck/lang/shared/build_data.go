@@ -279,10 +279,3 @@ func abort(message string) {
 	fmt.Println(message)
 	os.Exit(1)
 }
-
-func isSetRequired(f *protogen.Field) bool {
-	if f.Desc.IsList() || f.Desc.IsMap() {
-		return false
-	}
-	return true
-}
