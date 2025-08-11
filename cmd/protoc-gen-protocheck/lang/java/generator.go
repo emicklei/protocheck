@@ -10,6 +10,10 @@ import (
 
 func Process(p *protogen.Plugin, f *protogen.File) error {
 	fd := shared.BuildFileData(f, postBuilder{}, *f.Proto.Options.JavaPackage)
+	if len(fd.Messages) == 0 {
+		slog.Info("no checkable messages, skipping file", "file", f.GeneratedFilenamePrefix)
+		return nil
+	}
 	fd.JavaOuterClassname = *f.Proto.Options.JavaOuterClassname
 	content, err := generate(fd)
 	if err != nil {
