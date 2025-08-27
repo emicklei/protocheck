@@ -20,4 +20,4 @@ opaque: install
 		--protocheck_out=api_opaque/golang \
 		--protocheck_opt=paths=source_relative,default_api_level=API_OPAQUE \
 	person.proto
-	gofmt -w person.check.go	
+	gofmt -w api_opaque/golang/person.check.go

@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/checker/decls"
 )
 
 type ValidationOption byte
@@ -81,7 +82,11 @@ func evalChecker(each Checker, env map[string]interface{}) (result []*CheckError
 }
 
 // MakeProgram creates a cel Program for a given expression and environment.
-func MakeProgram(env *cel.Env, expression string) (cel.Program, error) {
+func MakeProgram(env *cel.Env, expression string, container string) (cel.Program, error) {
+	env, err := env.Extend(cel.Declarations(decls.NewVar("this", decls.NewObjectType(container))))
+	if err != nil {
+		return nil, fmt.Errorf("protocheck: failed to extend CEL environment: %w", err)
+	}
 	ast, iss := env.Compile(expression)
 	if err := iss.Err(); err != nil {
 		return nil, fmt.Errorf("protocheck: failed to compile CEL expression: %w", err)

@@ -3,40 +3,48 @@
 package golang
 
 import (
-	"sync"
-	"fmt"
 	"log/slog"
 
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
 )
 
 var (
-	person_healthValidator     protocheck.MessageValidator
-	person_healthValidatorOnce sync.Once
-	personValidator            protocheck.MessageValidator
-	personValidatorOnce        sync.Once
-	petValidator               protocheck.MessageValidator
-	petValidatorOnce           sync.Once
+	// celEnv is the shared CEL environment.
+	celEnv                 *cel.Env
+	person_healthValidator protocheck.MessageValidator
+	personValidator        protocheck.MessageValidator
+	petValidator           protocheck.MessageValidator
 )
 
-func file_person_health_check_proto_init() error {
+func init() {
 	// ensure proto_init (idempotent) is called first.
+	// This is needed to register the types of the messages in the proto package.
 	file_person_proto_init()
-	env, err := cel.NewEnv(
-		cel.Types(new(Person_Health)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("golang.Person.Health"))))
+
+	var err error
+	celEnv, err = cel.NewEnv(
+		cel.Types(
+			new(Person_Health),
+			new(Person),
+			new(Pet),
+		),
+	)
 	if err != nil {
-		return fmt.Errorf("cel.NewEnv failed: %w", err)
+		slog.Error("failed to create CEL environment", "err", err)
+		return
 	}
+	init_person_health_validator()
+	init_person_validator()
+	init_pet_validator()
+}
+func init_person_health_validator() {
 	messageCheckers := []protocheck.Checker{}
 	fieldCheckers := []protocheck.Checker{}
 	{ // Weight
 		expr := `this.weight > 0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person.Health"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "weight in kg must be positive", expr, "Weight", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -51,8 +59,8 @@ func file_person_health_check_proto_init() error {
 	}
 	{ // AvgHartRate
 		expr := `this.avg_hart_rate > 0.0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person.Health"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "average heart rate must be positive", expr, "AvgHartRate", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -66,7 +74,6 @@ func file_person_health_check_proto_init() error {
 		}
 	}
 	person_healthValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
-	return nil
 }
 
 // Validate checks the validity of the Person_Health message.
@@ -75,11 +82,6 @@ func (x *Person_Health) Validate(options ...protocheck.ValidationOption) (list p
 	if x == nil {
 		return nil
 	}
-	person_healthValidatorOnce.Do(func() {
-		if err := file_person_health_check_proto_init(); err != nil {
-			slog.Error("checkers initialization failed", "err", err)
-		}
-	})
 	if verrs := person_healthValidator.Validate(x, options...); verrs != nil {
 		list = append(list, verrs...)
 	}
@@ -88,28 +90,19 @@ func (x *Person_Health) Validate(options ...protocheck.ValidationOption) (list p
 	}
 	return list
 }
-func file_person_check_proto_init() error {
-	// ensure proto_init (idempotent) is called first.
-	file_person_proto_init()
-	env, err := cel.NewEnv(
-		cel.Types(new(Person)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("golang.Person"))))
-	if err != nil {
-		return fmt.Errorf("cel.NewEnv failed: %w", err)
-	}
+func init_person_validator() {
 	messageCheckers := []protocheck.Checker{}
 	{ // person_invariant
-		if prg, err := protocheck.MakeProgram(env, `size(this.name + this.surname) > 0`); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, `size(this.name + this.surname) > 0`, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("person_invariant", "name and surname cannot be empty", `size(this.name + this.surname) > 0`, "", false, prg)
 			messageCheckers = append(messageCheckers, ch)
 		}
 	}
 	{ // person_health_weight_invariant
-		if prg, err := protocheck.MakeProgram(env, `this.health.weight <= 300`); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, `this.health.weight <= 300`, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("person_health_weight_invariant", "weight cannot be larger than 300", `this.health.weight <= 300`, "", false, prg)
 			messageCheckers = append(messageCheckers, ch)
@@ -118,8 +111,8 @@ func file_person_check_proto_init() error {
 	fieldCheckers := []protocheck.Checker{}
 	{ // Name
 		expr := `size(this.name) > 1`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "name must be longer than 1", expr, "Name", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -134,8 +127,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // MiddleName
 		expr := `size(this.middle_name) > 0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "middle name (if set) cannot be empty", expr, "MiddleName", true, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -150,8 +143,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Surname
 		expr := `size(this.surname) > 1`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "surname must be longer than 1", expr, "Surname", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -166,8 +159,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // BirthDate
 		expr := `this.birth_date.getFullYear() > 2000`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("check_birth_date", "[this.birth_date.getFullYear() > 2000] is false", expr, "BirthDate", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -182,8 +175,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Email
 		expr := `this.email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$')`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("email", "email is not valid", expr, "Email", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -205,8 +198,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Phone
 		expr := `this.phone.matches('^[0-9]{3}-[0-9]{3}-[0-9]{4}$')`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "phone is not valid", expr, "Phone", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -228,8 +221,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Nicknames
 		expr := `size(this.nicknames) > 0 && this.nicknames.all(x,size(x)>0)`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one nickname is required", expr, "Nicknames", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -244,8 +237,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Nicknames
 		expr := `this.nicknames.all(x,size(x)>0)`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "nickname cannot be empty", expr, "Nicknames", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -260,8 +253,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Pets
 		expr := `size(this.pets) > 0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one Pet is required", expr, "Pets", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -276,8 +269,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Attributes
 		expr := `size(this.attributes) > 0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one attribute is required", expr, "Attributes", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -292,8 +285,8 @@ func file_person_check_proto_init() error {
 	}
 	{ // Favorites
 		expr := `size(this.favorites) > 0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Person"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "at least one favorite is required", expr, "Favorites", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -307,7 +300,6 @@ func file_person_check_proto_init() error {
 		}
 	}
 	personValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
-	return nil
 }
 
 // Validate checks the validity of the Person message.
@@ -316,11 +308,6 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) (list protoche
 	if x == nil {
 		return nil
 	}
-	personValidatorOnce.Do(func() {
-		if err := file_person_check_proto_init(); err != nil {
-			slog.Error("checkers initialization failed", "err", err)
-		}
-	})
 	if verrs := personValidator.Validate(x, options...); verrs != nil {
 		list = append(list, verrs...)
 	}
@@ -351,22 +338,13 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) (list protoche
 	}
 	return list
 }
-func file_pet_check_proto_init() error {
-	// ensure proto_init (idempotent) is called first.
-	file_person_proto_init()
-	env, err := cel.NewEnv(
-		cel.Types(new(Pet)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("golang.Pet"))))
-	if err != nil {
-		return fmt.Errorf("cel.NewEnv failed: %w", err)
-	}
+func init_pet_validator() {
 	messageCheckers := []protocheck.Checker{}
 	fieldCheckers := []protocheck.Checker{}
 	{ // Kind
 		expr := `this.kind == 'cat' || this.kind == 'dog'`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Pet"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("pet1", "only dog or cat is allowed", expr, "Kind", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -381,8 +359,8 @@ func file_pet_check_proto_init() error {
 	}
 	{ // Name
 		expr := `size(this.name) > 0`
-		if prg, err := protocheck.MakeProgram(env, expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "golang.Pet"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("", "name cannot be empty", expr, "Name", false, prg)
 			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
@@ -396,7 +374,6 @@ func file_pet_check_proto_init() error {
 		}
 	}
 	petValidator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
-	return nil
 }
 
 // Validate checks the validity of the Pet message.
@@ -405,11 +382,6 @@ func (x *Pet) Validate(options ...protocheck.ValidationOption) (list protocheck.
 	if x == nil {
 		return nil
 	}
-	petValidatorOnce.Do(func() {
-		if err := file_pet_check_proto_init(); err != nil {
-			slog.Error("checkers initialization failed", "err", err)
-		}
-	})
 	if verrs := petValidator.Validate(x, options...); verrs != nil {
 		list = append(list, verrs...)
 	}

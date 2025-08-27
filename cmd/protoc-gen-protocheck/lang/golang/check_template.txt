@@ -3,57 +3,69 @@
 package {{.PkgName}}
 
 import (
-	"sync"
-	"fmt"
 	"log/slog"
-	
+
 	"github.com/emicklei/protocheck"
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
 )
 
 var (
-    {{- range .Messages}}
-    {{.LowercaseMessageName}}Validator     protocheck.MessageValidator
-    {{.LowercaseMessageName}}ValidatorOnce sync.Once
-    {{- end }}
+	// celEnv is the shared CEL environment.
+	celEnv *cel.Env
+	{{- range .Messages}}
+	{{.LowercaseMessageName}}Validator protocheck.MessageValidator
+	{{- end }}
 )
 
- {{- range .Messages}}
-func file_{{.LowercaseMessageName}}_check_proto_init() error {
+func init() {
 	// ensure proto_init (idempotent) is called first.
-	{{.InitFuncName}}()
+	// This is needed to register the types of the messages in the proto package.
+	{{ with (index .Messages 0) }}{{.InitFuncName}}(){{ end }}
 
-    {{- $lowerName := .LowercaseMessageName}}
-	env, err := cel.NewEnv(
-		cel.Types(new({{.MessageName}})),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("{{.ObjectTypeName}}"))))
+	var err error
+	celEnv, err = cel.NewEnv(
+		cel.Types(
+			{{- range .Messages}}
+			new({{.MessageName}}),
+			{{- end }}
+		),
+	)
 	if err != nil {
-		return fmt.Errorf("cel.NewEnv failed: %w", err)
+		slog.Error("failed to create CEL environment", "err", err)
+		return
 	}
-	messageCheckers := []protocheck.Checker{}	
-	{{- range .MessageCheckers }}	
+
+	{{- range .Messages}}
+	init_{{.LowercaseMessageName}}_validator()
+	{{- end }}
+}
+
+{{- range .Messages}}
+func init_{{.LowercaseMessageName}}_validator() {
+	{{- $lowerName := .LowercaseMessageName}}
+	{{- $objTypeName := .ObjectTypeName}}
+	messageCheckers := []protocheck.Checker{}
+	{{- range .MessageCheckers }}
 	{ // {{.Comment}}
-		if prg, err := protocheck.MakeProgram(env,`{{.Expr}}`); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, `{{.Expr}}`, "{{$objTypeName}}"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
 			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", `{{.Expr}}`, "", false, prg)
 			messageCheckers = append(messageCheckers, ch)
 		}
-	}	
-    {{- end }}	
+	}
+	{{- end }}
 	fieldCheckers := []protocheck.Checker{}
 	{{- $msgName := .MessageName}}
-	{{- range .FieldCheckers }}	
+	{{- range .FieldCheckers }}
 	{ // {{.Comment}}
 		expr := `{{.Expr}}`
-		if prg, err := protocheck.MakeProgram(env,expr); err != nil {
-			return fmt.Errorf("protocheck.MakeProgram failed: %w", err)
+		if prg, err := protocheck.MakeProgram(celEnv, expr, "{{$objTypeName}}"); err != nil {
+			slog.Error("MakeProgram failed", "err", err)
 		} else {
-			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}",expr,"{{.FieldName}}", {{.IsOptional}}, prg)
+			ch := protocheck.NewChecker("{{.ID}}", "{{.Fail}}", expr, "{{.FieldName}}", {{.IsOptional}}, prg)
 			{{- if .IsHasMethodAvailable }}
-			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
 				if x == nil {
 					return false
 				}
@@ -61,7 +73,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 				return typedX.Has{{.FieldName}}()
 			})
 			{{- else }}
-			ch = ch.WithIsSetFunc(func(x any, _ string) bool { 
+			ch = ch.WithIsSetFunc(func(x any, _ string) bool {
 				if x == nil {
 					return false
 				}
@@ -71,7 +83,7 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 			{{- end }}
 			{{- if ne .OneOfType "" }}
 			{{- if .IsHasMethodAvailable }}
-			ch = ch.WithEnabledFunc(func(x any) bool { 
+			ch = ch.WithEnabledFunc(func(x any) bool {
 				if x == nil {
 					return false
 				}
@@ -79,22 +91,21 @@ func file_{{.LowercaseMessageName}}_check_proto_init() error {
 				return typedX.Has{{.OneOfFieldName}}()
 			})
 			{{- else }}
-			ch = ch.WithEnabledFunc(func(x any) bool { 
+			ch = ch.WithEnabledFunc(func(x any) bool {
 				if x == nil {
 					return false
 				}
 				typedX, _ := x.(*{{$msgName}})
 				_, ok := typedX.{{.OneOfFieldName}}.(*{{.OneOfType}})
-				return ok 
+				return ok
 			})
 			{{- end }}
 			{{- end }}
 			fieldCheckers = append(fieldCheckers, ch)
 		}
-	}	
-    {{- end }}
-	{{$lowerName}}Validator = protocheck.NewMessageValidator(messageCheckers,fieldCheckers)
-	return nil
+	}
+	{{- end }}
+	{{$lowerName}}Validator = protocheck.NewMessageValidator(messageCheckers, fieldCheckers)
 }
 
 // Validate checks the validity of the {{.MessageName}} message.
@@ -103,27 +114,22 @@ func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) (lis
 	if x == nil {
 		return nil
 	}
-	{{.LowercaseMessageName}}ValidatorOnce.Do(func() {
-		if err := file_{{.LowercaseMessageName}}_check_proto_init(); err != nil {
-			slog.Error("checkers initialization failed","err",err)
-		}
-	})
-	if verrs := {{.LowercaseMessageName}}Validator.Validate(x,options...); verrs != nil {
+	if verrs := {{.LowercaseMessageName}}Validator.Validate(x, options...); verrs != nil {
 		list = append(list, verrs...)
 	}
-	{{- range .MessageFieldNames}}	
+	{{- range .MessageFieldNames}}
 	// {{.}}
-	if verrs := x.Get{{.}}().Validate(options...); verrs != nil {		
-		for _ , each := range verrs {
+	if verrs := x.Get{{.}}().Validate(options...); verrs != nil {
+		for _, each := range verrs {
 			list = append(list, each.WithPath("{{.}}"))
 		}
 	}
-	{{- end}}		
+	{{- end}}
 	{{- range .RepeatedFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		if verrs := msg.Validate(options...); verrs != nil {			
-			for _ , each := range verrs {
+		if verrs := msg.Validate(options...); verrs != nil {
+			for _, each := range verrs {
 				list = append(list, each.WithParentField("{{.Name}}", key))
 			}
 		}
@@ -132,8 +138,8 @@ func (x *{{.MessageName}}) Validate(options ...protocheck.ValidationOption) (lis
 	{{- range .MapFields}}
 	// {{.Name}}
 	for key, msg := range x.Get{{.Name}}() {
-		if verrs := msg.Validate(options...); verrs != nil {	
-			for _ , each := range verrs {
+		if verrs := msg.Validate(options...); verrs != nil {
+			for _, each := range verrs {
 				list = append(list, each.WithParentField("{{.Name}}", key))
 			}
 		}
