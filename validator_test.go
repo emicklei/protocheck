@@ -5,15 +5,12 @@ import (
 	"testing"
 
 	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
 )
 
 func TestMakeProgram(t *testing.T) {
 	env, _ := cel.NewEnv(
-		cel.Types(new(Check)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("check.Check"))))
-	_, err := MakeProgram(env, "this != null")
+		cel.Types(new(Check)))
+	_, err := MakeProgram(env, "this != null", "check.Check")
 	if err != nil {
 		t.Error(err)
 	}
@@ -21,7 +18,7 @@ func TestMakeProgram(t *testing.T) {
 func TestMakeProgramBadExpression(t *testing.T) {
 	env, _ := cel.NewEnv(
 		cel.Types(new(Check)))
-	_, err := MakeProgram(env, "this ==== null")
+	_, err := MakeProgram(env, "this ==== null", "check.Check")
 	if err == nil {
 		t.Error("errror expected")
 	}
@@ -38,13 +35,11 @@ func TestEmptyValidator(t *testing.T) {
 func TestEvalChecker(t *testing.T) {
 	expr := "size(this.cel) > 0"
 	env, err := cel.NewEnv(
-		cel.Types(new(Check)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("check.Check"))))
+		cel.Types(new(Check)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	prog, err := MakeProgram(env, expr)
+	prog, err := MakeProgram(env, expr, "check.Check")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,13 +77,11 @@ func TestEvalChecker(t *testing.T) {
 func TestEvalCheckerNotSetButEnabledOptional(t *testing.T) {
 	expr := "size(this.cel) > 0"
 	env, err := cel.NewEnv(
-		cel.Types(new(Check)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("check.Check"))))
+		cel.Types(new(Check)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	prog, err := MakeProgram(env, expr)
+	prog, err := MakeProgram(env, expr, "check.Check")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,13 +102,11 @@ func TestEvalCheckerNotSetButEnabledOptional(t *testing.T) {
 func TestEvalCheckerNotEnabled(t *testing.T) {
 	expr := "size(this.cel) > 0"
 	env, err := cel.NewEnv(
-		cel.Types(new(Check)),
-		cel.Declarations(
-			decls.NewVar("this", decls.NewObjectType("check.Check"))))
+		cel.Types(new(Check)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	prog, err := MakeProgram(env, expr)
+	prog, err := MakeProgram(env, expr, "check.Check")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +125,7 @@ func TestEvalCheckerNonBoolean(t *testing.T) {
 	expr := "1+2"
 	env, _ := cel.NewEnv(
 		cel.Types(new(Check)))
-	prog, _ := MakeProgram(env, expr)
+	prog, _ := MakeProgram(env, expr, "check.Check")
 	checker := NewChecker("1", "", expr, "Cel", false, prog)
 	{
 		result := evalChecker(checker, map[string]interface{}{"this": &Check{Cel: "1+2"}})

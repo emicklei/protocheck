@@ -9,18 +9,34 @@ import (
 
 func createValidPerson() *Person {
 	notempty := "test"
-	p := &Person{
-		Name:       notempty,
-		Surname:    notempty,
-		MiddleName: &notempty,
-		BirthDate:  &timestamppb.Timestamp{Seconds: 200 * 365 * 60 * 60 * 60},
-		Health:     &Person_Health{Weight: 1, AvgHartRate: 60.0}}
+	p := new(Person)
+	p.SetName(notempty)
+	p.SetSurname(notempty)
+	p.SetMiddleName(notempty)
+	p.SetBirthDate(&timestamppb.Timestamp{Seconds: 200 * 365 * 60 * 60 * 60})
+
+	h := new(Person_Health)
+	h.SetWeight(1)
+	h.SetAvgHartRate(60.0)
+	p.SetHealth(h)
+
 	// either email or phone
-	p.Identification = &Person_Email{Email: "a.b@here.com"}
-	p.Pets = append(p.Pets, &Pet{Kind: "dog", Name: notempty})
-	p.Attributes = map[string]string{notempty: notempty}
-	p.Favorites = map[string]*Pet{notempty: {Kind: "cat", Name: notempty}}
-	p.Nicknames = []string{notempty}
+	p.SetEmail("a.b@here.com")
+
+	pet := new(Pet)
+	pet.SetKind("dog")
+	pet.SetName(notempty)
+	pets := []*Pet{pet}
+	p.SetPets(pets)
+
+	p.SetAttributes(map[string]string{notempty: notempty})
+
+	cat := new(Pet)
+	cat.SetKind("cat")
+	cat.SetName(notempty)
+	p.SetFavorites(map[string]*Pet{notempty: cat})
+
+	p.SetNicknames([]string{notempty})
 	return p
 }
 
@@ -34,7 +50,7 @@ func BenchmarkValidation(t *testing.B) {
 
 func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 	p := createValidPerson()
-	p.Favorites["test"].Kind = "spider"
+	p.GetFavorites()["test"].SetKind("spider")
 
 	ve := p.Validate()
 	if len(ve) == 0 {
@@ -49,7 +65,7 @@ func TestCheckPersonMapWithInvalidPet(t *testing.T) {
 }
 func TestCheckPersonInvalidEmail(t *testing.T) {
 	p := createValidPerson()
-	p.Identification = &Person_Email{Email: "invalid"}
+	p.SetEmail("invalid")
 	ve := p.Validate()
 	if len(ve) == 0 {
 		t.Fatal("expected error")
@@ -66,7 +82,7 @@ func TestCheckPersonInvalidEmail(t *testing.T) {
 }
 func TestCheckPersonInvalidPet(t *testing.T) {
 	p := createValidPerson()
-	p.Pets[0].Kind = "spider"
+	p.GetPets()[0].SetKind("spider")
 	ve := p.Validate()
 	if len(ve) == 0 {
 		t.Fatal("expected error")
@@ -80,7 +96,7 @@ func TestCheckPersonInvalidPet(t *testing.T) {
 }
 func TestCheckPersonInvalidPetMapValue(t *testing.T) {
 	p := createValidPerson()
-	p.Favorites["test"].Kind = "spider"
+	p.GetFavorites()["test"].SetKind("spider")
 	ve := p.Validate()
 	if len(ve) == 0 {
 		t.Fatal("expected error")
@@ -95,7 +111,7 @@ func TestCheckPersonInvalidPetMapValue(t *testing.T) {
 }
 func TestCheckPersonInvalidName(t *testing.T) {
 	p := createValidPerson()
-	p.Name = "?"
+	p.SetName("?")
 	ve := p.Validate()
 	if got, want := ve[0].Fail, "name must be longer than 1"; got != want {
 		t.Errorf("got [%[1]v:%[1]T] want [%[2]v:%[2]T]", got, want)
@@ -103,7 +119,7 @@ func TestCheckPersonInvalidName(t *testing.T) {
 }
 func TestCheckPersonInvalidBirthdate(t *testing.T) {
 	p := createValidPerson()
-	p.BirthDate = &timestamppb.Timestamp{Seconds: 0}
+	p.SetBirthDate(&timestamppb.Timestamp{Seconds: 0})
 	ve := p.Validate()
 	if len(ve) != 1 {
 		t.Fatal(ve)
@@ -115,7 +131,7 @@ func TestCheckPersonInvalidBirthdate(t *testing.T) {
 
 func TestCheckPersonInvalidHealthWeight(t *testing.T) {
 	p := createValidPerson()
-	p.Health.Weight = -1
+	p.GetHealth().SetWeight(-1)
 	ve := p.Validate()
 	if len(ve) != 1 {
 		t.Fatal(ve)
@@ -130,7 +146,7 @@ func TestCheckPersonInvalidHealthWeight(t *testing.T) {
 
 func TestCheckPersonInvalidHealthHeartRate(t *testing.T) {
 	p := createValidPerson()
-	p.Health.AvgHartRate = -1
+	p.GetHealth().SetAvgHartRate(-1)
 	ve := p.Validate()
 	if len(ve) != 1 {
 		t.Fatal(ve)
@@ -142,12 +158,9 @@ func TestCheckPersonInvalidHealthHeartRate(t *testing.T) {
 
 func TestValidateSetFieldsOn(t *testing.T) {
 	notempty := "test"
-	p := &Person{
-		Name:       notempty,
-		Nicknames:  nil, // mark not set
-		Pets:       nil, // mark not set
-		Attributes: nil, // mark not set
-		Favorites:  nil} // mark not set
+	p := new(Person)
+	p.SetName(notempty)
+
 	err := p.Validate(protocheck.FieldsSetOnly)
 	if err != nil {
 		t.Error("unexpected", err)
