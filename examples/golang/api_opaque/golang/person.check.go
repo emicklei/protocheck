@@ -191,7 +191,7 @@ func init_person_validator() {
 					return false
 				}
 				typedX, _ := x.(*Person)
-				return typedX.HasIdentification()
+				return typedX.HasEmail()
 			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}
@@ -214,7 +214,7 @@ func init_person_validator() {
 					return false
 				}
 				typedX, _ := x.(*Person)
-				return typedX.HasIdentification()
+				return typedX.HasPhone()
 			})
 			fieldCheckers = append(fieldCheckers, ch)
 		}

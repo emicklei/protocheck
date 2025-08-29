@@ -88,7 +88,7 @@ func init_{{.LowercaseMessageName}}_validator() {
 					return false
 				}
 				typedX, _ := x.(*{{$msgName}})
-				return typedX.Has{{.OneOfFieldName}}()
+				return typedX.Has{{.FieldName}}()
 			})
 			{{- else }}
 			ch = ch.WithEnabledFunc(func(x any) bool {
