@@ -17,32 +17,32 @@ public final class Group extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:golang.Group)
     GroupOrBuilder {
-  private static final long serialVersionUID = 0L;
+private static final long serialVersionUID = 0L;
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 32,
-        /* patch= */ 0,
-        /* suffix= */ "",
-        Group.class.getName());
+      com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+      /* major= */ 4,
+      /* minor= */ 32,
+      /* patch= */ 0,
+      /* suffix= */ "",
+      Group.class.getName());
   }
-
   // Use Group.newBuilder() to construct.
   private Group(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
     super(builder);
   }
-
   private Group() {
     name_ = "";
   }
 
-  public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+  public static final com.google.protobuf.Descriptors.Descriptor
+      getDescriptor() {
     return hr.HRProtos.internal_static_golang_Group_descriptor;
   }
 
   @java.lang.Override
-  protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+  protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internalGetFieldAccessorTable() {
     return hr.HRProtos.internal_static_golang_Group_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
             hr.Group.class, hr.Group.Builder.class);
@@ -51,10 +51,8 @@ public final class Group extends
   public static final int NAME_FIELD_NUMBER = 1;
   @SuppressWarnings("serial")
   private volatile java.lang.Object name_ = "";
-
   /**
    * <code>string name = 1;</code>
-   * 
    * @return The name.
    */
   @java.lang.Override
@@ -63,24 +61,25 @@ public final class Group extends
     if (ref instanceof java.lang.String) {
       return (java.lang.String) ref;
     } else {
-      com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+      com.google.protobuf.ByteString bs = 
+          (com.google.protobuf.ByteString) ref;
       java.lang.String s = bs.toStringUtf8();
       name_ = s;
       return s;
     }
   }
-
   /**
    * <code>string name = 1;</code>
-   * 
    * @return The bytes for name.
    */
   @java.lang.Override
-  public com.google.protobuf.ByteString getNameBytes() {
+  public com.google.protobuf.ByteString
+      getNameBytes() {
     java.lang.Object ref = name_;
     if (ref instanceof java.lang.String) {
-      com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8(
-          (java.lang.String) ref);
+      com.google.protobuf.ByteString b = 
+          com.google.protobuf.ByteString.copyFromUtf8(
+              (java.lang.String) ref);
       name_ = b;
       return b;
     } else {
@@ -89,14 +88,11 @@ public final class Group extends
   }
 
   private byte memoizedIsInitialized = -1;
-
   @java.lang.Override
   public final boolean isInitialized() {
     byte isInitialized = memoizedIsInitialized;
-    if (isInitialized == 1)
-      return true;
-    if (isInitialized == 0)
-      return false;
+    if (isInitialized == 1) return true;
+    if (isInitialized == 0) return false;
 
     memoizedIsInitialized = 1;
     return true;
@@ -104,7 +100,7 @@ public final class Group extends
 
   @java.lang.Override
   public void writeTo(com.google.protobuf.CodedOutputStream output)
-      throws java.io.IOException {
+                      throws java.io.IOException {
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
       com.google.protobuf.GeneratedMessage.writeString(output, 1, name_);
     }
@@ -114,8 +110,7 @@ public final class Group extends
   @java.lang.Override
   public int getSerializedSize() {
     int size = memoizedSize;
-    if (size != -1)
-      return size;
+    if (size != -1) return size;
 
     size = 0;
     if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
@@ -129,7 +124,7 @@ public final class Group extends
   @java.lang.Override
   public boolean equals(final java.lang.Object obj) {
     if (obj == this) {
-      return true;
+     return true;
     }
     if (!(obj instanceof hr.Group)) {
       return super.equals(obj);
@@ -137,10 +132,8 @@ public final class Group extends
     hr.Group other = (hr.Group) obj;
 
     if (!getName()
-        .equals(other.getName()))
-      return false;
-    if (!getUnknownFields().equals(other.getUnknownFields()))
-      return false;
+        .equals(other.getName())) return false;
+    if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
 
@@ -163,45 +156,38 @@ public final class Group extends
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static hr.Group parseFrom(
       java.nio.ByteBuffer data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static hr.Group parseFrom(
       com.google.protobuf.ByteString data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static hr.Group parseFrom(
       com.google.protobuf.ByteString data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static hr.Group parseFrom(byte[] data)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data);
   }
-
   public static hr.Group parseFrom(
       byte[] data,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
       throws com.google.protobuf.InvalidProtocolBufferException {
     return PARSER.parseFrom(data, extensionRegistry);
   }
-
   public static hr.Group parseFrom(java.io.InputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-
   public static hr.Group parseFrom(
       java.io.InputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -223,14 +209,12 @@ public final class Group extends
     return com.google.protobuf.GeneratedMessage
         .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
   }
-
   public static hr.Group parseFrom(
       com.google.protobuf.CodedInputStream input)
       throws java.io.IOException {
     return com.google.protobuf.GeneratedMessage
         .parseWithIOException(PARSER, input);
   }
-
   public static hr.Group parseFrom(
       com.google.protobuf.CodedInputStream input,
       com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -240,23 +224,17 @@ public final class Group extends
   }
 
   @java.lang.Override
-  public Builder newBuilderForType() {
-    return newBuilder();
-  }
-
+  public Builder newBuilderForType() { return newBuilder(); }
   public static Builder newBuilder() {
     return DEFAULT_INSTANCE.toBuilder();
   }
-
   public static Builder newBuilder(hr.Group prototype) {
     return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
   }
-
   @java.lang.Override
   public Builder toBuilder() {
     return this == DEFAULT_INSTANCE
-        ? new Builder()
-        : new Builder().mergeFrom(this);
+        ? new Builder() : new Builder().mergeFrom(this);
   }
 
   @java.lang.Override
@@ -265,7 +243,6 @@ public final class Group extends
     Builder builder = new Builder(parent);
     return builder;
   }
-
   /**
    * <pre>
    * message without checks
@@ -277,12 +254,14 @@ public final class Group extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:golang.Group)
       hr.GroupOrBuilder {
-    public static final com.google.protobuf.Descriptors.Descriptor getDescriptor() {
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
       return hr.HRProtos.internal_static_golang_Group_descriptor;
     }
 
     @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable internalGetFieldAccessorTable() {
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
       return hr.HRProtos.internal_static_golang_Group_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               hr.Group.class, hr.Group.Builder.class);
@@ -298,7 +277,6 @@ public final class Group extends
       super(parent);
 
     }
-
     @java.lang.Override
     public Builder clear() {
       super.clear();
@@ -308,7 +286,8 @@ public final class Group extends
     }
 
     @java.lang.Override
-    public com.google.protobuf.Descriptors.Descriptor getDescriptorForType() {
+    public com.google.protobuf.Descriptors.Descriptor
+        getDescriptorForType() {
       return hr.HRProtos.internal_static_golang_Group_descriptor;
     }
 
@@ -329,9 +308,7 @@ public final class Group extends
     @java.lang.Override
     public hr.Group buildPartial() {
       hr.Group result = new hr.Group(this);
-      if (bitField0_ != 0) {
-        buildPartial0(result);
-      }
+      if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
     }
@@ -346,7 +323,7 @@ public final class Group extends
     @java.lang.Override
     public Builder mergeFrom(com.google.protobuf.Message other) {
       if (other instanceof hr.Group) {
-        return mergeFrom((hr.Group) other);
+        return mergeFrom((hr.Group)other);
       } else {
         super.mergeFrom(other);
         return this;
@@ -354,8 +331,7 @@ public final class Group extends
     }
 
     public Builder mergeFrom(hr.Group other) {
-      if (other == hr.Group.getDefaultInstance())
-        return this;
+      if (other == hr.Group.getDefaultInstance()) return this;
       if (!other.getName().isEmpty()) {
         name_ = other.name_;
         bitField0_ |= 0x00000001;
@@ -407,20 +383,18 @@ public final class Group extends
       } // finally
       return this;
     }
-
     private int bitField0_;
 
     private java.lang.Object name_ = "";
-
     /**
      * <code>string name = 1;</code>
-     * 
      * @return The name.
      */
     public java.lang.String getName() {
       java.lang.Object ref = name_;
       if (!(ref instanceof java.lang.String)) {
-        com.google.protobuf.ByteString bs = (com.google.protobuf.ByteString) ref;
+        com.google.protobuf.ByteString bs =
+            (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         name_ = s;
         return s;
@@ -428,44 +402,38 @@ public final class Group extends
         return (java.lang.String) ref;
       }
     }
-
     /**
      * <code>string name = 1;</code>
-     * 
      * @return The bytes for name.
      */
-    public com.google.protobuf.ByteString getNameBytes() {
+    public com.google.protobuf.ByteString
+        getNameBytes() {
       java.lang.Object ref = name_;
       if (ref instanceof String) {
-        com.google.protobuf.ByteString b = com.google.protobuf.ByteString.copyFromUtf8(
-            (java.lang.String) ref);
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
         name_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
-
     /**
      * <code>string name = 1;</code>
-     * 
      * @param value The name to set.
      * @return This builder for chaining.
      */
     public Builder setName(
         java.lang.String value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
+      if (value == null) { throw new NullPointerException(); }
       name_ = value;
       bitField0_ |= 0x00000001;
       onChanged();
       return this;
     }
-
     /**
      * <code>string name = 1;</code>
-     * 
      * @return This builder for chaining.
      */
     public Builder clearName() {
@@ -474,18 +442,14 @@ public final class Group extends
       onChanged();
       return this;
     }
-
     /**
      * <code>string name = 1;</code>
-     * 
      * @param value The bytes for name to set.
      * @return This builder for chaining.
      */
     public Builder setNameBytes(
         com.google.protobuf.ByteString value) {
-      if (value == null) {
-        throw new NullPointerException();
-      }
+      if (value == null) { throw new NullPointerException(); }
       checkByteStringIsUtf8(value);
       name_ = value;
       bitField0_ |= 0x00000001;
@@ -506,7 +470,8 @@ public final class Group extends
     return DEFAULT_INSTANCE;
   }
 
-  private static final com.google.protobuf.Parser<Group> PARSER = new com.google.protobuf.AbstractParser<Group>() {
+  private static final com.google.protobuf.Parser<Group>
+      PARSER = new com.google.protobuf.AbstractParser<Group>() {
     @java.lang.Override
     public Group parsePartialFrom(
         com.google.protobuf.CodedInputStream input,
@@ -542,3 +507,4 @@ public final class Group extends
   }
 
 }
+

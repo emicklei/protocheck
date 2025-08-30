@@ -30,7 +30,7 @@ public class CheckerTest {
             fail("Expected error for empty name");
         }
         if (e.size() != 1) {
-            fail("Expected one error for empty name");
+            fail("Expected one error for empty name, got:"+e.size());
         }
     }
 
@@ -38,6 +38,7 @@ public class CheckerTest {
         Pet cat = Pet.newBuilder().setKind("cat").setName("harry").build();
         return Person.newBuilder()
                 .setName("John")
+                .setEmail("lisa@micklei.nl")
                 .setMiddleName("Que")
                 .setSurname("Doe")
                 .addNicknames("johnny")

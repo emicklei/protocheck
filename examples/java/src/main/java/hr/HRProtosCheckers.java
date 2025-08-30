@@ -134,7 +134,7 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("email","email is not valid",expr,prog,"Email",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    return true;
+                    return ((Person)x).hasEmail();
                 });            
                 personValidator.addFieldChecker(checker);
             }
@@ -144,7 +144,7 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","phone is not valid",expr,prog,"Phone",false);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    return true;
+                    return ((Person)x).hasPhone();
                 });            
                 personValidator.addFieldChecker(checker);
             }
