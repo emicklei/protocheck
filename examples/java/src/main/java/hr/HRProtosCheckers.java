@@ -136,6 +136,10 @@ public final class HRProtosCheckers {
                     if (x == null) { return false; }
                     return ((Person)x).hasEmail();
                 });            
+                checker.setIsEnabled(x-> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasEmail();
+                });
                 personValidator.addFieldChecker(checker);
             }
             { // Phone
@@ -145,7 +149,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return ((Person)x).hasPhone();
-                });            
+                });     
+                checker.setIsEnabled(x-> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasPhone();
+                });       
                 personValidator.addFieldChecker(checker);
             }
             { // Nicknames

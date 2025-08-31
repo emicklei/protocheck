@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package golang;
+
+import "check.proto";
+
+option go_package = "github.com/emicklei/protocheck-example/golang;golang";
+option java_multiple_files = true;
+option java_package = "hr";
+option java_outer_classname = "HRProtos";
+
+message Toy {
+  string name = 1 [(check.field) = { cel:"size(this.name)>0" }];
+  string color = 2 [(check.field) = { cel:"size(this.color)>0" }];
+}
