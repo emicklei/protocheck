@@ -10,8 +10,6 @@ import (
 )
 
 var (
-	// celEnv is the shared CEL environment.
-	celEnv *cel.Env
 	{{- range .Messages}}
 	{{.LowercaseMessageName}}Validator protocheck.MessageValidator
 	{{- end }}
@@ -22,8 +20,8 @@ func init() {
 	// This is needed to register the types of the messages in the proto package.
 	{{ with (index .Messages 0) }}{{.InitFuncName}}(){{ end }}
 
-	var err error
-	celEnv, err = cel.NewEnv(
+	// celEnv is the shared CEL environment.
+	celEnv, err := cel.NewEnv(
 		cel.Types(
 			{{- range .Messages}}
 			new({{.MessageName}}),
@@ -36,12 +34,12 @@ func init() {
 	}
 
 	{{- range .Messages}}
-	init_{{.LowercaseMessageName}}_validator()
+	init_{{.LowercaseMessageName}}_validator(celEnv)
 	{{- end }}
 }
 
 {{- range .Messages}}
-func init_{{.LowercaseMessageName}}_validator() {
+func init_{{.LowercaseMessageName}}_validator(celEnv *cel.Env) {
 	{{- $lowerName := .LowercaseMessageName}}
 	{{- $objTypeName := .ObjectTypeName}}
 	messageCheckers := []protocheck.Checker{}

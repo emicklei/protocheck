@@ -8,7 +8,7 @@ gen: install
 		--go_opt=paths=source_relative \
 		--protocheck_out=. \
 		--protocheck_opt=paths=source_relative \
-	person.proto
+	person.proto toy.proto
 	gofmt -w person.check.go
 
 opaque: install
