@@ -30,5 +30,8 @@ func isSetConditionSource(f *protogen.Field) string {
 	if f.Desc.Kind() == protoreflect.MessageKind {
 		return fmt.Sprintf("((%s)x).has%s();", f.Parent.Desc.Name(), f.GoName)
 	}
+	if f.Oneof != nil {
+		return fmt.Sprintf("((%s)x).has%s();", f.Parent.Desc.Name(), f.GoName)
+	}
 	return "true;"
 }
