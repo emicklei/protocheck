@@ -37,7 +37,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 person_healthValidator.addFieldChecker(checker);
             }
             { // AvgHartRate
@@ -47,7 +51,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 person_healthValidator.addFieldChecker(checker);
             }
         } catch (CelEvaluationException ex) {
@@ -95,7 +103,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // MiddleName
@@ -104,8 +116,12 @@ public final class HRProtosCheckers {
                 Checker checker = new Checker("","middle name (if set) cannot be empty",expr,prog,"MiddleName",true);
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
-                    return true;
-                });            
+                    return ((Person)x).hasMiddleName();
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasMiddleName();
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Surname
@@ -115,7 +131,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // BirthDate
@@ -125,7 +145,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return ((Person)x).hasBirthDate();
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasBirthDate();
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Email
@@ -135,7 +159,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return ((Person)x).hasEmail();
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasEmail();
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Phone
@@ -145,7 +173,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return ((Person)x).hasPhone();
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return ((Person)x).hasPhone();
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Nicknames
@@ -155,7 +187,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Nicknames
@@ -165,7 +201,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Pets
@@ -175,7 +215,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Attributes
@@ -185,7 +229,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
             { // Favorites
@@ -195,7 +243,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 personValidator.addFieldChecker(checker);
             }
         } catch (CelEvaluationException ex) {
@@ -247,7 +299,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 petValidator.addFieldChecker(checker);
             }
             { // Name
@@ -257,7 +313,11 @@ public final class HRProtosCheckers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return true;
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return true;
+                });             
                 petValidator.addFieldChecker(checker);
             }
         } catch (CelEvaluationException ex) {

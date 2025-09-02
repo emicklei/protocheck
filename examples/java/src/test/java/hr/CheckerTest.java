@@ -16,7 +16,7 @@ public class CheckerTest {
     public void testValid() throws Exception {
         Person p = createValidPerson();
         java.util.List<CheckError> e = HRProtosCheckers.validate(p);
-        if (e != null) {
+        if (!e.isEmpty()) {
             fail(e.toString());
         }
     }
@@ -30,7 +30,7 @@ public class CheckerTest {
             fail("Expected error for empty name");
         }
         if (e.size() != 1) {
-            fail("Expected one error for empty name, got:"+e.size());
+            fail("Expected one error for empty name, got:" + e.size());
         }
     }
 
@@ -38,7 +38,6 @@ public class CheckerTest {
         Pet cat = Pet.newBuilder().setKind("cat").setName("harry").build();
         return Person.newBuilder()
                 .setName("John")
-                .setEmail("lisa@micklei.nl")
                 .setMiddleName("Que")
                 .setSurname("Doe")
                 .addNicknames("johnny")

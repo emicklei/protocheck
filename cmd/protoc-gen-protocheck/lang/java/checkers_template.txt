@@ -50,7 +50,11 @@ public final class {{.JavaOuterClassname}}Checkers {
                 checker.setIsSet(x -> {
                     if (x == null) { return false; }
                     return {{.IsSetConditionSource}}
-                });            
+                });
+                checker.setIsEnabled(x -> {
+                    if (x == null) { return false; }
+                    return {{.IsSetConditionSource}}
+                });             
                 {{$lowerName}}Validator.addFieldChecker(checker);
             }
             {{- end}}
