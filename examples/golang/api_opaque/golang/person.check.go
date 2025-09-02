@@ -10,8 +10,6 @@ import (
 )
 
 var (
-	// celEnv is the shared CEL environment.
-	celEnv                 *cel.Env
 	person_healthValidator protocheck.MessageValidator
 	personValidator        protocheck.MessageValidator
 	petValidator           protocheck.MessageValidator
@@ -22,8 +20,8 @@ func init() {
 	// This is needed to register the types of the messages in the proto package.
 	file_person_proto_init()
 
-	var err error
-	celEnv, err = cel.NewEnv(
+	// celEnv is the shared CEL environment.
+	celEnv, err := cel.NewEnv(
 		cel.Types(
 			new(Person_Health),
 			new(Person),
@@ -34,11 +32,11 @@ func init() {
 		slog.Error("failed to create CEL environment", "err", err)
 		return
 	}
-	init_person_health_validator()
-	init_person_validator()
-	init_pet_validator()
+	init_person_health_validator(celEnv)
+	init_person_validator(celEnv)
+	init_pet_validator(celEnv)
 }
-func init_person_health_validator() {
+func init_person_health_validator(celEnv *cel.Env) {
 	messageCheckers := []protocheck.Checker{}
 	fieldCheckers := []protocheck.Checker{}
 	{ // Weight
@@ -90,7 +88,7 @@ func (x *Person_Health) Validate(options ...protocheck.ValidationOption) (list p
 	}
 	return list
 }
-func init_person_validator() {
+func init_person_validator(celEnv *cel.Env) {
 	messageCheckers := []protocheck.Checker{}
 	{ // person_invariant
 		if prg, err := protocheck.MakeProgram(celEnv, `size(this.name + this.surname) > 0`, "golang.Person"); err != nil {
@@ -338,7 +336,7 @@ func (x *Person) Validate(options ...protocheck.ValidationOption) (list protoche
 	}
 	return list
 }
-func init_pet_validator() {
+func init_pet_validator(celEnv *cel.Env) {
 	messageCheckers := []protocheck.Checker{}
 	fieldCheckers := []protocheck.Checker{}
 	{ // Kind
