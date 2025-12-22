@@ -1,15 +1,15 @@
 
-# protoc-gen-validate: Lightweight Protobuf Validation in Go
+# protocheck: Lightweight Protobuf Validation in Go
 
-For Go developers working with Protocol Buffers, ensuring data integrity is crucial. While Protobufs guarantee type safety, they don't enforce semantic rules out of the box. This is where `protoc-gen-validate` comes in, a lightweight and powerful tool for adding validation logic to your Protobuf messages.
+For Go developers working with Protocol Buffers, ensuring data integrity is crucial. While Protobufs guarantee type safety, they don't enforce semantic rules out of the box. This is where `protocheck` comes in, a lightweight and powerful tool for adding validation logic to your Protobuf messages.
 
-This blog post will explore the design choices behind `protoc-gen-validate`, focusing on its simplicity of declaration and code generation. We'll also compare it to its successor, `buf-validate`, to help you choose the right tool for your project.
+This blog post will explore the design choices behind `protocheck`, focusing on its simplicity of declaration and code generation. We'll also compare it to `bufbuild/protovalidate` to help you choose the right tool for your project.
 
 ## Simplicity of Declaration
 
-One of the standout features of `protoc-gen-validate` is its intuitive and straightforward approach to defining validation rules. The validations are declared directly within the `.proto` file using custom options. This co-location of data structure and validation rules makes the schema easy to read and maintain.
+One of the standout features of `protocheck` is its intuitive and straightforward approach to defining validation rules. The validations are declared directly within the `.proto` file using custom options. This co-location of data structure and validation rules makes the schema easy to read and maintain.
 
-Let's look at an example from the `person.proto` file in the `protoc-gen-validate` repository:
+Let's look at an example from the `person.proto` file in the `protocheck` repository:
 
 ```protobuf
 message Person {
@@ -43,7 +43,7 @@ This approach has several advantages:
 
 ## Code Generation
 
-The `protoc-gen-validate` tool is a `protoc` plugin that generates Go code for the validation rules defined in the `.proto` file. The generated code is placed in a separate file (e.g., `person.check.go`), which keeps the validation logic separate from the core Protobuf-generated code.
+The `protocheck` tool is a `protoc` plugin that generates Go code for the validation rules defined in the `.proto` file. The generated code is placed in a separate file (e.g., `person.check.go`), which keeps the validation logic separate from the core Protobuf-generated code.
 
 The generated code is efficient and easy to use. For each message with validation rules, a `Validate()` method is generated. This method can be called to check if a message instance is valid.
 
@@ -63,21 +63,21 @@ if err := p.Validate(); err != nil {
 
 The generated code is also highly optimized. It uses a shared CEL environment to avoid the overhead of creating a new environment for each validation check.
 
-## protoc-gen-validate vs. buf-validate
+## protocheck vs. bufbuild/protovalidate
 
-The `buf-validate` package is the successor to `protoc-gen-validate`. It's built on the same principles but offers a more powerful and flexible validation framework.
+The `protocheck` package is inspired by `bufbuild/protovalidate`, which also uses the powerful CEL expression language for defining validation rules. However, `protocheck` has some key differences in its design philosophy, prioritizing simplicity and minimal dependencies.
 
-Here are some of the key differences between the two packages:
+Here are some of the key differences:
 
-*   **Standardized Rules:** `buf-validate` provides a set of standardized validation rules for common use cases, such as string length, number range, and regex matching. This can save you from writing custom CEL expressions for common scenarios.
-*   **More Powerful CEL Integration:** `buf-validate` offers a more powerful and flexible integration with CEL. It allows you to define custom functions and macros, which can be used to create more complex validation rules.
-*   **Better Error Reporting:** `buf-validate` provides more detailed and structured error messages, which can be helpful for debugging.
-*   **Active Development:** `buf-validate` is actively developed and maintained by Buf, while `protoc-gen-validate` is no longer actively developed.
+*   **`this` Keyword:** In `protocheck`, the `this` keyword always refers to the message being validated, even in field-level validations. This provides a consistent and predictable way to write validation rules. In `bufbuild/protovalidate`, the context of `this` can change.
+*   **Minimal Dependencies:** `protocheck` has minimal dependencies, relying only on the `cel-go` and `protobuf` libraries. This makes it a lightweight choice that is easy to integrate into existing projects.
+*   **Compact Syntax:** The syntax for defining validation rules in `protocheck` is designed to be more compact and readable.
+*   **Standardized Rules:** `bufbuild/protovalidate` provides a rich set of standardized validation rules for common use cases, which can reduce the need for writing custom CEL expressions. `protocheck` focuses on providing a flexible foundation with CEL, giving developers more control.
 
 ## Conclusion
 
-The `protoc-gen-validate` package is a lightweight and powerful tool for adding validation logic to your Protobuf messages. Its simplicity of declaration and efficient code generation make it a great choice for projects that need a straightforward and easy-to-use validation solution.
+The `protocheck` package offers a compelling solution for developers who value simplicity, minimal dependencies, and a consistent approach to Protobuf validation. Its design choices make it easy to learn and use, and its focus on CEL provides a powerful and flexible way to define custom validation rules.
 
-However, if you need a more powerful and flexible validation framework, or if you want to take advantage of the latest features and improvements, you should consider using `buf-validate`.
+`bufbuild/protovalidate` is a more feature-rich and comprehensive validation framework, with a large set of standardized rules.
 
-Ultimately, the choice between `protoc-gen-validate` and `buf-validate` depends on the specific needs of your project. If you're looking for a simple and easy-to-use solution, `protoc-gen-validate` is a great choice. If you need a more powerful and flexible framework, `buf-validate` is the way to go.
+Ultimately, the choice between `protocheck` and `bufbuild/protovalidate` depends on your project's specific needs. If you prioritize a lightweight, straightforward solution with minimal overhead, `protocheck` is an excellent choice. If you require a wider range of pre-built validation rules and a more extensive feature set, `bufbuild/protovalidate` might be a better fit.
