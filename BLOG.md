@@ -43,11 +43,11 @@ This approach has several advantages:
 
 ## Code Generation
 
-The `protocheck` tool is a `protoc` plugin that generates Go code for the validation rules defined in the `.proto` file. The generated code is placed in a separate file (e.g., `person.check.go`), which keeps the validation logic separate from the core Protobuf-generated code.
+The `protocheck` tool is a `protoc` plugin that generates code for the validation rules defined in the `.proto` file. The generated code is placed in a separate file (e.g., `person.check.go`), which keeps the validation logic separate from the core Protobuf-generated code. A key design benefit is that the validation definitions in the `.proto` file are language-agnostic. This allows the `protoc-gen-protocheck` plugin to be extended to support multiple programming languages. Currently, it supports both Go and Java.
 
 The generated code is efficient and easy to use. For each message with validation rules, a `Validate()` method is generated. This method can be called to check if a message instance is valid.
 
-Here's an example of how to use the generated `Validate()` method:
+Here's an example of how to use the generated `Validate()` method in Go:
 
 ```go
 p := &Person{
@@ -65,18 +65,29 @@ The generated code is also highly optimized. It uses a shared CEL environment to
 
 ## protocheck vs. bufbuild/protovalidate
 
-The `protocheck` package is inspired by `bufbuild/protovalidate`, which also uses the powerful CEL expression language for defining validation rules. However, `protocheck` makes deliberate design choices that will appeal to experienced Go developers who prioritize simplicity, elegance, and minimal dependencies.
+The `protocheck` package is inspired by `bufbuild/protovalidate`, which also uses the powerful CEL expression language for defining validation rules. However, `protocheck` makes deliberate design choices that will appeal to experienced developers who prioritize simplicity, elegance, and minimal dependencies.
 
 While `bufbuild/protovalidate` is a powerful, feature-rich framework, `protocheck` offers a more focused and lightweight approach. Here’s why you might prefer `protocheck`:
 
 *   **Design Simplicity and Consistency:** In `protocheck`, the `this` keyword *always* refers to the message being validated, even in field-level validations. This elegant consistency simplifies the mental model and reduces the cognitive load when writing validation rules. In `bufbuild/protovalidate`, the context of `this` can change, which can lead to more complex and less predictable expressions.
-*   **Minimal Dependencies:** As an experienced Go developer, you appreciate keeping your dependency tree lean. `protocheck` has minimal dependencies, relying only on the `cel-go` and `protobuf` libraries. This makes it a lightweight choice that is easy to integrate into existing projects without introducing unnecessary bloat. `bufbuild/protovalidate` has a larger dependency footprint.
-*   **Developer Control over Readability:** `protocheck` trusts the developer to write clear and effective CEL expressions. While `bufbuild/protovalidate` offers many standardized rules, these can sometimes obscure the underlying logic and lead to a more verbose `.proto` file. The compact syntax of `protocheck` keeps your definitions clean and readable, putting the power of CEL directly in your hands. `protocheck` is designed for developers who prefer the expressiveness of a powerful language like CEL over a large set of pre-defined, and sometimes limiting, rules.
+*   **Minimal Dependencies:** `protocheck` keeps your dependency tree lean. It relies only on the core `cel` and `protobuf` libraries for each language. This makes it a lightweight choice that is easy to integrate into existing projects without introducing unnecessary bloat.
+*   **Developer Control over Readability:** `protocheck` trusts the developer to write clear and effective CEL expressions. The compact syntax keeps your definitions clean and readable, putting the power of CEL directly in your hands. `protocheck` is designed for developers who prefer the expressiveness of a powerful language like CEL over a large set of pre-defined, and sometimes limiting, rules.
 
 In short, `protocheck` is not just a validation tool; it's a statement of a design philosophy that favors simplicity, developer control, and a lean dependency graph.
 
+## Future Development: Adding Python Support
+
+The modular design of `protocheck`'s code generator makes it straightforward to add support for new languages. Here is a high-level plan for adding Python support:
+
+1.  **Create a Python Generator:** A new generator will be created in the `cmd/protoc-gen-protocheck/lang/` directory, alongside the existing `golang` and `java` implementations.
+2.  **Implement the Generator Interface:** This new generator will be responsible for translating the protobuf validation rules into Python-specific code.
+3.  **Develop a Python Template:** A template file will be created to define the structure of the generated Python validation methods. This template will use the `cel-python` library to execute the CEL expressions.
+4.  **Integrate into the Plugin:** Finally, the `lang=python` option will be added to the `protoc-gen-protocheck` plugin, allowing users to generate Python validation code.
+
+This clear path to extension demonstrates the robustness and forward-thinking design of the `protocheck` package.
+
 ## Conclusion
 
-For the discerning Go developer, `protocheck` offers a compelling solution for Protobuf validation. It's a tool that respects your desire for simplicity, minimal dependencies, and design consistency. While `bufbuild/protovalidate` is a comprehensive framework that may be suitable for teams that prefer a large set of pre-built rules, `protocheck` provides a more elegant, lightweight, and Go-idiomatic alternative.
+For the discerning developer, `protocheck` offers a compelling solution for Protobuf validation. It's a tool that respects your desire for simplicity, minimal dependencies, and design consistency. While `bufbuild/protovalidate` is a comprehensive framework, `protocheck` provides a more elegant, lightweight, and extensible alternative.
 
-If you value a focused tool that gives you the full power of CEL without the overhead of a heavy framework, `protocheck` is the clear choice. It helps you write clean, maintainable, and efficient validation logic, making it a valuable addition to any experienced Go developer's toolkit.
+If you value a focused tool that gives you the full power of CEL without the overhead of a heavy framework, `protocheck` is the clear choice. It helps you write clean, maintainable, and efficient validation logic, making it a valuable addition to any developer's toolkit.
