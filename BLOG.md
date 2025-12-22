@@ -65,19 +65,18 @@ The generated code is also highly optimized. It uses a shared CEL environment to
 
 ## protocheck vs. bufbuild/protovalidate
 
-The `protocheck` package is inspired by `bufbuild/protovalidate`, which also uses the powerful CEL expression language for defining validation rules. However, `protocheck` has some key differences in its design philosophy, prioritizing simplicity and minimal dependencies.
+The `protocheck` package is inspired by `bufbuild/protovalidate`, which also uses the powerful CEL expression language for defining validation rules. However, `protocheck` makes deliberate design choices that will appeal to experienced Go developers who prioritize simplicity, elegance, and minimal dependencies.
 
-Here are some of the key differences:
+While `bufbuild/protovalidate` is a powerful, feature-rich framework, `protocheck` offers a more focused and lightweight approach. Here’s why you might prefer `protocheck`:
 
-*   **`this` Keyword:** In `protocheck`, the `this` keyword always refers to the message being validated, even in field-level validations. This provides a consistent and predictable way to write validation rules. In `bufbuild/protovalidate`, the context of `this` can change.
-*   **Minimal Dependencies:** `protocheck` has minimal dependencies, relying only on the `cel-go` and `protobuf` libraries. This makes it a lightweight choice that is easy to integrate into existing projects.
-*   **Compact Syntax:** The syntax for defining validation rules in `protocheck` is designed to be more compact and readable.
-*   **Standardized Rules:** `bufbuild/protovalidate` provides a rich set of standardized validation rules for common use cases, which can reduce the need for writing custom CEL expressions. `protocheck` focuses on providing a flexible foundation with CEL, giving developers more control.
+*   **Design Simplicity and Consistency:** In `protocheck`, the `this` keyword *always* refers to the message being validated, even in field-level validations. This elegant consistency simplifies the mental model and reduces the cognitive load when writing validation rules. In `bufbuild/protovalidate`, the context of `this` can change, which can lead to more complex and less predictable expressions.
+*   **Minimal Dependencies:** As an experienced Go developer, you appreciate keeping your dependency tree lean. `protocheck` has minimal dependencies, relying only on the `cel-go` and `protobuf` libraries. This makes it a lightweight choice that is easy to integrate into existing projects without introducing unnecessary bloat. `bufbuild/protovalidate` has a larger dependency footprint.
+*   **Developer Control over Readability:** `protocheck` trusts the developer to write clear and effective CEL expressions. While `bufbuild/protovalidate` offers many standardized rules, these can sometimes obscure the underlying logic and lead to a more verbose `.proto` file. The compact syntax of `protocheck` keeps your definitions clean and readable, putting the power of CEL directly in your hands. `protocheck` is designed for developers who prefer the expressiveness of a powerful language like CEL over a large set of pre-defined, and sometimes limiting, rules.
+
+In short, `protocheck` is not just a validation tool; it's a statement of a design philosophy that favors simplicity, developer control, and a lean dependency graph.
 
 ## Conclusion
 
-The `protocheck` package offers a compelling solution for developers who value simplicity, minimal dependencies, and a consistent approach to Protobuf validation. Its design choices make it easy to learn and use, and its focus on CEL provides a powerful and flexible way to define custom validation rules.
+For the discerning Go developer, `protocheck` offers a compelling solution for Protobuf validation. It's a tool that respects your desire for simplicity, minimal dependencies, and design consistency. While `bufbuild/protovalidate` is a comprehensive framework that may be suitable for teams that prefer a large set of pre-built rules, `protocheck` provides a more elegant, lightweight, and Go-idiomatic alternative.
 
-`bufbuild/protovalidate` is a more feature-rich and comprehensive validation framework, with a large set of standardized rules.
-
-Ultimately, the choice between `protocheck` and `bufbuild/protovalidate` depends on your project's specific needs. If you prioritize a lightweight, straightforward solution with minimal overhead, `protocheck` is an excellent choice. If you require a wider range of pre-built validation rules and a more extensive feature set, `bufbuild/protovalidate` might be a better fit.
+If you value a focused tool that gives you the full power of CEL without the overhead of a heavy framework, `protocheck` is the clear choice. It helps you write clean, maintainable, and efficient validation logic, making it a valuable addition to any experienced Go developer's toolkit.
